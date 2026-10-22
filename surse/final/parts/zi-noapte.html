@@ -1,0 +1,279 @@
+<!--CSS--><style id="s-zn-css">
+/* ===== #zi-noapte — Ziua și seara: aceeași capsulă X7 seara (stânga) și ziua (dreapta), despărțite de o linie aurie.
+   --split (0…1) = cât din lățime e seară, de la stânga. Decupajul stă pe .s-zn-clip (netransformat), ca marginea să rămână sub linie. ===== */
+#zi-noapte{padding:clamp(70px,8vw,110px) 0 0;background:#fff}
+.s-zn .head-row{row-gap:14px}
+.s-zn-note{max-width:400px;font-size:15px;line-height:1.55;color:var(--mute)}
+.s-zn-note .s{display:none}
+.s-zn-stage{--split:1;--q:.5;--op:50% 55%;position:relative;margin-top:36px;width:100%;height:min(84vh,56.25vw);height:min(84svh,56.25vw);overflow:hidden;background:#070b16;isolation:isolate;touch-action:pan-y;-webkit-user-select:none;user-select:none;-webkit-tap-highlight-color:transparent}
+@media (hover:hover) and (pointer:fine){.s-zn-stage{cursor:ew-resize}}
+.s-zn-pan,.s-zn-clip{position:absolute;inset:0;pointer-events:none}
+.s-zn-clip{-webkit-clip-path:inset(0 calc(100% - var(--split)*100%) 0 0);clip-path:inset(0 calc(100% - var(--split)*100%) 0 0)}
+.s-zn-pan{transform:scale(1.08) translateX(calc((var(--q) - .5) * -4%));will-change:transform}
+.s-zn-pan img{width:100%;height:100%;max-width:none;object-fit:cover;object-position:var(--op);opacity:0;transition:opacity .9s var(--ease);-webkit-user-drag:none}
+.s-zn-pan img.on{opacity:1}
+.s-zn-gl{position:absolute;inset:0;width:100%;height:100%;display:block;opacity:0;pointer-events:none}
+.s-zn-stage.gl .s-zn-gl{opacity:1}
+.s-zn-stage.gl .s-zn-pan{opacity:0} /* ascunse vizual (nu visibility:hidden), ca textul alternativ să rămână pentru cititoarele de ecran */
+/* pastilele: „Seara” pe sticlă întunecată, „Ziua” pe alb; JS le stinge când partea lor e prea îngustă */
+.s-zn-pill{position:absolute;top:24px;z-index:4;display:inline-flex;align-items:center;gap:7px;font:600 13px/1 var(--body);padding:7px 12px;border-radius:999px;pointer-events:none;white-space:nowrap}
+.s-zn-pill svg{width:13px;height:13px;flex:none;color:var(--accent)}
+.s-zn-pill.n{left:24px;background:rgba(7,11,22,.55);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);box-shadow:inset 0 0 0 1px rgba(255,255,255,.12)}
+.s-zn-pill.d{right:24px;background:#fff;color:var(--ink);box-shadow:0 6px 18px rgba(15,20,30,.16)}
+.s-zn-line{position:absolute;top:0;bottom:0;left:calc(var(--split)*100%);z-index:3;width:2px;margin-left:-1px;background:#d4a24c;box-shadow:0 0 12px rgba(212,162,76,.6);pointer-events:none}
+/* butonul liniei: centrat pe linie; la capete rămâne întreg în bandă (nu e tăiat pe jumătate) */
+.s-zn-knob{position:absolute;top:50%;left:clamp(32px,calc(var(--split)*100%),calc(100% - 32px));z-index:5;width:56px;height:56px;padding:0;transform:translate(-50%,-50%);border-radius:50%;background:#fff;color:var(--ink);font:700 21px/1 var(--body);letter-spacing:.04em;box-shadow:0 10px 30px rgba(15,20,30,.3),inset 0 0 0 1px rgba(212,162,76,.45);border:0;display:grid;place-items:center;cursor:ew-resize;transition:transform .25s var(--ease)}
+.s-zn-knob::after{content:"";position:absolute;inset:0;border-radius:50%;border:2px solid #d4a24c;opacity:0;pointer-events:none}
+.s-zn-knob:focus-visible{outline:3px solid var(--accent);outline-offset:3px}
+@media (hover:hover) and (pointer:fine){.s-zn-knob:hover{transform:translate(-50%,-50%) scale(1.06)}}
+.s-zn-knob.pulse{animation:znPulse .6s var(--ease)}
+.s-zn-knob.pulse::after{animation:znRing .9s var(--ease)}
+@keyframes znPulse{50%{transform:translate(-50%,-50%) scale(1.12)}}
+@keyframes znRing{from{opacity:.9;transform:scale(1)}to{opacity:0;transform:scale(1.75)}}
+.s-zn-cap{z-index:4;font-size:12.5px;pointer-events:none} /* eticheta și pastilele stau peste linie; butonul peste tot */
+/* tabletă */
+@media (min-width:801px) and (max-width:1100px){.s-zn-stage{height:max(56.25vw,52vh);height:max(56.25vw,52svh);--op:62% 55%}}
+/* telefon */
+@media (max-width:800px){
+  .s-zn-note{max-width:none;font-size:14px}
+  .s-zn-stage{margin-top:28px;height:min(52vh,120vw);height:min(52svh,120vw);--op:64% 52%}
+  .s-zn-knob{width:48px;height:48px;font-size:19px}
+  .s-zn-pill{top:12px;font-size:12px;padding:6px 10px;gap:6px}
+  .s-zn-pill svg{width:12px;height:12px}
+  .s-zn-pill.n{left:12px}.s-zn-pill.d{right:12px}
+  .s-zn-cap{font-size:12px;max-width:calc(100% - 96px)} /* ține eticheta departe de butonul WhatsApp */
+}
+/* ecran scurt (panoul 506×506, telefon culcat) */
+@media (max-height:620px){
+  .s-zn-note .l{display:none}.s-zn-note .s{display:inline}
+  .s-zn-stage{margin-top:24px;height:clamp(240px,60vh,320px);height:clamp(240px,60svh,320px);--op:64% 52%}
+  .s-zn-knob{width:44px;height:44px;font-size:18px}
+}
+@media (prefers-reduced-motion:reduce){.s-zn-pan{transform:none;will-change:auto}}
+</style><!--/CSS-->
+
+<!--HTML--><!-- ZI ȘI SEARĂ: aceeași capsulă, seara și ziua, cu o linie aurie de tras -->
+<section id="zi-noapte" class="s-zn" aria-labelledby="znTitle">
+ <div class="wrap head-row"><div><div class="eyebrow reveal" data-n="03">Zi și seară</div><h2 class="title" id="znTitle">Ziua și <em>seara.</em></h2></div>
+  <p class="note s-zn-note"><span class="l">Trage linia ca să compari. Iluminatul interior și exterior se controlează din sistemul smart home, inclusiv vocal.</span><span class="s">Trage linia ca să compari ziua cu seara.</span></p></div>
+ <div class="s-zn-stage" id="znStage">
+  <div class="s-zn-pan"><img class="s-zn-day" data-src="img/x7s_day.webp" alt="Capsula X7 ziua" width="2149" height="1209" decoding="async" draggable="false"></div>
+  <div class="s-zn-clip"><div class="s-zn-pan"><img class="s-zn-night" data-src="img/x7s_night.webp" alt="Capsula X7 seara, cu luminile aprinse" width="2149" height="1209" decoding="async" draggable="false"></div></div>
+  <canvas class="s-zn-gl" aria-hidden="true"></canvas>
+  <span class="s-zn-pill n"><svg viewBox="0 0 16 16" aria-hidden="true"><path fill="currentColor" d="M10.6 1.3a6.9 6.9 0 1 0 4.1 10.4A5.6 5.6 0 0 1 10.6 1.3Z"/></svg>Seara</span><span class="s-zn-pill d"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="3.1" fill="currentColor"/><path fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" d="M8 1.2v1.6M8 13.2v1.6M1.2 8h1.6M13.2 8h1.6M3.2 3.2l1.1 1.1M11.7 11.7l1.1 1.1M3.2 12.8l1.1-1.1M11.7 4.3l1.1-1.1"/></svg>Ziua</span>
+  <div class="s-zn-line" aria-hidden="true"></div>
+  <button class="s-zn-knob" type="button" role="slider" aria-label="Mută linia dintre seară și zi" aria-valuemin="0" aria-valuemax="100" aria-valuenow="100" aria-valuetext="Seara 100%, ziua 0%">‹ ›</button>
+  <small class="caps-label s-zn-cap">Vizualizare realizată pornind de la fotografia capsulei X7.</small>
+ </div>
+</section><!--/HTML-->
+
+<!--JS--><script>
+/* ===== #zi-noapte: linia aurie dintre seară (stânga) și zi (dreapta).
+   - Imaginile se încarcă după `load`, doar când banda e la 600px de ecran (ziua nu se descarcă la prima afișare).
+   - „Răsăritul” (singurul moment automat): o dată, la prima vizibilitate ≥40%, --split 1 → 0,5 în 2,4 s, apoi butonul pulsează.
+   - Calculator (pointer fin, >800px, fără mișcare redusă): WebGL cu harta de adâncime, ca hero-ul (aceeași deplasare pentru ambele
+     imagini, deci jumătățile se potrivesc exact sub linie). Contextul e creat leneș, desenează doar cât banda e vizibilă și
+     se eliberează (WEBGL_lose_context) când banda e la peste 2 ecrane; la pierderea contextului rămân imaginile cu clip-path.
+   - Telefon / fără WebGL: același pan CSS ușor pe ambele imagini (--q). Mișcare redusă: fără răsărit, pan, WebGL sau puls. ===== */
+(function(){'use strict';
+const C=window.CAPS,stage=document.getElementById('znStage');
+if(!C||!stage)return;
+const knob=stage.querySelector('.s-zn-knob'),imN=stage.querySelector('.s-zn-night'),imD=stage.querySelector('.s-zn-day'),
+  pN=stage.querySelector('.s-zn-pill.n'),pD=stage.querySelector('.s-zn-pill.d');
+const rm=()=>C.rm.matches;
+
+/* ---------- linia ---------- */
+let split=-1,ariaV=-1,W=0,wN=0,wD=0,pad=24,dirty=true;
+function pills(){
+  if(!W)return;
+  const a=split*W,b=(1-split)*W;
+  pN.style.opacity=C.clamp((a-(pad+wN+14))/48).toFixed(3);
+  pD.style.opacity=C.clamp((b-(pad+wD+14))/48).toFixed(3);
+}
+function setSplit(x){
+  x=C.clamp(x);if(x===split)return;split=x;
+  stage.style.setProperty('--split',x.toFixed(4));
+  const v=Math.round(x*100);
+  if(v!==ariaV){ariaV=v;knob.setAttribute('aria-valuenow',v);knob.setAttribute('aria-valuetext','Seara '+v+'%, ziua '+(100-v)+'%')}
+  pills();dirty=true;
+}
+function measure(){
+  W=stage.clientWidth;wN=pN.offsetWidth;wD=pD.offsetWidth;pad=pN.offsetLeft||24;
+  pos=(getComputedStyle(imN).objectPosition||'50% 55%').split(' ').map(s=>parseFloat(s)/100);
+  pills();dirty=true;kick();
+}
+
+/* ---------- animații (răsăritul și alunecarea scurtă după click / tastă) ---------- */
+let anim=null,played=false,sunWanted=false,ready=false;
+function tween(to,ms,kind,done){
+  if(rm()||ms<=0){anim=null;setSplit(to);if(done)done();return}
+  const from=split,t0=performance.now();
+  anim={to,kind,step(now){const t=C.clamp((now-t0)/ms);setSplit(from+(to-from)*C.ease(t));if(t>=1){anim=null;if(done)done()}}};
+  kick();
+}
+function stop(){anim=null}
+function pulse(){if(rm())return;knob.classList.remove('pulse');void knob.offsetWidth;knob.classList.add('pulse');setTimeout(()=>knob.classList.remove('pulse'),950)}
+function trySun(){
+  if(played||!sunWanted||!ready)return;played=true;
+  if(rm()){setSplit(.5);return}
+  tween(.5,2400,'sun',pulse);
+}
+const xOf=cx=>{const r=stage.getBoundingClientRect();return r.width?C.clamp((cx-r.left)/r.width):split};
+
+/* ---------- tragere, click, atingere ---------- */
+let drag=null,tmx=0,tmy=0,mx=0,my=0;
+stage.addEventListener('pointerdown',e=>{
+  if(e.pointerType==='mouse'&&e.button!==0)return;
+  stop();played=true; // orice atingere anulează / împiedică răsăritul
+  const touch=e.pointerType==='touch';
+  drag={id:e.pointerId,x:e.clientX,on:!touch};
+  try{stage.setPointerCapture(e.pointerId)}catch(_){}
+  if(!touch)tween(xOf(e.clientX),220,'glide'); // mouse: linia vine lin la click, apoi urmează cursorul
+});
+stage.addEventListener('pointermove',e=>{
+  if(e.pointerType==='mouse'&&C.fine.matches){const r=stage.getBoundingClientRect();
+    tmx=C.clamp((e.clientX-r.left)/r.width*2-1,-1,1);tmy=C.clamp((e.clientY-r.top)/r.height*2-1,-1,1);kick()}
+  if(!drag||e.pointerId!==drag.id)return;
+  if(!drag.on){if(Math.abs(e.clientX-drag.x)<6)return;drag.on=true} // pe telefon: abia după o mișcare orizontală
+  stop();setSplit(xOf(e.clientX));kick();
+});
+function end(e){
+  if(!drag||e.pointerId!==drag.id)return;
+  if(e.type==='pointerup'&&!drag.on)tween(xOf(e.clientX),260,'glide'); // atingere simplă: linia merge acolo
+  drag=null;
+}
+stage.addEventListener('pointerup',end);stage.addEventListener('pointercancel',end);
+stage.addEventListener('pointerleave',e=>{if(e.pointerType==='mouse'){tmx=tmy=0;kick()}});
+
+/* ---------- tastatura pe buton ---------- */
+knob.addEventListener('keydown',e=>{
+  const base=Math.round((anim&&anim.kind==='glide'?anim.to:split)*100);let v=null;
+  switch(e.key){
+    case 'ArrowLeft':case 'ArrowDown':v=base-5;break;
+    case 'ArrowRight':case 'ArrowUp':v=base+5;break;
+    case 'PageDown':v=base-10;break;case 'PageUp':v=base+10;break;
+    case 'Home':v=0;break;case 'End':v=100;break;
+  }
+  if(v===null)return;e.preventDefault();stop();played=true;tween(C.clamp(v/100),200,'glide');
+});
+
+/* ---------- WebGL (doar calculator) ---------- */
+let gl=null,cv=stage.querySelector('.s-zn-gl'),U=null,dep=null,making=false,fails=0,lastKey='',pos=[.5,.55],near=false,within=true;
+const VS='attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;v.y=1.-v.y;gl_Position=vec4(p,0.,1.);}';
+const FS=`precision highp float;varying vec2 v;uniform sampler2D t0,t1,td;uniform vec2 res,isz,pos,camo;uniform float zm,dol,split;
+void main(){
+  float s=max(res.x/isz.x,res.y/isz.y);vec2 ds=isz*s;vec2 off=(res-ds)*pos;
+  vec2 c=vec2(.62,.6);float f=.42;
+  vec2 dst=c+((v*res-off)/ds-c)/zm;
+  vec2 u=dst;
+  for(int i=0;i<7;i++){float d=texture2D(td,u).g;u=c+(dst-c-camo*(d-f))/(1.+dol*(d-f));}
+  vec2 uu=clamp(u,vec2(.001),vec2(.999));
+  vec3 a=texture2D(t0,uu).rgb,b=texture2D(t1,uu).rgb;
+  gl_FragColor=vec4(v.x<split?a:b,1.);
+}`;
+const canGL=()=>!rm()&&C.fine.matches&&innerWidth>800&&fails<2;
+const loaded=im=>im.complete&&im.naturalWidth?Promise.resolve(im):new Promise((res,rej)=>{im.addEventListener('load',()=>res(im),{once:true});im.addEventListener('error',rej,{once:true})});
+function makeGL(){
+  if(gl||making||!ready||!near||!canGL())return;
+  making=true;
+  if(!dep){dep=new Image();dep.decoding='async';dep.src='img/x7s_depth.png'}
+  loaded(dep).then(()=>{
+    making=false;
+    if(gl||!near||!canGL())return;
+    if(!cv||!cv.isConnected){cv=document.createElement('canvas');cv.className='s-zn-gl';cv.setAttribute('aria-hidden','true');stage.insertBefore(cv,pN)}
+    let g=null;try{g=cv.getContext('webgl',{antialias:false,alpha:false,depth:false,stencil:false,premultipliedAlpha:false})}catch(_){}
+    if(!g){fails=9;return}
+    const sh=(t,src)=>{const o=g.createShader(t);g.shaderSource(o,src);g.compileShader(o);return g.getShaderParameter(o,g.COMPILE_STATUS)?o:null};
+    const vs=sh(g.VERTEX_SHADER,VS),fs=sh(g.FRAGMENT_SHADER,FS);
+    const pr=g.createProgram();if(vs&&fs){g.attachShader(pr,vs);g.attachShader(pr,fs);g.linkProgram(pr)}
+    if(!vs||!fs||!g.getProgramParameter(pr,g.LINK_STATUS)){fails=9;lose(g);return}
+    g.useProgram(pr);
+    const buf=g.createBuffer();g.bindBuffer(g.ARRAY_BUFFER,buf);g.bufferData(g.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),g.STATIC_DRAW);
+    const ap=g.getAttribLocation(pr,'p');g.enableVertexAttribArray(ap);g.vertexAttribPointer(ap,2,g.FLOAT,false,0,0);
+    try{[imN,imD,dep].forEach((im,i)=>{const t=g.createTexture();g.activeTexture(g.TEXTURE0+i);g.bindTexture(g.TEXTURE_2D,t);
+      [g.TEXTURE_WRAP_S,g.TEXTURE_WRAP_T].forEach(k=>g.texParameteri(g.TEXTURE_2D,k,g.CLAMP_TO_EDGE));
+      [g.TEXTURE_MIN_FILTER,g.TEXTURE_MAG_FILTER].forEach(k=>g.texParameteri(g.TEXTURE_2D,k,g.LINEAR));
+      g.texImage2D(g.TEXTURE_2D,0,g.RGB,g.RGB,g.UNSIGNED_BYTE,im)})}catch(_){fails=9;lose(g);return}
+    U={};['t0','t1','td','res','isz','pos','camo','zm','dol','split'].forEach(n=>U[n]=g.getUniformLocation(pr,n));
+    g.uniform1i(U.t0,0);g.uniform1i(U.t1,1);g.uniform1i(U.td,2);
+    g.uniform2f(U.isz,imN.naturalWidth,imN.naturalHeight);g.uniform1f(U.zm,1.04);g.uniform1f(U.dol,.03);
+    cv.addEventListener('webglcontextlost',onLost);
+    gl=g;lastKey='';kick();
+  }).catch(()=>{making=false;fails=9});
+}
+function lose(g){try{const x=g.getExtension('WEBGL_lose_context');if(x)x.loseContext()}catch(_){}}
+function back(){ // înapoi la imaginile cu clip-path, cu pan-ul la zi
+  stage.classList.remove('gl');lastQ=-1;syncPan();
+}
+function dropGL(){ // eliberare voluntară (banda e departe sau nu mai e calculator)
+  if(!gl)return;const g=gl,c=cv;gl=null;back();
+  if(c){c.removeEventListener('webglcontextlost',onLost);c.remove()}cv=null;lose(g);
+}
+function onLost(){ // pierdere neașteptată (driver, prea multe contexte): rămân imaginile
+  if(!gl)return;fails++;gl=null;back();if(cv){cv.removeEventListener('webglcontextlost',onLost);cv.remove()}cv=null;
+}
+function draw(){
+  const dpr=Math.min(devicePixelRatio||1,1.75),w=Math.round(stage.clientWidth*dpr),h=Math.round(stage.clientHeight*dpr);
+  if(!w||!h)return;
+  if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}
+  const A=.04,ox=A*(.9*(2*q-1)+.3*mx),oy=A*.25*my;
+  const key=w+'|'+h+'|'+split.toFixed(4)+'|'+ox.toFixed(5)+'|'+oy.toFixed(5)+'|'+pos[0]+'|'+pos[1];
+  if(key===lastKey)return;lastKey=key;
+  gl.viewport(0,0,w,h);
+  gl.uniform2f(U.res,w,h);gl.uniform2f(U.pos,isNaN(pos[0])?.5:pos[0],isNaN(pos[1])?.55:pos[1]);
+  gl.uniform2f(U.camo,ox,oy);gl.uniform1f(U.split,split);
+  gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
+  if(!stage.classList.contains('gl'))stage.classList.add('gl');
+}
+
+/* ---------- bucla (rulează doar cât banda e vizibilă sau o animație e în curs) ---------- */
+let raf=0,visible=false,q=.5,lastQ=-1;
+function kick(){if(!raf)raf=requestAnimationFrame(frame)}
+function syncPan(){
+  if(rm()||gl)return;
+  if(Math.abs(q-lastQ)>1e-4){lastQ=q;stage.style.setProperty('--q',q.toFixed(4))}
+}
+function frame(now){
+  raf=0;
+  if(anim)anim.step(now);
+  if(visible&&!document.hidden){
+    const r=stage.getBoundingClientRect(),H=innerHeight;
+    q=C.clamp((H-r.top)/(H+r.height));
+    if(gl){
+      mx+=(tmx-mx)*.05;my+=(tmy-my)*.05;
+      if(Math.abs(tmx-mx)<1e-3)mx=tmx;if(Math.abs(tmy-my)<1e-3)my=tmy;
+      draw();
+    }else syncPan();
+  }
+  if(anim||visible)kick();
+}
+
+/* ---------- pornire ---------- */
+setSplit(rm()?.5:1);
+measure();
+if(window.ResizeObserver)new ResizeObserver(()=>measure()).observe(stage);
+addEventListener('resize',()=>{measure();if(gl&&!canGL())dropGL();else makeGL()});
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(measure);
+const onRm=()=>{if(rm()){stop();dropGL();if(!played){played=true}setSplit(.5)}};
+if(C.rm.addEventListener)C.rm.addEventListener('change',onRm);
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)kick()});
+
+C.afterLoad(()=>{
+  // vizibilitate: bucla + răsăritul
+  new IntersectionObserver(es=>{const e=es[es.length-1];visible=e.isIntersecting;
+    if(e.isIntersecting&&e.intersectionRatio>=.39){sunWanted=true;trySun()}
+    if(visible)kick()},{threshold:[0,.4]}).observe(stage);
+  // la 600px de ecran: (re)creează WebGL; la peste 2 ecrane: îl eliberează
+  new IntersectionObserver(es=>{near=es[es.length-1].isIntersecting;if(near)makeGL()},{rootMargin:'600px 0px'}).observe(stage);
+  new IntersectionObserver(es=>{within=es[es.length-1].isIntersecting;if(!within)dropGL()},{rootMargin:'200% 0px'}).observe(stage);
+  // imaginile, doar aproape de ecran
+  C.near(stage,'600px 0px',()=>{
+    const go=im=>{im.src=im.dataset.src;return loaded(im).then(()=>im.decode?im.decode().catch(()=>{}):0).then(()=>{im.classList.add('on');return true},()=>false)};
+    Promise.all([go(imN),go(imD)]).then(ok=>{
+      ready=true;measure();trySun();
+      if(ok[0]&&ok[1])makeGL();else fails=9;
+    });
+  });
+});
+})();
+</script><!--/JS-->
