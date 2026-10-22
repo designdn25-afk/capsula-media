@@ -70,7 +70,7 @@ nav .wrap{display:flex;align-items:center;justify-content:space-between;height:7
 
 
 /* SECTIONS */
-section{padding:clamp(80px,11vw,140px) 0}
+section{padding:clamp(72px,9vw,120px) 0}
 .alt{background:var(--bg2)}
 .eyebrow{display:flex;align-items:center;gap:14px;font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--accent);margin-bottom:22px}
 .eyebrow::before{content:attr(data-n);font-family:var(--display);color:var(--ink);opacity:.5}
@@ -102,7 +102,9 @@ section{padding:clamp(80px,11vw,140px) 0}
 .price{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
 .price b{font-family:var(--display);font-weight:700;font-size:44px;letter-spacing:-.03em}
 .price s{color:var(--mute);font-size:18px}
-.off{font-size:12px;background:var(--accent2);color:#111;font-weight:700;padding:4px 10px;border-radius:999px}
+.model-more{flex-basis:100%;margin-top:4px;font-size:14px;font-weight:600;color:var(--ink);text-decoration:underline;text-underline-offset:4px;text-decoration-thickness:1px}
+.model-more:hover{color:var(--accent-ink)}
+.off{font-size:12px;background:transparent;color:var(--accent-ink);border:1px solid var(--accent);font-weight:600;padding:4px 10px;border-radius:999px}
 .fine{font-size:13px;color:var(--mute);margin-bottom:24px}
 
 /* EQUIPMENT */
@@ -256,6 +258,8 @@ footer h5{font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(
 footer li{list-style:none;margin-bottom:10px;font-size:15px}
 footer li a:hover{color:var(--accent)}
 .fbottom{display:flex;justify-content:space-between;gap:20px;flex-wrap:wrap;margin-top:50px;padding-top:24px;border-top:1px solid var(--line);font-size:13px;color:var(--mute)}
+@media (min-width:801px){.fbottom{padding-right:220px}}
+@media (max-width:800px){.fbottom{padding-right:72px}}
 .big{font-family:var(--display);font-weight:900;font-size:clamp(56px,14.5vw,210px);letter-spacing:-.05em;line-height:.8;margin-top:60px;color:transparent;-webkit-text-stroke:1px rgba(255,255,255,.13);white-space:nowrap;overflow:hidden}
 .wa{position:fixed;right:18px;bottom:18px;z-index:60;display:flex;align-items:center;gap:10px;padding:0 20px 0 14px;height:56px;border-radius:999px;background:#25d366;color:#fff;font-weight:700;font-size:14px;box-shadow:0 10px 30px rgba(0,0,0,.4);transition:transform .2s}
 .wa:hover{transform:scale(1.05)}
@@ -402,12 +406,12 @@ footer li a:hover{color:var(--accent)}
 .cc-b{padding:18px 18px 20px;display:flex;flex-direction:column;gap:10px;flex:1}
 .cc-h{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
 .cc-h h4{font-family:var(--display);font-weight:700;font-size:28px;letter-spacing:-.03em}
-.cc-h b{font-family:var(--display);font-weight:500;font-size:18px;color:var(--accent)}
+.cc-h b{font-family:var(--display);font-weight:500;font-size:18px;color:var(--accent-ink)}
 .cc-d{font-size:13px;color:var(--mute)}
-.cc-l{font-size:13.5px;color:#d7d8dc}
+.cc-l{font-size:13.5px;color:var(--mute)}
 .cc-f{margin-top:auto;display:flex;justify-content:space-between;align-items:center;gap:10px;padding-top:12px;border-top:1px solid var(--line)}
 .cc-p{font-weight:700;font-size:15px}
-.cc-p.req{color:var(--accent);font-weight:600;font-size:14px}
+.cc-p.req{color:var(--accent-ink);font-weight:600;font-size:14px}
 .cc-f span.more{font-size:13px;color:var(--mute)}
 .cmodal{position:fixed;inset:0;z-index:120;background:rgba(5,6,8,.82);backdrop-filter:blur(6px);display:none;align-items:center;justify-content:center;padding:20px}
 .cmodal.on{display:flex}
@@ -526,7 +530,9 @@ footer li a:hover{color:var(--accent)}
 .hub{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:8px}
 .hub a{display:grid;grid-template-columns:auto 1fr;grid-template-rows:auto auto;column-gap:16px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:20px;padding:22px 24px;transition:transform .25s,border-color .25s}
 .hub a:hover{transform:translateY(-4px);border-color:rgba(232,194,122,.5)}
-.hub i{grid-row:1/3;font-style:normal;font-size:28px}
+.hub i{grid-row:1/3;font-style:normal;display:grid;place-items:center;width:46px;height:46px;border-radius:50%;background:var(--bg2);color:var(--accent-ink)}
+.hub i svg,.addr-i svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.addr-i{display:grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--bg2);color:var(--accent-ink);flex:none}
 .hub b{font-family:var(--display);font-weight:500;font-size:17px}
 .hub span{color:var(--mute);font-size:14px}
 .journey{height:260vh!important}
@@ -720,6 +726,10 @@ nav.solid{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-ba
 nav.solid .links{color:var(--mute)}nav.solid .links a:hover{color:var(--ink)}
 nav.solid .lang{color:var(--mute)}nav.solid .lang b{color:var(--ink)}
 nav.solid .burger{color:var(--ink)}
+nav.solid.dark{background:rgba(7,11,22,.72);border-bottom-color:rgba(255,255,255,.08);color:#fff}
+nav.solid.dark .links{color:rgba(255,255,255,.75)}nav.solid.dark .links a:hover{color:#fff}
+nav.solid.dark .lang{color:rgba(255,255,255,.6)}nav.solid.dark .lang b,nav.solid.dark .burger{color:#fff}
+nav.solid.dark .btn-light{background:#fff;color:var(--ink)}
 .btn-light{background:#fff;color:#0e1116;box-shadow:0 1px 2px rgba(0,0,0,.08)}
 nav.solid .btn-light{background:var(--ink);color:#fff}
 .btn-ghost{border:1px solid rgba(15,20,30,.22);color:var(--ink)}
@@ -736,7 +746,7 @@ nav.solid .btn-light{background:var(--ink);color:#fff}
 .ft+.ft{border-left:1px solid var(--line)}
 .ft:first-child{padding-left:0}
 .ft i{font-style:normal;font-size:12px;letter-spacing:.2em;text-transform:uppercase;color:var(--accent-ink);font-weight:600}
-.ft h3{font-family:var(--display);font-weight:500;font-size:clamp(20px,1.8vw,26px);letter-spacing:-.02em;margin:14px 0 10px}
+.ft h3{font-family:var(--display);font-weight:500;font-size:clamp(18px,1.5vw,22px);letter-spacing:-.02em;margin:14px 0 10px}
 .ft p{color:var(--mute);font-size:15px}
 @media (max-width:900px){.feat-grid{grid-template-columns:1fr 1fr;gap:28px 0}.ft:nth-child(3){padding-left:0;border-left:0}}
 @media (max-width:560px){.feat-grid{grid-template-columns:1fr}.ft{padding:0 0 22px!important;border-left:0!important;border-bottom:1px solid var(--line)}.ft:last-child{border-bottom:0}}
@@ -751,7 +761,7 @@ nav.solid .btn-light{background:var(--ink);color:#fff}
 
 
 .step b{-webkit-text-stroke:1px rgba(15,20,30,.28)}
-.big{-webkit-text-stroke:1px rgba(15,20,30,.08)}
+.big{-webkit-text-stroke:0;color:rgba(15,20,30,.05);font-size:min(calc((100vw - 40px)/7.8),158px)}
 
 .cc-img .tagS{color:#fff}
 .transport{color:#fff}
@@ -837,7 +847,6 @@ footer{background:var(--bg2)}
 .hub a.t3,.hstrip div.t3{overflow:hidden}
 .model-img.t3{background-position:var(--bx,50%) var(--by,50%)!important;transition:rotate .5s cubic-bezier(.2,.8,.2,1),box-shadow .4s,background-position .5s}
 .model-img.t3{box-shadow:0 40px 80px -30px rgba(15,20,30,.45)}
-.model-info h3{text-shadow:1px 1px 0 #e7e9ee,2px 2px 0 #dfe2e8,3px 3px 0 #d6d9e0,4px 4px 0 #cdd1d9,6px 8px 18px rgba(15,20,30,.18)}
 @media (prefers-reduced-motion:reduce){.r3{opacity:1!important;transform:none!important}.t3{rotate:none!important;translate:none!important}}
 
 
@@ -955,7 +964,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
     <div class="feat-grid">
       <div class="ft"><i>01 · Spațiu</i><h3>36,5 m² utili</h3><p>Living luminos, dormitor separat și baie completă, pe 39 m² construiți.</p></div>
       <div class="ft"><i>02 · Structură</i><h3>Oțel și aluminiu</h3><p>Oțel galvanizat, aluminiu fluorocarbon și izolație din spumă poliuretanică: acoperiș 15 cm, pereți 10 cm, pardoseală 15 cm.</p></div>
-      <div class="ft"><i>03 · Vitraj</i><h3>Geam triplu LOW-E</h3><p>Ferestre panoramice cu forme rotunjite. Natura intră în casă din toate unghiurile.</p></div>
+      <div class="ft"><i>03 · Vitraj</i><h3>Geam triplu <span style="white-space:nowrap">LOW-E</span></h3><p>Ferestre panoramice cu forme rotunjite. Natura intră în casă din toate unghiurile.</p></div>
       <div class="ft"><i>04 · Smart home</i><h3>Control vocal</h3><p>Iluminat interior și exterior, încuietoare smart, 2 × Midea Inverter 12.000 BTU.</p></div>
     </div>
   </div>
@@ -987,7 +996,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
         <div class="btns">
           <a href="complet.html#configurator" class="btn btn-accent">Preț și opțiuni</a>
           <a href="complet.html#finantare" class="btn btn-ghost">Află despre finanțare ↗</a>
-          <a href="#contact" class="btn btn-ghost">Spune-ne ce îți dorești ↗</a>
+          <a href="#contact" class="model-more">Spune-ne ce îți dorești ↗</a>
         </div>
       </div>
     </div>
@@ -1100,7 +1109,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 
 
 <!-- INCREDERE SCURT -->
-<section class="alt" id="galerie">
+<section id="galerie">
   <div class="wrap">
     <div class="head-row">
       <div>
@@ -1123,16 +1132,16 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 
 
 <!-- HUB -->
-<section id="mai-mult" style="padding:clamp(70px,9vw,110px) 0">
+<section id="mai-mult" class="alt">
   <div class="wrap">
     <div class="eyebrow reveal" data-n="08">Tot ce mai vrei să știi</div>
     <div class="hub">
-      <a href="complet.html#configurator" class="reveal"><i>💶</i><b>Preț și configurator</b><span>Alege dotările, vezi totalul</span></a>
-      <a href="complet.html#finantare" class="reveal"><i>🏦</i><b>Rate TBI Bank</b><span>Calculează rata lunară</span></a>
-      <a href="complet.html#investitori" class="reveal"><i>📈</i><b>Pentru investitori</b><span>Randament și mini-resort</span></a>
-      <a href="complet.html#specificatii" class="reveal"><i>🔧</i><b>Specificații tehnice</b><span>Structură, izolație, instalații</span></a>
-      <a href="complet.html#legal" class="reveal"><i>📄</i><b>Este legal?</b><span>Autorizații, pe înțelesul tău</span></a>
-      <a href="complet.html#faq" class="reveal"><i>❓</i><b>Întrebări frecvente</b><span>Livrare, iarnă, închiriere</span></a>
+      <a href="complet.html#configurator" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></i><b>Preț și configurator</b><span>Alege dotările, vezi totalul</span></a>
+      <a href="complet.html#finantare" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 4l9 5.5M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7M3 20h18"/></svg></i><b>Rate TBI Bank</b><span>Calculează rata lunară</span></a>
+      <a href="complet.html#investitori" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"/><path d="M15 7h6v6"/></svg></i><b>Pentru investitori</b><span>Randament și mini-resort</span></a>
+      <a href="complet.html#specificatii" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="2.5" y="7.5" width="19" height="9" rx="1.5"/><path d="M6.5 7.5v3.5M10.5 7.5v2.5M14.5 7.5v3.5M18.5 7.5v2.5"/></svg></i><b>Specificații tehnice</b><span>Structură, izolație, instalații</span></a>
+      <a href="complet.html#legal" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V8z"/><path d="M14 3v5h5M9 14.5l2 2 4-4.5"/></svg></i><b>Este legal?</b><span>Autorizații, pe înțelesul tău</span></a>
+      <a href="complet.html#faq" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.4 2.4c-.6.3-1 .8-1 1.5v.6M12 16.8v.2"/></svg></i><b>Întrebări frecvente</b><span>Livrare, iarnă, închiriere</span></a>
     </div>
   </div>
 </section>
@@ -1143,8 +1152,8 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
     <div>
       <div class="eyebrow reveal" data-n="09">Ciorogârla</div>
       <h2 class="title reveal">Vino să o vezi<br>înainte să <em>alegi.</em></h2>
-      <p class="lead reveal" style="color:#c9cad0">Vezi capsule finalizate și capsule în asamblare.</p>
-      <div class="addr reveal">📍<div><b>Calea București nr. 41</b><small>077055 Ciorogârla, Ilfov</small></div></div>
+      <p class="lead reveal">Vezi capsule finalizate și capsule în asamblare.</p>
+      <div class="addr reveal"><i class="addr-i" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i><div><b>Calea București nr. 41</b><small>077055 Ciorogârla, Ilfov</small></div></div>
       <div class="btns reveal">
         <a href="#tur" class="btn btn-light" style="box-shadow:0 0 0 1px rgba(15,20,30,.12)">Intră în turul 360°</a>
         <a href="https://maps.google.com/?q=Calea+Bucuresti+41+Ciorogarla+Ilfov" target="_blank" rel="noopener" class="btn btn-ghost">Vezi traseul pe hartă ↗</a>
@@ -1178,10 +1187,10 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
       </div>
       <div><h5>Descoperă</h5><ul><li><a href="#interior">Interiorul capsulei</a></li><li><a href="#exterior">Ocolește capsula</a></li><li><a href="#la-comanda">Capsule la comandă</a></li><li><a href="#model">Modelul X7</a></li><li><a href="#galerie">Galerie foto</a></li><li><a href="#tur">Tur virtual 360°</a></li><li><a href="complet.html#configurator">Preț și configurator</a></li></ul></div>
       <div><h5>Informații utile</h5><ul><li><a href="complet.html#despre">Despre noi</a></li><li><a href="complet.html#livrare">Livrare și instalare</a></li><li><a href="complet.html#investitori">Pentru investitori</a></li><li><a href="complet.html#specificatii">Specificații tehnice</a></li><li><a href="complet.html#legal">Este legal?</a></li><li><a href="complet.html#faq">Întrebări frecvente</a></li><li><a href="https://casecapsula.ro/docs/oferta-capsula-x7-v2.pdf">Descarcă oferta · PDF</a></li><li><a href="https://casecapsula.ro/docs/prezentare-tehnica-x7.pdf">Prezentare tehnică X7 · PDF</a></li><li><a href="#confidentialitate">Confidențialitatea solicitării</a></li></ul></div>
-      <div><h5>Contact</h5><ul><li><a href="https://wa.me/40731166070">WhatsApp +40 731 166 070</a></li><li>Calea București nr. 41, Ciorogârla, Ilfov</li><li>Extindere regională: Trakia St. 12, Varna (BG)</li><li style="display:flex;gap:16px;margin-top:16px"><a href="https://www.tiktok.com/@multimester" target="_blank" rel="noopener">TikTok</a></li></ul></div>
+      <div><h5>Contact</h5><ul><li><a href="https://wa.me/40731166070">WhatsApp +40 731 166 070</a></li><li>Calea București nr. 41, Ciorogârla, Ilfov</li><li>Extindere regională: Trakia St.&nbsp;12, Varna&nbsp;(BG)</li><li style="display:flex;gap:16px;margin-top:16px"><a href="https://www.tiktok.com/@multimester" target="_blank" rel="noopener">TikTok</a></li></ul></div>
     </div>
     <div class="big">CAPSULA X7</div>
-    <div class="fbottom"><span>© 2026 Capsula România · <b class="tbdtxt">Denumire firmă SRL · CUI ____ · Nr. Reg. Com. ____ (de completat)</b> · X7: 39.500 € cu TVA inclus. Transportul, macaraua și montajul se calculează separat.</span><a href="#top">Înapoi sus ↑</a></div>
+    <div class="fbottom"><span>© 2026 Capsula România<!-- DE COMPLETAT cu datele de la client: Denumire firmă SRL · CUI ____ · Nr. Reg. Com. ____ --> · X7: 39.500 € cu TVA inclus. Transportul, macaraua și montajul se calculează separat.</span><a href="#top">Înapoi sus ↑</a></div>
   </div>
 </footer>
 
@@ -1195,7 +1204,12 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 <script>window.GAL=[["img/n_hero.jpg", "Capsula X7, latura cu intrarea și scărița"], ["img/n_v1.jpg", "Colțul vitrat, cu reflexii"], ["img/n_v2.jpg", "Capătul vitrat cu ușă"], ["img/n_v3.jpg", "Vitraj din podea până în tavan"], ["img/n_v4.jpg", "Capătul vitrat, vedere laterală"], ["img/n_v5.jpg", "Panouri exterioare și ventilație"], ["img/n_g1.jpg", "Capsula X7 în showroom-ul din Ciorogârla"], ["img/n_g2.jpg", "Curtea showroom-ului"], ["img/n_g3.jpg", "Capsula X7 în curtea showroom-ului"], ["img/x7_photo.jpg", "Capsula X7, capătul vitrat și intrarea"]];</script>
 <script>
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
-const nav=$('#nav');addEventListener('scroll',()=>nav.classList.toggle('solid',scrollY>40),{passive:true});
+const nav=$('#nav'),heroEl=document.getElementById('top'),intEl=document.getElementById('interior');
+// bara rămâne închisă la culoare peste capsula de noapte și peste intrarea întunecată din interior
+const navU=()=>{const y=scrollY;nav.classList.toggle('solid',y>40);let dark=!!heroEl&&y<heroEl.offsetHeight-72;
+ if(!dark&&intEl&&intEl.classList.contains('is-dark')){const r=intEl.getBoundingClientRect();dark=r.top<=72&&r.bottom>72}
+ nav.classList.toggle('dark',dark)};
+addEventListener('scroll',navU,{passive:true});addEventListener('resize',navU);navU();window.navU=navU;
 $('#burger').onclick=()=>$('#links').classList.toggle('open');
 $$('#links a').forEach(a=>a.onclick=()=>$('#links').classList.remove('open'));
 
@@ -1203,7 +1217,7 @@ $$('#links a').forEach(a=>a.onclick=()=>$('#links').classList.remove('open'));
 const R='https://casecapsula.ro/images/real/';
 const G=window.GAL;
 // ordinea de afișare: x7_photo (verticală) pe locul 2; data-i = indicele real din GAL
-const ORD=[0,9,1,2,3,4,5,6,7,8].filter(i=>i<G.length);
+const ORD=[8,9,2,3,4,1,5,0,6,7].filter(i=>i<G.length);
 $('#gal').innerHTML=ORD.map((i,k)=>{const g=G[i];return `<button class="reveal${/x7_photo/.test(g[0])?' tall':''}" data-i="${i}"><img src="${g[0]}" alt="${g[1]}" loading="lazy" decoding="async"><figcaption><i>${String(k+1).padStart(2,'0')}</i>${g[1]}</figcaption></button>`}).join('');
 // lightbox comun: window.openLB(lista,i), lista = [[src, legendă], …]
 const lb=$('#lb');let cur=0,LBL=G;
@@ -1671,14 +1685,14 @@ new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible&&!V)init()
   }
   // înclinarea după derulare: cardurile se „apleacă” spre tine când intră în ecran și se îndreaptă la mijloc
   let tick=false;
-  function onScroll(){if(tick)return;tick=true;requestAnimationFrame(()=>{tick=false;const H=innerHeight;
+  function onScroll(){if(!fine||tick)return;tick=true;requestAnimationFrame(()=>{tick=false;const H=innerHeight;
     items.forEach(st=>{const r=st.el.getBoundingClientRect();if(r.bottom<-50||r.top>H+50)return;
       const c=((r.top+r.height/2)-H/2)/(H/2); const k=Math.max(-1,Math.min(1,c));
       st.sx=k*st.pitch; st.yaw=st.yawK?k*st.yawK:0; apply(st)})})}
   function init(){
     rise('#caracteristici .ft');rise('#galerie .hstrip div');rise('#gal button');rise('#cgrid .cc');
     tilt('#caracteristici .ft',{max:6,pitch:5});
-    tilt('#model .model-img',{max:7,pitch:7,yaw:-10,bg:true});
+    tilt('#model .model-img',{max:7,pitch:4,yaw:-4,bg:true});
     tilt('#cgrid .cc',{max:10,pitch:6});
     tilt('#gal button',{max:8,pitch:6});
     tilt('#galerie .hstrip div',{max:8,pitch:4});

@@ -25,7 +25,7 @@
 .s-int-wall *{fill:none;stroke:var(--plan-wall);stroke-width:3px;vector-effect:non-scaling-stroke}
 .s-int-wall3 *{stroke:#fff}
 .s-int-wall3 .e *{stroke:var(--plan-edge);stroke-width:1px}
-.s-int-rig.up{--rx:28deg;--wz:2.2px}
+.s-int-rig.up{--rx:22deg;--wz:2.2px}
 .s-int-ov{transform:translateZ(.5px)}
 .s-int-mkl{pointer-events:none;transform:translateZ(calc(3*var(--wz,0px) + 1px));transition:transform .9s var(--ease) .18s}
 .s-int-z{fill:rgba(212,162,76,0);stroke:none;cursor:pointer;transition:fill .4s,opacity .4s;outline:none}
@@ -33,7 +33,7 @@
 .s-int-z.dim{opacity:.5}
 .s-int-z:focus-visible{stroke:var(--accent-ink);stroke-width:2.5px;vector-effect:non-scaling-stroke}
 @media (hover:hover) and (pointer:fine){.s-int-z:not(.on):hover{fill:rgba(212,162,76,.12)}}
-.s-int-lbl text{transition:fill .3s}
+.s-int-lbl text{transition:fill .3s;paint-order:stroke;stroke:var(--plan-floor);stroke-width:.09px;stroke-linejoin:round}
 .s-int-lbl text.on{fill:#0e1116}
 .s-int-mk line,.s-int-mk circle{pointer-events:none}
 .s-int:not(.s-int--film) .s-int-mk{transition:transform .5s var(--ease)}
@@ -76,6 +76,9 @@
 .s-int-nrow h3{font:500 18px/1.2 var(--display);letter-spacing:-.02em;color:var(--ink)}
 .s-int-text>p{text-wrap:pretty;margin-top:6px;font-size:14px;line-height:1.45;color:var(--mute);max-width:62ch;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .s-int-still,.s-int-extras{display:none}
+.s-int:not(.s-int--film) .s-int-text>p{display:block;-webkit-line-clamp:unset}
+.s-int-room .s-int-text{transition:opacity .3s}
+.s-int-room:not(.on) .s-int-text{opacity:.35}
 .s-int-still{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:#eceef2;margin:0}
 .s-int-still button,.s-int-extras button{display:block;position:relative;width:100%;height:100%;border:0;padding:0;background:none;cursor:zoom-in;border-radius:inherit;overflow:hidden}
 .s-int-still img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .45s,transform .6s var(--ease)}
@@ -93,7 +96,9 @@
 #interior.s-int--film{padding:0;--fh:clamp(260px,min(52svh,100svh - 400px),540px)}
 /* îmbinare fără linie cu partea de jos a hero-ului (poza de noapte se stinge în #070b16) */
 #interior.s-int--film::before{content:"";position:absolute;left:0;right:0;top:-48px;height:48px;background:linear-gradient(rgba(7,11,22,0),#070b16);pointer-events:none;z-index:1}
-.s-int--film .s-int-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;overflow:clip;padding-top:calc(var(--nav-h) + 24px)}
+.s-int--film .s-int-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;overflow:clip;padding-top:calc(var(--nav-h) + 24px);background:#070b16}
+/* lumina zilei se deschide din prima fereastră, ca un cerc care crește (fără trecere prin gri) */
+.s-int--film .s-int-stage::before{content:"";position:absolute;inset:0;background:#fff;-webkit-clip-path:circle(var(--rv,0px) at var(--cx,30%) var(--cy,65%));clip-path:circle(var(--rv,0px) at var(--cx,30%) var(--cy,65%));pointer-events:none;z-index:0}
 .s-int--film .s-int-glow{display:block;position:absolute;left:0;top:0;width:0;height:0;border-radius:50%;background:radial-gradient(closest-side,rgba(255,186,110,.55),rgba(255,186,110,0));pointer-events:none;z-index:0;will-change:opacity}
 .s-int--film .s-int-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px}
 .s-int--film .s-int-hl{min-width:0}
@@ -127,9 +132,9 @@
 .s-int.is-dark .s-int-sub{color:rgba(255,255,255,.78)}
 .s-int.is-dark .eyebrow{color:rgba(255,255,255,.7)}
 .s-int.is-dark .eyebrow::before{color:#fff}
-.s-int.is-dark .s-int-foot,.s-int.is-dark .s-int-skip{color:rgba(255,255,255,.7)}
-.s-int.is-dark .s-int-nrow h3{color:#fff}
-.s-int.is-dark .s-int-text>p{color:rgba(255,255,255,.7)}
+.s-int.is-dark-f .s-int-foot,.s-int.is-dark-f .s-int-skip{color:rgba(255,255,255,.7)}
+.s-int.is-dark-r .s-int-nrow h3{color:#fff}
+.s-int.is-dark-r .s-int-text>p{color:rgba(255,255,255,.7)}
 @media (min-width:1600px){.s-int--film .s-int-room-in{grid-template-columns:auto 360px}}
 /* mod B pe calculator (mișcare redusă): antet pe două coloane, ca în modul film */
 @media (min-width:1101px){.s-int:not(.s-int--film) .s-int-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px}
@@ -162,7 +167,7 @@
  .s-int--film .s-int-lbl{display:none}
  .s-int--film .s-int-rig.up{--rx:20deg}
  .s-int--film .s-int-viewport{margin-top:14px;padding-bottom:40px}
- .s-int--film .s-int-track{--pw:min(76vw,calc((100svh - 540px)*.8));gap:6vw;padding:0 12vw 0 16px}
+ .s-int--film .s-int-track{--pw:min(76vw,calc((100svh - 560px)*.8));gap:6vw;padding:0 12vw 0 16px}
  .s-int--film .s-int-room{flex:0 0 var(--pw)}
  .s-int--film .s-int-room-in{grid-template-columns:1fr;gap:8px}
  .s-int--film .s-int-frame{width:100%;height:auto;aspect-ratio:4/5;-webkit-mask-image:var(--win-p);mask-image:var(--win-p)}
@@ -173,11 +178,20 @@
  .s-int--film .s-int-text{container-type:inline-size}
  .s-int--film .s-int-nrow h3{font-size:18px;font-size:clamp(14px,calc((100cqi - 128px)/6.9),18px)}
  .s-int--film .caps-seg button{font-size:12px;padding:6px 8px}
- .s-int--film .s-int-text>p{display:-webkit-box;-webkit-line-clamp:2;font-size:14px;line-height:1.45;max-width:none;margin:4px 0 0}
+ .s-int--film .s-int-text>p{display:-webkit-box;-webkit-line-clamp:3;font-size:14px;line-height:1.45;max-width:none;margin:4px 0 0}
  .s-int--film .s-int-still,.s-int--film .s-int-extras{display:none}
  .s-int--film .s-int-end{flex:0 0 max(var(--pw),250px);padding:22px}
  .s-int--film .s-int-foot{font-size:12px;line-height:1.35;right:84px;bottom:14px}
  .s-int--film .s-int-skip{font-size:12px;margin-left:8px}
+}
+/* laptop scund: antet compact, camere mari */
+@media (min-width:1101px) and (max-height:820px){
+ #interior.s-int--film{--fh:clamp(280px,calc(100svh - 310px),540px)}
+ .s-int--film .s-int-stage{padding-top:calc(var(--nav-h) + 12px)}
+ .s-int--film .s-int-sub{display:none}
+ .s-int--film .s-int-hl .title{font-size:clamp(28px,2.7vw,38px)}
+ .s-int--film .s-int-plan{width:clamp(280px,24vw,360px);padding:8px 12px 6px}
+ .s-int--film .s-int-viewport{margin-top:12px;padding-bottom:36px}
 }
 /* calculator cu ecran mai scund: fără miniaturi; sub 752px fără poza din coloană (Zi/Seara schimbă cadrul, ca pe telefon) */
 @media (min-width:801px) and (max-height:863px){.s-int--film .s-int-extras{display:none}}
@@ -192,7 +206,7 @@
  .s-int--film .s-int-plan-cap{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
  .s-int--film .s-int-hl .title{font-size:24px}
  .s-int--film .s-int-plan{margin-top:10px;padding:6px 8px}
- .s-int--film .s-int-track{--pw:min(76vw,calc((100svh - 456px)*.8))}
+ .s-int--film .s-int-track{--pw:min(76vw,calc((100svh - 476px)*.8))}
  .s-int--film .s-int-foot{bottom:12px}
 }
 @media (prefers-reduced-motion:reduce){.s-int-room .s-int-fi{animation:none!important}.s-int-rig,.s-int-wall,.s-int-mkl{transition:none!important}}
@@ -280,8 +294,8 @@ window.ROOMS=[
  x:6.2,z:'baie'},
 {id:'dorm',n:'Dormitorul',t:'Dormitor separat, cu vitraj panoramic pe tot capătul, aer condiționat și loc de birou. Aici e amenajat cu fotolii.',
  v:'img/vid/x7_dormitor',vw:false,vop:'50% 55%',va:'Clip: dormitorul, cu draperii și fotolii',
- still:['img/int/int_dorm_a.webp','Dormitorul, cu draperii și două fotolii'],
- night:['img/int/int_dorm_n_a.webp','Dormitorul, seara, cu draperiile trase, biroul și lumina LED aprinsă'],
+ still:['img/int/int_dorm_n_a.webp','Dormitorul, cu biroul și aerul condiționat'],
+ extra:[['img/int/int_dorm_a.webp','Dormitorul, cu draperii și două fotolii']],
  p:['img/int/int_dorm_p.webp','Dormitorul, cu fotoliile lângă draperii'],x:9.8,z:'dorm'}];
 (function(){'use strict';
 const C=window.CAPS,RM=window.ROOMS,sec=document.getElementById('interior');
@@ -340,7 +354,7 @@ const R0=rooms[0];
 
 // ---- stare ----
 let fT=0,film=false,phone=false,ready=false,secVis=false,active=-1,userPlay=-1,rigUp=false,lt=-1,raf=0,nameT=0;
-let stageH=0,VW=0,travel=0,E=1,W=1,PL=0,secTop=0;
+let stageH=0,VW=0,travel=0,E=1,W=1,PL=0,secTop=0,RMAX=1,DH=0,DR=0,DF=0;
 // ecran scund pe calculator (cadrul primește Zi/Seara) și telefon sub 740px (trece în modul B: cadrul ar fi prea mic)
 const CMP=matchMedia('(min-width:801px) and (max-height:751px)'),PSH=matchMedia('(max-width:800px) and (max-height:739px)');
 const rm=()=>C.rm.matches,useFN=()=>!film||phone||CMP.matches;
@@ -405,17 +419,24 @@ function measure(){
   const gx=vp.offsetLeft+track.offsetLeft+R0.el.offsetLeft+R0.inn.offsetLeft+f.offsetLeft+f.offsetWidth/2;
   const gy=vp.offsetTop+track.offsetTop+R0.el.offsetTop+R0.inn.offsetTop+f.offsetTop+f.offsetHeight*.55;
   glow.style.width=gw+'px';glow.style.height=gh+'px';glow.style.transform=`translate(${(gx-gw/2).toFixed(1)}px,${(gy-gh/2).toFixed(1)}px)`;
+  // cercul de lumină: centrul în prima fereastră; raza maximă = până la colțul cel mai îndepărtat al scenei
+  stage.style.setProperty('--cx',gx.toFixed(1)+'px');stage.style.setProperty('--cy',gy.toFixed(1)+'px');
+  const SW=stage.offsetWidth,SH=stage.offsetHeight;RMAX=Math.max(Math.hypot(gx,gy),Math.hypot(SW-gx,gy),Math.hypot(gx,SH-gy),Math.hypot(SW-gx,SH-gy));
+  const ctr=el=>{let x=el.offsetWidth/2,y=el.offsetHeight/2,n=el;while(n&&n!==stage){x+=n.offsetLeft;y+=n.offsetTop;n=n.offsetParent}return Math.hypot(x-gx,y-gy)};
+  const tt=q('#intTitle'),r0t=R0.el.querySelector('.s-int-text'),ft=q('.s-int-foot');
+  DH=tt?ctr(tt):0;DR=r0t?ctr(r0t):0;DF=ft?ctr(ft):0;
   lt=-1;
 }
 function updFilm(){
   const S=-sec.getBoundingClientRect().top;
   const e=C.clamp(S/E),w=C.clamp((S-E)/W),t=C.ease(e);
   if(t!==lt){lt=t;
-    const L=k=>Math.round(C.lerp(k,255,t));
-    stage.style.backgroundColor=`rgb(${L(7)},${L(11)},${L(22)})`;
-    sec.classList.toggle('is-dark',t<.45);
+    const rv=t*RMAX;stage.style.setProperty('--rv',rv.toFixed(1)+'px');
+    // fiecare text trece pe închis când lumina ajunge la el
+    sec.classList.toggle('is-dark',rv<DH);sec.classList.toggle('is-dark-r',rv<DR);sec.classList.toggle('is-dark-f',rv<DF);
+    if(window.navU)window.navU();
     glow.style.opacity=(1-t).toFixed(3);
-    plan.style.opacity=e.toFixed(3);plan.style.transform=`translateY(${((1-e)*12).toFixed(2)}px)`;
+    plan.style.opacity=C.clamp((e-.5)/.5).toFixed(3);plan.style.transform=`translateY(${((1-e)*12).toFixed(2)}px)`;
     R0.fw.style.transform=`scale(${(1.12-.12*t).toFixed(4)})`;
   }
   if(e>=1&&!rigUp){rigUp=true;rig.classList.add('up');if(active===0)draw(R0)}
@@ -458,7 +479,7 @@ function applyMode(){
   WP=!film?C.WIN.L:phone?C.WIN.P:C.WIN.V;
   if(film){track.removeAttribute('tabindex');track.scrollLeft=0}
   else{track.setAttribute('tabindex','0');track.style.transform='';items.forEach(o=>{o.inn.style.transform=''});R0.fw.style.transform='';
-    stage.style.backgroundColor='';sec.classList.remove('is-dark');plan.style.opacity='';plan.style.transform='';glow.style.opacity='0'}
+    stage.style.removeProperty('--rv');sec.classList.remove('is-dark','is-dark-r','is-dark-f');if(window.navU)window.navU();plan.style.opacity='';plan.style.transform='';glow.style.opacity='0'}
   if(rm()){rig.classList.remove('up');rooms.forEach(o=>{if(o.el.classList.contains('on'))draw(o)})}
   applyMedia();measure();active=-1;update();
 }
