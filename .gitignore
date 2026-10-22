@@ -2,3 +2,4 @@ node_modules/
 screenshots/
 __pycache__/
 .DS_Store
+site/_t_*.html
