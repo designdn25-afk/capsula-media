@@ -1,0 +1,499 @@
+<!--CSS--><style id="s-int-css">
+/* ===================== #interior: plimbarea prin capsula X7 (mod A „film” cu scenă fixată, mod B „glisare”) ===================== */
+#interior.s-int{position:relative;background:#fff;padding:clamp(48px,7vw,96px) 0;scroll-margin-top:var(--nav-h);overflow-x:clip}
+.s-int-stage{position:relative;display:flex;flex-direction:column}
+.s-int-glow{display:none}
+.s-int-head{order:1;position:relative;z-index:2}
+.s-int-viewport{order:2;position:relative;margin-top:22px}
+.s-int-foot{order:3;margin-top:14px;font-size:13px;color:var(--mute)}
+.s-int-foot p{display:inline}
+.s-int-skip{display:none;margin-left:12px;font-size:14px;font-weight:600;color:var(--ink);text-decoration:underline;text-underline-offset:3px;text-decoration-thickness:1px;white-space:nowrap}
+.s-int-skip:focus-visible{outline:2px solid var(--accent-ink);outline-offset:3px;border-radius:4px}
+.s-int-hl .title{font-size:clamp(24px,5.4vw,40px);max-width:16em}
+#intTitle em{white-space:nowrap}
+.s-int-sub{margin-top:10px;font-size:14px;line-height:1.5;color:var(--mute)}
+.s-int-sub-l,.s-int-sub-s{display:none}
+.s-int .title,.s-int-sub,.s-int .eyebrow::before,.s-int-foot,.s-int-skip,.s-int-nrow h3,.s-int-text>p{transition:color .25s}
+.s-int .eyebrow{transition:color .25s,opacity .9s,transform .9s cubic-bezier(.2,.7,.2,1)}
+
+/* planul: desen plat care devine machetă */
+.s-int-plan{margin:16px 0 0;max-width:440px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow);padding:12px 14px 10px}
+.s-int-plan3d{perspective:900px}
+.s-int-rig{position:relative;aspect-ratio:3/1;transform-style:preserve-3d;transform:rotateX(var(--rx,0deg));transform-origin:50% 60%;transition:transform 1.2s var(--ease)}
+.s-int-rig>svg{position:absolute;inset:0;width:100%;height:100%;overflow:visible;display:block}
+.s-int-wall{transform:translateZ(calc(var(--i)*var(--wz,0px)));transition:transform .9s var(--ease) calc(var(--i)*60ms);pointer-events:none}
+.s-int-wall *{fill:none;stroke:var(--plan-wall);stroke-width:3px;vector-effect:non-scaling-stroke}
+.s-int-wall3 *{stroke:#fff}
+.s-int-wall3 .e *{stroke:var(--plan-edge);stroke-width:1px}
+.s-int-rig.up{--rx:28deg;--wz:2.2px}
+.s-int-ov{transform:translateZ(.5px)}
+.s-int-mkl{pointer-events:none;transform:translateZ(calc(3*var(--wz,0px) + 1px));transition:transform .9s var(--ease) .18s}
+.s-int-z{fill:rgba(212,162,76,0);stroke:none;cursor:pointer;transition:fill .4s,opacity .4s;outline:none}
+.s-int-z.on{fill:rgba(212,162,76,.24);stroke:#d4a24c;stroke-width:1.5px;vector-effect:non-scaling-stroke}
+.s-int-z.dim{opacity:.5}
+.s-int-z:focus-visible{stroke:var(--accent-ink);stroke-width:2.5px;vector-effect:non-scaling-stroke}
+@media (hover:hover) and (pointer:fine){.s-int-z:not(.on):hover{fill:rgba(212,162,76,.12)}}
+.s-int-lbl text{transition:fill .3s}
+.s-int-lbl text.on{fill:#0e1116}
+.s-int-mk line,.s-int-mk circle{pointer-events:none}
+.s-int:not(.s-int--film) .s-int-mk{transition:transform .5s var(--ease)}
+.s-int:not(.s-int--film) .s-int-rig.up{--rx:18deg;--wz:2px}
+.s-int-plan-cap{display:flex;justify-content:space-between;align-items:baseline;gap:12px;margin-top:8px}
+.s-int-plan-cap span{font-size:12px;color:var(--mute)}
+.s-int-plan-cap b{font-size:13px;font-weight:600;color:var(--ink);transition:opacity .2s;white-space:nowrap}
+.s-int-ruler{display:flex;align-items:center;gap:8px;margin-top:5px;font-size:12px;color:var(--mute);font-variant-numeric:tabular-nums}
+.s-int-ruler i{flex:1;height:1px;background:var(--line);position:relative}
+.s-int-ruler i::before,.s-int-ruler i::after{content:"";position:absolute;top:-3px;width:1px;height:7px;background:var(--plan-edge)}
+.s-int-ruler i::before{left:0}.s-int-ruler i::after{right:0}
+
+/* pista: mod B = scroller orizontal propriu */
+.s-int-track{--bw:clamp(240px,min(74vw,760px,calc((100svh - 250px)*1.6)),760px);position:relative;display:flex;gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;padding:22px max(16px,calc((100% - 1240px)/2)) 12px;margin-top:-18px;scroll-padding-left:max(16px,calc((100% - 1240px)/2))}
+.s-int-track::-webkit-scrollbar{display:none}
+.s-int-track:focus-visible{outline:2px solid var(--accent-ink);outline-offset:-2px;border-radius:12px}
+.s-int-room{position:relative;flex:0 0 var(--bw);scroll-snap-align:start;min-width:0}
+.s-int-room-in{position:relative}
+.s-int-fw{position:relative;filter:drop-shadow(0 30px 50px rgba(15,20,30,.22))}
+.s-int:not(.s-int--film) .s-int-fw{filter:drop-shadow(0 18px 30px rgba(15,20,30,.16))}
+.s-int-frame{position:relative;aspect-ratio:16/10;background:#e7eaee;-webkit-mask:var(--win-l) center/100% 100% no-repeat;mask:var(--win-l) center/100% 100% no-repeat;overflow:hidden}
+.s-int-frame video,.s-int-frame img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block}
+.s-int-frame video{object-position:var(--vop,50% 50%)}
+.s-int-fi{object-position:var(--fop,50% 50%)}
+.s-int-frame:not(.is-vid) video{display:none}
+.s-int-frame.is-vid .s-int-fi{display:none}
+.s-int-fn{object-position:55% 50%!important;opacity:0;transition:opacity .45s;z-index:1}
+.s-int-room.is-night .s-int-fn{opacity:1}
+.s-int-zoom{position:absolute;inset:0;z-index:2;width:100%;height:100%;border:0;padding:0;background:none;cursor:zoom-in}
+.s-int-zoom:focus-visible{outline:3px solid var(--accent);outline-offset:-6px}
+.s-int-frame .caps-play{z-index:3}
+@keyframes s-int-kb{from{transform:scale(1)}to{transform:scale(1.06)}}
+.s-int-room.on .s-int-frame:not(.is-vid) .s-int-fi{animation:s-int-kb 9s ease-in-out infinite alternate}
+.s-int-line{position:absolute;inset:0;width:100%;height:100%;overflow:visible;pointer-events:none;z-index:3}
+.s-int-line path{fill:none;stroke:#d4a24c;stroke-width:1.5px;stroke-linejoin:round;stroke-dasharray:1 1;stroke-dashoffset:1;transition:stroke-dashoffset 1.2s var(--ease)}
+.s-int-fw.drawn .s-int-line path{stroke-dashoffset:0}
+.s-int-text{padding-top:12px;min-width:0}
+.s-int-nrow{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:6px 12px}
+.s-int-nrow .caps-seg{flex:none}.s-int-nrow .caps-seg button{white-space:nowrap}
+.s-int-nrow h3{font:500 18px/1.2 var(--display);letter-spacing:-.02em;color:var(--ink)}
+.s-int-text>p{text-wrap:pretty;margin-top:6px;font-size:14px;line-height:1.45;color:var(--mute);max-width:62ch;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.s-int-still,.s-int-extras{display:none}
+.s-int-still{position:relative;aspect-ratio:16/10;border-radius:14px;overflow:hidden;background:#eceef2;margin:0}
+.s-int-still button,.s-int-extras button{display:block;position:relative;width:100%;height:100%;border:0;padding:0;background:none;cursor:zoom-in;border-radius:inherit;overflow:hidden}
+.s-int-still img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:opacity .45s,transform .6s var(--ease)}
+.s-int-still .n{opacity:0}
+.s-int-room.is-night .s-int-still .n{opacity:1}
+.s-int-extras button{aspect-ratio:16/10;border-radius:10px;background:#eceef2}
+.s-int-extras img{width:100%;height:100%;object-fit:cover;transition:transform .6s var(--ease)}
+@media (hover:hover) and (pointer:fine){.s-int-still button:hover img,.s-int-extras button:hover img{transform:scale(1.04)}}
+.s-int-still button:focus-visible,.s-int-extras button:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.s-int-end{flex:0 0 min(74vw,360px);align-self:stretch;display:flex;flex-direction:column;justify-content:center;gap:10px;background:#fff;border:1px solid var(--line);border-radius:18px;padding:28px;box-shadow:var(--shadow);scroll-snap-align:start;margin-bottom:6px}
+.s-int-end h3{font:500 22px/1.2 var(--display);letter-spacing:-.02em;margin-bottom:8px;color:var(--ink);text-wrap:balance}
+.s-int-end .btn{justify-content:center}
+
+/* ===== mod A „film”: scena fixată, intrarea din noapte, pista condusă de derulare ===== */
+#interior.s-int--film{padding:0;--fh:clamp(260px,min(52svh,100svh - 400px),540px)}
+/* îmbinare fără linie cu partea de jos a hero-ului (poza de noapte se stinge în #070b16) */
+#interior.s-int--film::before{content:"";position:absolute;left:0;right:0;top:-48px;height:48px;background:linear-gradient(rgba(7,11,22,0),#070b16);pointer-events:none;z-index:1}
+.s-int--film .s-int-stage{position:sticky;top:0;height:100vh;height:100svh;overflow:hidden;overflow:clip;padding-top:calc(var(--nav-h) + 24px)}
+.s-int--film .s-int-glow{display:block;position:absolute;left:0;top:0;width:0;height:0;border-radius:50%;background:radial-gradient(closest-side,rgba(255,186,110,.55),rgba(255,186,110,0));pointer-events:none;z-index:0;will-change:opacity}
+.s-int--film .s-int-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px}
+.s-int--film .s-int-hl{min-width:0}
+.s-int--film .s-int-hl .title{font-size:clamp(28px,3.4vw,50px);max-width:13em}
+.s-int--film .s-int-sub{font-size:16px;line-height:1.55;max-width:46ch;margin-top:12px}
+.s-int--film .s-int-sub-l{display:inline}
+.s-int--film .s-int-sub-x{display:none}
+.s-int--film .s-int-plan{flex:none;width:clamp(320px,30vw,460px);max-width:none;margin:0;will-change:opacity,transform}
+.s-int--film .s-int-viewport{flex:1;min-height:0;margin-top:clamp(20px,3svh,36px);display:flex;align-items:flex-start;padding-bottom:44px;perspective:1400px;z-index:1}
+.s-int--film .s-int-track{flex:none;width:max-content;align-items:flex-end;gap:5vw;overflow:visible;scroll-snap-type:none;margin:0;padding:0 10vw 0 max(16px,calc((100% - 1240px)/2));transform-style:preserve-3d;will-change:transform}
+.s-int--film .s-int-room{flex:none;transform-style:preserve-3d}
+/* în 3D, planurile goale (pistă, articol) stau în fața conținutului împins înapoi: nu primesc clicuri */
+.s-int--film .s-int-track,.s-int--film .s-int-room{pointer-events:none}
+.s-int--film .s-int-room-in,.s-int--film .s-int-end{pointer-events:auto}
+.s-int--film .s-int-room-in{display:grid;grid-template-columns:auto 340px;gap:28px;align-items:end;transform-style:preserve-3d;will-change:transform}
+.s-int--film .s-int-fw{transform-origin:50% 35%}
+.s-int--film .s-int-frame{height:var(--fh);aspect-ratio:9/16;background:#141a2b;-webkit-mask-image:var(--win-v);mask-image:var(--win-v)}
+.s-int--film .s-int-zoom{display:none}
+.s-int--film .s-int-text{padding:0 0 2px}
+.s-int--film .s-int-nrow h3{font-size:26px}
+.s-int--film .s-int-text>p{display:block;-webkit-line-clamp:unset;font-size:16px;line-height:1.55;max-width:32ch;margin:8px 0 16px}
+.s-int--film .s-int-still{display:block}
+.s-int--film .s-int-extras{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px}
+.s-int--film .s-int-fn{display:none}
+.s-int--film .s-int-end{flex:0 0 340px;align-self:center;margin:0}
+.s-int--film .s-int-foot{position:absolute;bottom:16px;left:max(16px,calc((100% - 1240px)/2));right:max(250px,calc((100% - 1240px)/2 + 250px));width:auto;margin:0;z-index:2}
+.s-int--film .s-int-skip{display:inline}
+/* intrarea: text deschis pe noapte */
+.s-int.is-dark .title{color:#fff}
+.s-int.is-dark .title em{color:#d4a24c}
+.s-int.is-dark .s-int-sub{color:rgba(255,255,255,.78)}
+.s-int.is-dark .eyebrow{color:rgba(255,255,255,.7)}
+.s-int.is-dark .eyebrow::before{color:#fff}
+.s-int.is-dark .s-int-foot,.s-int.is-dark .s-int-skip{color:rgba(255,255,255,.7)}
+.s-int.is-dark .s-int-nrow h3{color:#fff}
+.s-int.is-dark .s-int-text>p{color:rgba(255,255,255,.7)}
+@media (min-width:1600px){.s-int--film .s-int-room-in{grid-template-columns:auto 360px}}
+/* mod B pe calculator (mișcare redusă): antet pe două coloane, ca în modul film */
+@media (min-width:1101px){.s-int:not(.s-int--film) .s-int-head{display:flex;justify-content:space-between;align-items:flex-end;gap:32px}
+ .s-int:not(.s-int--film) .s-int-nrow h3{font-size:22px}
+ .s-int:not(.s-int--film) .s-int-text>p{font-size:15px}
+ .s-int:not(.s-int--film) .s-int-plan{flex:none;width:440px;margin:0}
+ .s-int:not(.s-int--film) .s-int-viewport{margin-top:32px}}
+/* tabletă în picioare (pe tableta culcată rămâne antetul pe două coloane, ca să încapă) */
+@media (min-width:801px) and (max-width:1100px) and (min-height:900px){
+ #interior.s-int--film{--fh:clamp(300px,44svh,560px)}
+ .s-int--film .s-int-head{flex-direction:column;align-items:stretch;gap:0}
+ .s-int--film .s-int-hl .title{font-size:clamp(30px,4.6vw,40px)}
+ .s-int--film .s-int-plan{width:100%;max-width:520px;margin-top:16px}
+ .s-int--film .s-int-room-in{grid-template-columns:auto 300px}
+ .s-int--film .s-int-end{flex-basis:300px}
+ .s-int--film .s-int-nrow h3{font-size:22px}
+}
+/* telefon */
+@media (max-width:800px){
+ .s-int--film .s-int-stage{padding-top:calc(var(--nav-h) + 10px)}
+ .s-int--film .s-int-head{display:block}
+ .s-int--film .eyebrow{display:none}
+ .s-int--film .s-int-hl .title{font-size:26px;line-height:1.08;max-width:none}
+ .s-int--film .s-int-sub{font-size:14px;line-height:1.45;margin-top:8px}
+ .s-int--film .s-int-sub-l{display:none}
+ .s-int--film .s-int-sub-s{display:inline}
+ .s-int--film .s-int-plan{width:auto;margin-top:12px;padding:8px 10px 6px}
+ .s-int--film .s-int-plan-cap{margin-top:4px}
+ .s-int--film .s-int-ruler{display:none}
+ .s-int--film .s-int-lbl{display:none}
+ .s-int--film .s-int-rig.up{--rx:20deg}
+ .s-int--film .s-int-viewport{margin-top:14px;padding-bottom:40px}
+ .s-int--film .s-int-track{--pw:min(76vw,calc((100svh - 540px)*.8));gap:6vw;padding:0 12vw 0 16px}
+ .s-int--film .s-int-room{flex:0 0 var(--pw)}
+ .s-int--film .s-int-room-in{grid-template-columns:1fr;gap:8px}
+ .s-int--film .s-int-frame{width:100%;height:auto;aspect-ratio:4/5;-webkit-mask-image:var(--win-p);mask-image:var(--win-p)}
+ .s-int--film .s-int-zoom{display:block}
+ .s-int--film .s-int-fn{display:block}
+ .s-int--film .s-int-track{align-items:flex-start}
+ .s-int--film .s-int-nrow{gap:6px 8px}
+ .s-int--film .s-int-text{container-type:inline-size}
+ .s-int--film .s-int-nrow h3{font-size:18px;font-size:clamp(14px,calc((100cqi - 128px)/6.9),18px)}
+ .s-int--film .caps-seg button{font-size:12px;padding:6px 8px}
+ .s-int--film .s-int-text>p{display:-webkit-box;-webkit-line-clamp:2;font-size:14px;line-height:1.45;max-width:none;margin:4px 0 0}
+ .s-int--film .s-int-still,.s-int--film .s-int-extras{display:none}
+ .s-int--film .s-int-end{flex:0 0 max(var(--pw),250px);padding:22px}
+ .s-int--film .s-int-foot{font-size:12px;line-height:1.35;right:84px;bottom:14px}
+ .s-int--film .s-int-skip{font-size:12px;margin-left:8px}
+}
+/* calculator cu ecran mai scund: fără miniaturi; sub 752px fără poza din coloană (Zi/Seara schimbă cadrul, ca pe telefon) */
+@media (min-width:801px) and (max-height:863px){.s-int--film .s-int-extras{display:none}}
+@media (min-width:801px) and (max-height:751px){
+ .s-int--film .s-int-still{display:none}
+ .s-int--film .s-int-fn,.s-int--film .s-int-zoom{display:block}
+ .s-int--film .s-int-text>p{margin-bottom:0}
+}
+/* telefon 700–799px înălțime (bara browserului vizibilă): antet compact, cadrul rămâne mare */
+@media (max-width:800px) and (max-height:799px){
+ .s-int--film .s-int-sub{display:none}
+ .s-int--film .s-int-plan-cap{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%);white-space:nowrap}
+ .s-int--film .s-int-hl .title{font-size:24px}
+ .s-int--film .s-int-plan{margin-top:10px;padding:6px 8px}
+ .s-int--film .s-int-track{--pw:min(76vw,calc((100svh - 456px)*.8))}
+ .s-int--film .s-int-foot{bottom:12px}
+}
+@media (prefers-reduced-motion:reduce){.s-int-room .s-int-fi{animation:none!important}.s-int-rig,.s-int-wall,.s-int-mkl{transition:none!important}}
+</style><!--/CSS-->
+
+<!--HTML--><!-- 01 INTERIOR: plimbarea prin capsula X7 -->
+<section id="interior" class="s-int" aria-labelledby="intTitle">
+ <div class="s-int-stage">
+  <div class="s-int-glow" aria-hidden="true"></div>
+  <div class="wrap s-int-head">
+   <div class="s-int-hl">
+    <div class="eyebrow reveal" data-n="01">Interior</div>
+    <h2 class="title" id="intTitle">Înăuntru, de la un capăt <em>la altul.</em></h2>
+    <p class="s-int-sub"><span class="s-int-sub-l">Living, zonă de bucătărie, baie completă și dormitor separat, pe 36,5 m² utili. Derulează ca să mergi prin capsulă.</span><span class="s-int-sub-s">36,5 m² utili. Derulează ca să mergi prin capsulă.</span><span class="s-int-sub-x">Glisează sau atinge o cameră pe plan.</span></p>
+   </div>
+   <figure class="s-int-plan">
+    <div class="s-int-plan3d"><div class="s-int-rig">
+     <svg class="s-int-floor" viewBox="-0.2 -0.7 12 4" aria-hidden="true">
+      <defs><clipPath id="intShell"><rect width="11.6" height="3" rx="1.1"/></clipPath></defs>
+      <rect width="11.6" height="3" rx="1.1" fill="var(--plan-floor)" stroke="#0e1116" stroke-width="1.2" vector-effect="non-scaling-stroke"/>
+      <path d="M1.1 0A1.1 1.1 0 0 0 0 1.1V1.9A1.1 1.1 0 0 0 1.1 3" fill="none" stroke="var(--glass)" stroke-width="3" vector-effect="non-scaling-stroke"/>
+      <path d="M10.5 0A1.1 1.1 0 0 1 11.6 1.1V1.9A1.1 1.1 0 0 1 10.5 3" fill="none" stroke="var(--glass)" stroke-width="3" vector-effect="non-scaling-stroke"/>
+      <rect x="1.4" y=".75" width="1.6" height="1.5" rx=".12" fill="none" stroke="#9aa1ad" stroke-width="1" stroke-dasharray="3 3" vector-effect="non-scaling-stroke"/>
+      <g fill="var(--plan-fur)">
+       <rect x="3.45" y="2.5" width="1.55" height=".42" rx=".08"/>
+       <circle cx="2.3" cy="2.38" r=".3"/>
+       <rect x=".45" y=".3" width=".5" height="1.45" rx=".18"/>
+       <rect x="8.1" y="2.03" width=".45" height=".85" rx=".05"/>
+       <rect x="10.7" y="1.9" width=".55" height=".55" rx=".12"/><rect x="10.7" y=".5" width=".55" height=".55" rx=".12"/>
+      </g>
+      <rect x="5.15" y="-.5" width="1.1" height=".38" rx=".06" fill="var(--plan-wall)"/>
+      <line x1="5.3" y1="0" x2="6.1" y2="0" stroke="#d4a24c" stroke-width="3" vector-effect="non-scaling-stroke"/>
+      <g class="s-int-lbl" font-family="Manrope" font-weight="600" font-size=".3" fill="#5d6572" text-anchor="middle">
+       <text x="1.05" y="2.55" data-z="living">Living</text><text x="2.3" y="1.75" data-z="masa">Masa</text>
+       <text x="4.22" y="2.3" data-z="blat">Bucătărie</text><text x="6.2" y="2.3" data-z="baie">Baie</text>
+       <text x="9.6" y="1.65" data-z="dorm">Dormitor</text><text x="6.4" y="-.2" text-anchor="start" font-size=".26">Intrare</text>
+      </g>
+     </svg>
+     <svg class="s-int-wall" style="--i:1" viewBox="-0.2 -0.7 12 4" aria-hidden="true"><rect width="11.6" height="3" rx="1.1"/><rect x="5.1" y="1.4" width="2.2" height="1.55"/><line x1="8" y1="1.25" x2="8" y2="2.95"/></svg>
+     <svg class="s-int-wall" style="--i:2" viewBox="-0.2 -0.7 12 4" aria-hidden="true"><rect width="11.6" height="3" rx="1.1"/><rect x="5.1" y="1.4" width="2.2" height="1.55"/><line x1="8" y1="1.25" x2="8" y2="2.95"/></svg>
+     <svg class="s-int-wall s-int-wall3" style="--i:3" viewBox="-0.2 -0.7 12 4" aria-hidden="true"><g><rect width="11.6" height="3" rx="1.1"/><rect x="5.1" y="1.4" width="2.2" height="1.55"/><line x1="8" y1="1.25" x2="8" y2="2.95"/></g><g class="e"><rect width="11.6" height="3" rx="1.1"/><rect x="5.1" y="1.4" width="2.2" height="1.55"/><line x1="8" y1="1.25" x2="8" y2="2.95"/></g></svg>
+     <svg class="s-int-ov" viewBox="-0.2 -0.7 12 4">
+      <g clip-path="url(#intShell)">
+       <rect class="s-int-z" data-z="living" x="0" y="0" width="1.9" height="3" role="button" tabindex="0" aria-label="Livingul"/>
+       <rect class="s-int-z" data-z="masa" x="1.9" y="0" width="1.3" height="3" role="button" tabindex="0" aria-label="Masa"/>
+       <rect class="s-int-z" data-z="blat" x="3.2" y="0" width="1.9" height="3" role="button" tabindex="0" aria-label="Bucătăria"/>
+       <rect class="s-int-z" data-z="baie" x="5.1" y="1.4" width="2.2" height="1.55" role="button" tabindex="0" aria-label="Baia"/>
+       <rect class="s-int-z" data-z="dorm" x="8" y="0" width="3.6" height="3" role="button" tabindex="0" aria-label="Dormitorul"/>
+      </g>
+     </svg>
+     <svg class="s-int-mkl" viewBox="-0.2 -0.7 12 4" aria-hidden="true"><g class="s-int-mk" style="transform:translateX(.95px)"><line y1="-.15" y2="3.15" stroke="#d4a24c" stroke-width="2" vector-effect="non-scaling-stroke"/><circle cy="-.32" r=".16" fill="#d4a24c"/></g></svg>
+    </div></div>
+    <figcaption class="s-int-plan-cap"><span>Planul capsulei X7 (orientativ)</span><b id="intRoomName" aria-live="polite">Livingul</b></figcaption>
+    <div class="s-int-ruler" aria-hidden="true"><span>0 m</span><i></i><span>11,5 m</span></div>
+   </figure>
+  </div>
+  <div class="wrap s-int-foot"><p>Capsula X7 din showroom-ul din Ciorogârla. Mobilierul și unele elemente prezentate sunt opționale.</p><a class="s-int-skip" href="#caracteristici">Sari peste ↓</a></div>
+  <div class="s-int-viewport"><div class="s-int-track" id="intTrack" role="group" aria-label="Camerele capsulei X7"></div></div>
+ </div>
+</section><!--/HTML-->
+
+<!--JS--><script>
+/* ===== #interior: camerele X7 (doar fișiere verificate cu ls pe 22 oct 2026) ===== */
+window.ROOMS=[
+{id:'living',n:'Livingul',t:'Luminator în tavan, vitraj pe trei laturi și bandă LED. Seara, draperiile închid complet spațiul.',
+ v:'img/vid/x7_living_lumina',vw:true,vop:'50% 30%',va:'Clip: livingul capsulei X7, cu luminatorul din tavan',
+ still:['img/int/int_living_a.webp','Livingul capsulei X7, cu vitraj pe trei laturi și canapeaua lângă geam'],
+ night:['img/int/int_living_n_a.webp','Livingul cu draperiile trase și lumina LED aprinsă'],
+ extra:[['img/int/int_living_b.webp','Livingul spre blatul de bucătărie, cu luminatorul deasupra'],['img/int/int_tavan_a.webp','Luminatorul din tavan și benzile LED']],
+ p:['img/int/int_living_p.webp','Livingul, cu luminatorul deasupra'],x:.95,z:'living'},
+{id:'masa',n:'Masa',t:'Loc de luat masa pentru două persoane, între blatul de bucătărie și zona de relaxare.',
+ v:'img/vid/x7_living_masa',vw:false,vop:'50% 60%',va:'Clip: masa rotundă din living',
+ still:['img/int/int_masa_a.webp','Masa rotundă din living, lângă vitraj'],
+ night:['img/int/int_masa_n_a.webp','Masa și canapeaua, seara, cu draperiile trase și banda LED aprinsă'],
+ x:2.3,z:'masa'},
+{id:'blat',n:'Bucătăria',t:'Blat din lemn cu dulapuri, prize pregătite și racorduri pentru bucătărie. Mobilierul de bucătărie este opțional (+1.050 €).',
+ v:null,frame:['img/int/int_blat_p.webp','Zona de bucătărie, sub luminator'],fop:'45% 55%',
+ still:['img/int/int_blat_b.webp','Blatul de bucătărie din lemn, cu dulapuri verzi, de aproape'],
+ x:4.22,z:'blat'},
+{id:'baie',n:'Baia',t:'Baie completă: duș cu cabină de sticlă, lavoar suspendat, oglindă cu LED și WC smart.',
+ v:'img/vid/x7_baie',vw:false,vop:'50% 50%',va:'Clip: baia, cu lavoarul și oglinda cu LED',
+ still:['img/int/int_baie_a.webp','Lavoarul și oglinda din baie'],
+ night:['img/int/int_baie_n_a.webp','Baia, cu lumina caldă de sub oglindă aprinsă'],
+ extra:[['img/int/int_baie_p.webp','Dușul cu cabină de sticlă'],['img/int/int_hol_a.webp','Holul central, spre living']],
+ x:6.2,z:'baie'},
+{id:'dorm',n:'Dormitorul',t:'Dormitor separat, cu vitraj panoramic pe tot capătul, aer condiționat și loc de birou. Aici e amenajat cu fotolii.',
+ v:'img/vid/x7_dormitor',vw:false,vop:'50% 55%',va:'Clip: dormitorul, cu draperii și fotolii',
+ still:['img/int/int_dorm_a.webp','Dormitorul, cu draperii și două fotolii'],
+ night:['img/int/int_dorm_n_a.webp','Dormitorul, seara, cu draperiile trase, biroul și lumina LED aprinsă'],
+ p:['img/int/int_dorm_p.webp','Dormitorul, cu fotoliile lângă draperii'],x:9.8,z:'dorm'}];
+(function(){'use strict';
+const C=window.CAPS,RM=window.ROOMS,sec=document.getElementById('interior');
+if(!C||!RM||!RM.length||!sec)return;
+const K=1.5; // derulare per pixel de pistă (1.8 dacă pagina pare prea lungă)
+const q=s=>sec.querySelector(s),qa=s=>[...sec.querySelectorAll(s)];
+const stage=q('.s-int-stage'),vp=q('.s-int-viewport'),track=document.getElementById('intTrack'),glow=q('.s-int-glow'),
+  plan=q('.s-int-plan'),rig=q('.s-int-rig'),mk=q('.s-int-mk'),nameEl=document.getElementById('intRoomName');
+const esc=s=>String(s==null?'':s).replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const N=RM.length;
+// camere lipsă → zona și eticheta lor dispar de pe plan
+const ZS=RM.map(r=>r.z);
+qa('.s-int-z,.s-int-lbl text[data-z]').forEach(el=>{if(!ZS.includes(el.dataset.z))el.style.display='none'});
+const zones=qa('.s-int-z').filter(z=>ZS.includes(z.dataset.z)),lbls=qa('.s-int-lbl text[data-z]');
+
+// ---- camerele, generate din ROOMS ----
+const seg=r=>r.night?'<div class="caps-seg" role="group" aria-label="Momentul zilei"><button type="button" aria-pressed="true" data-t="d">☀ Zi</button><button type="button" aria-pressed="false" data-t="n">☾ Seara</button></div>':'';
+track.innerHTML=RM.map(r=>`<article class="s-int-room" data-id="${esc(r.id)}" aria-label="${esc(r.n)}">
+<div class="s-int-room-in">
+ <div class="s-int-fw">
+  <div class="s-int-frame" style="--vop:${esc(r.vop||'50% 50%')};--fop:${esc(r.fop||'50% 50%')}">
+   ${r.v?`<video muted playsinline loop preload="none" aria-label="${esc(r.va||'Clip: '+r.n)}"></video>`:''}
+   <img class="s-int-fi" alt="" decoding="async">
+   ${r.night?'<img class="s-int-fn" alt="" decoding="async">':''}
+   <button class="s-int-zoom" type="button" aria-label="Fotografiile camerei: ${esc(r.n)}"></button>
+   ${r.v?'<button class="caps-play" type="button" hidden>▶ Pornește</button>':''}
+  </div>
+  <svg class="s-int-line" viewBox="0 0 1 1" preserveAspectRatio="none" aria-hidden="true"><path pathLength="1" d=""/></svg>
+ </div>
+ <div class="s-int-text">
+  <div class="s-int-nrow"><h3>${esc(r.n)}</h3>${seg(r)}</div>
+  <p>${esc(r.t)}</p>
+  <figure class="s-int-still"><button type="button" aria-label="Mărește: ${esc(r.still[1])}"><img class="d" alt="${esc(r.still[1])}" decoding="async">${r.night?`<img class="n" alt="${esc(r.night[1])}" decoding="async">`:''}</button></figure>
+  ${r.id==='living'&&r.extra?`<div class="s-int-extras">${r.extra.slice(0,2).map(x=>`<button type="button" aria-label="Mărește: ${esc(x[1])}"><img alt="${esc(x[1])}" decoding="async"></button>`).join('')}</div>`:''}
+ </div>
+</div>
+</article>`).join('')+'<aside class="s-int-end"><h3>Vrei să te uiți singur în jur?</h3><a class="btn btn-accent" href="#tur">Începe turul 360°</a><a class="btn btn-ghost" href="#model">Vezi prețul X7</a></aside>';
+
+const lbList=r=>{const o=[],seen=new Set(),add=a=>{if(a&&a[0]&&!seen.has(a[0])){seen.add(a[0]);o.push(a)}};add(r.still);add(r.night);(r.extra||[]).forEach(add);add(r.p);add(r.frame);return o};
+const rooms=[...track.querySelectorAll('.s-int-room')].map((el,i)=>{const o={el,i,r:RM[i],inn:el.querySelector('.s-int-room-in'),fw:el.querySelector('.s-int-fw'),
+  frame:el.querySelector('.s-int-frame'),v:el.querySelector('video'),fi:el.querySelector('.s-int-fi'),fn:el.querySelector('.s-int-fn'),
+  play:el.querySelector('.caps-play'),path:el.querySelector('.s-int-line path'),d:el.querySelector('.s-int-still .d'),n:el.querySelector('.s-int-still .n'),
+  sb:el.querySelector('.s-int-still button'),xs:[...el.querySelectorAll('.s-int-extras img')],segB:[...el.querySelectorAll('.caps-seg button')],
+  list:lbList(RM[i]),c:0,useVid:false,vErr:false,nightOn:false};
+  // o imagine care lipsește se ascunde
+  if(o.d)o.d.addEventListener('error',()=>{o.el.querySelector('.s-int-still').style.display='none'});
+  if(o.n)o.n.addEventListener('error',()=>{o.n.style.display='none'});
+  o.xs.forEach(im=>im.addEventListener('error',()=>{im.parentElement.style.display='none'}));
+  o.fi.addEventListener('error',()=>{o.fi.style.visibility='hidden'});
+  if(o.fn)o.fn.addEventListener('error',()=>{o.fn.style.display='none'});
+  if(o.v)o.v.addEventListener('error',()=>{o.vErr=true;const h=()=>{if(o.play)o.play.hidden=true};h();setTimeout(h,60);applyMedia();syncPlay()});
+  return o});
+const endEl=track.querySelector('.s-int-end');
+const items=rooms.map(o=>({el:o.el,inn:o.inn,c:0})).concat([{el:endEl,inn:endEl,c:0}]);
+const R0=rooms[0];
+
+// ---- stare ----
+let fT=0,film=false,phone=false,ready=false,secVis=false,active=-1,userPlay=-1,rigUp=false,lt=-1,raf=0,nameT=0;
+let stageH=0,VW=0,travel=0,E=1,W=1,PL=0,secTop=0;
+// ecran scund pe calculator (cadrul primește Zi/Seara) și telefon sub 740px (trece în modul B: cadrul ar fi prea mic)
+const CMP=matchMedia('(min-width:801px) and (max-height:751px)'),PSH=matchMedia('(max-width:800px) and (max-height:739px)');
+const rm=()=>C.rm.matches,useFN=()=>!film||phone||CMP.matches;
+const setImg=(im,src)=>{if(im&&src&&im.getAttribute('src')!==src)im.src=src};
+// conturul ferestrei X7 în pixelii cadrului (pathLength merge corect fără vector-effect)
+let WP=C.WIN.V;
+const scaleP=(d,w,h)=>{let cmd='',k=0;return d.match(/[A-Za-z]|-?\d*\.?\d+/g).map(x=>{if(/[A-Za-z]/.test(x)){cmd=x;k=0;return x}
+  const n=parseFloat(x);return(cmd==='H'?n*w:cmd==='V'?n*h:(k++%2?n*h:n*w)).toFixed(1)}).join(' ')};
+function lines(){rooms.forEach(o=>{const w=o.frame.offsetWidth,h=o.frame.offsetHeight;if(!w||!h)return;
+  const sv=o.path.parentNode;sv.setAttribute('viewBox',`0 0 ${w} ${h}`);o.path.setAttribute('d',scaleP(WP,w,h))})}
+
+function applyMedia(){
+  rooms.forEach(o=>{const r=o.r;
+    o.useVid=!!(r.v&&o.v&&!o.vErr&&(film||r.vw));
+    o.frame.classList.toggle('is-vid',o.useVid);
+    if(!ready)return;
+    if(o.useVid){const base=film?r.v:r.v+'_w';
+      if(o.v.dataset.cur!==base){o.v.pause();o.v.poster=base+'.webp';o.v.src=base+'.mp4';o.v.dataset.cur=base}}
+    else{if(o.v&&!o.v.paused)o.v.pause();const im=film?(r.frame||r.p||r.still):r.still;setImg(o.fi,im[0]);o.fi.alt=im[1]}
+    if(r.night&&o.fn&&useFN())setImg(o.fn,r.night[0]);
+    if(film&&!phone&&!CMP.matches){setImg(o.d,r.still[0]);if(o.n)setImg(o.n,r.night[0]);o.xs.forEach((im,k)=>setImg(im,r.extra[k][0]))}
+  });
+}
+function syncPlay(){
+  const RMo=rm();
+  rooms.forEach((o,i)=>{if(!o.v||!o.play)return;
+    const usable=ready&&o.useVid&&!(useFN()&&o.nightOn);
+    const want=usable&&secVis&&!document.hidden&&(RMo?i===userPlay:(i===active||i===userPlay));
+    if(want){if(o.v.paused)C.play(o.v,o.play)}
+    else{if(!o.v.paused)o.v.pause();o.play.hidden=!(RMo&&usable)}
+  });
+}
+function draw(o){if(o&&o.fw)o.fw.classList.add('drawn')}
+let nameTo=nameEl.textContent;
+function setName(n){
+  if(n===nameTo)return;nameTo=n;clearTimeout(nameT);
+  if(rm()){nameEl.textContent=n;nameEl.style.opacity='';return}
+  nameEl.style.opacity='0';nameT=setTimeout(()=>{nameEl.textContent=nameTo;nameEl.style.opacity=''},200);
+}
+function setActive(i){
+  if(i===active)return;active=i;
+  const end=i>=N,ri=end?N-1:i,r=RM[ri];
+  rooms.forEach((o,k)=>o.el.classList.toggle('on',k===i));endEl.classList.toggle('on',end);
+  zones.forEach(z=>{const on=z.dataset.z===r.z;z.classList.toggle('on',on);z.classList.toggle('dim',on&&end);if(on)z.setAttribute('aria-current','true');else z.removeAttribute('aria-current')});
+  lbls.forEach(t=>t.classList.toggle('on',t.dataset.z===r.z));
+  setName(r.n);
+  if(!rm())userPlay=-1;
+  if(!end&&(!film||rigUp))draw(rooms[i]);
+  if(!film)mk.style.transform=`translateX(${r.x}px)`;
+  syncPlay();
+}
+function measure(){
+  lines();
+  if(!film){sec.style.height='';PL=parseFloat(getComputedStyle(track).paddingLeft)||0;return}
+  stageH=stage.offsetHeight;VW=vp.clientWidth;
+  travel=Math.max(0,track.offsetWidth-VW);
+  E=Math.max(1,.3*stageH);W=Math.max(1,travel/K);
+  sec.style.height=Math.round(stageH+E+W+.1*stageH)+'px';
+  items.forEach(o=>{o.c=o.el.offsetLeft+o.el.offsetWidth/2});rooms.forEach((o,i)=>{o.c=items[i].c});
+  // lumina caldă din spatele primului cadru (1,6 × cadrul)
+  const f=R0.fw,gw=f.offsetWidth*1.6,gh=f.offsetHeight*1.6;
+  const gx=vp.offsetLeft+track.offsetLeft+R0.el.offsetLeft+R0.inn.offsetLeft+f.offsetLeft+f.offsetWidth/2;
+  const gy=vp.offsetTop+track.offsetTop+R0.el.offsetTop+R0.inn.offsetTop+f.offsetTop+f.offsetHeight*.55;
+  glow.style.width=gw+'px';glow.style.height=gh+'px';glow.style.transform=`translate(${(gx-gw/2).toFixed(1)}px,${(gy-gh/2).toFixed(1)}px)`;
+  lt=-1;
+}
+function updFilm(){
+  const S=-sec.getBoundingClientRect().top;
+  const e=C.clamp(S/E),w=C.clamp((S-E)/W),t=C.ease(e);
+  if(t!==lt){lt=t;
+    const L=k=>Math.round(C.lerp(k,255,t));
+    stage.style.backgroundColor=`rgb(${L(7)},${L(11)},${L(22)})`;
+    sec.classList.toggle('is-dark',t<.45);
+    glow.style.opacity=(1-t).toFixed(3);
+    plan.style.opacity=e.toFixed(3);plan.style.transform=`translateY(${((1-e)*12).toFixed(2)}px)`;
+    R0.fw.style.transform=`scale(${(1.12-.12*t).toFixed(4)})`;
+  }
+  if(e>=1&&!rigUp){rigUp=true;rig.classList.add('up');if(active===0)draw(R0)}
+  const x=w*travel,MX=phone?10:14,Z=phone?40:60;
+  track.style.transform=`translate3d(${(-x).toFixed(1)}px,0,0)`;
+  let best=0,bd=1e9;
+  items.forEach((o,i)=>{const d=(o.c-x-VW/2)/VW,a=Math.abs(d);
+    o.inn.style.transform=`rotateY(${C.clamp(-d*12,-MX,MX).toFixed(2)}deg) translateZ(${(-Z*a).toFixed(1)}px)`;
+    if(a<bd){bd=a;best=i}});
+  const Cx=x+VW/2;let mx=RM[0].x;
+  if(Cx>=rooms[N-1].c)mx=RM[N-1].x;
+  else for(let i=0;i<N-1;i++){const a=rooms[i],b=rooms[i+1];if(Cx>=a.c&&Cx<b.c){mx=RM[i].x+(Cx-a.c)/(b.c-a.c)*(RM[i+1].x-RM[i].x);break}}
+  mk.style.transform=`translateX(${mx.toFixed(3)}px)`;
+  setActive(best);
+}
+function updB(){
+  const sl=track.scrollLeft,max=track.scrollWidth-track.clientWidth;let best=0,bd=1e9;
+  items.forEach((o,i)=>{const d=Math.abs(Math.min(o.el.offsetLeft-PL,max)-sl);if(d<bd-1){bd=d;best=i}});
+  setActive(best);
+}
+function update(){raf=0;if(film)updFilm();else updB()}
+const req=()=>{if(!raf)raf=requestAnimationFrame(update)};
+function goTo(i,instant){
+  i=C.clamp(i,0,items.length-1);const it=items[i];
+  if(film){secTop=sec.getBoundingClientRect().top+scrollY;
+    const top=secTop+E+(travel>0?C.clamp((it.c-VW/2)/travel):0)*W;
+    scrollTo({top:Math.round(top)+1,behavior:instant?'auto':'smooth'})}
+  else track.scrollTo({left:Math.max(0,it.el.offsetLeft-PL),behavior:rm()?'auto':'smooth'});
+}
+function setNight(o,on){
+  o.nightOn=on;o.segB.forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.t==='n')===on)));
+  o.el.classList.toggle('is-night',on);
+  if(on&&ready&&o.fn&&useFN())setImg(o.fn,o.r.night[0]);
+  const a=on&&o.r.night?o.r.night[1]:o.r.still[1];if(o.sb)o.sb.setAttribute('aria-label','Mărește: '+a);
+  syncPlay();
+}
+function applyMode(){
+  film=!C.short.matches&&!C.rm.matches&&!PSH.matches;phone=C.phone.matches;
+  sec.classList.toggle('s-int--film',film);
+  WP=!film?C.WIN.L:phone?C.WIN.P:C.WIN.V;
+  if(film){track.removeAttribute('tabindex');track.scrollLeft=0}
+  else{track.setAttribute('tabindex','0');track.style.transform='';items.forEach(o=>{o.inn.style.transform=''});R0.fw.style.transform='';
+    stage.style.backgroundColor='';sec.classList.remove('is-dark');plan.style.opacity='';plan.style.transform='';glow.style.opacity='0'}
+  if(rm()){rig.classList.remove('up');rooms.forEach(o=>{if(o.el.classList.contains('on'))draw(o)})}
+  applyMedia();measure();active=-1;update();
+}
+
+// ---- evenimente ----
+track.addEventListener('click',e=>{
+  const b=e.target.closest('button');if(!b)return;const el=b.closest('.s-int-room');if(!el)return;
+  const o=rooms.find(x=>x.el===el);if(!o)return;
+  if(b.dataset.t){setNight(o,b.dataset.t==='n');return}
+  if(b.classList.contains('caps-play')){e.stopPropagation();
+    if(!rm()&&o.i!==active){goTo(o.i);return}
+    userPlay=o.i;if(o.nightOn&&useFN())setNight(o,false);else syncPlay();return}
+  const at=src=>Math.max(0,o.list.findIndex(a=>a[0]===src));
+  if(b.classList.contains('s-int-zoom')){C.lb(o.list,o.nightOn&&o.r.night?at(o.r.night[0]):o.useVid?0:at(o.fi.getAttribute('src')));return}
+  if(b===o.sb){C.lb(o.list,o.nightOn&&o.r.night?at(o.r.night[0]):0);return}
+  const xi=o.xs.findIndex(im=>b.contains(im));if(xi>=0)C.lb(o.list,at(o.r.extra[xi][0]));
+});
+zones.forEach(z=>{const i=RM.findIndex(r=>r.z===z.dataset.z);
+  z.addEventListener('click',()=>goTo(i));
+  z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goTo(i)}})});
+track.addEventListener('keydown',e=>{if(film||e.target!==track)return;
+  if(e.key==='ArrowRight'||e.key==='ArrowLeft'){e.preventDefault();goTo(Math.max(0,active)+(e.key==='ArrowRight'?1:-1))}});
+track.addEventListener('focusin',e=>{if(!film)return;let f=false;try{f=e.target.matches(':focus-visible')}catch(_){}
+  if(!f)return;const i=items.findIndex(o=>o.el.contains(e.target));if(i<0)return;clearTimeout(fT);
+  // după derularea proprie a browserului pentru focus (altfel o anulează)
+  fT=setTimeout(()=>{if(film&&i!==active)goTo(i,true)},30)});
+track.addEventListener('scroll',()=>{if(!film)req()},{passive:true});
+addEventListener('scroll',()=>{if(film)req()},{passive:true});
+let rz=0;addEventListener('resize',()=>{cancelAnimationFrame(rz);rz=requestAnimationFrame(()=>{const ph=C.phone.matches;if(ph!==phone){applyMode();return}measure();lt=-1;update()})});
+[C.short,C.rm,C.phone,CMP,PSH].forEach(m=>{const f=()=>applyMode();m.addEventListener?m.addEventListener('change',f):m.addListener(f)});
+new IntersectionObserver(es=>{secVis=es[es.length-1].isIntersecting;if(!secVis&&rm())userPlay=-1;syncPlay()}).observe(sec);
+new IntersectionObserver(es=>{if(es[es.length-1].isIntersecting&&!film&&!rm())rig.classList.add('up')},{threshold:.35}).observe(plan);
+document.addEventListener('visibilitychange',syncPlay);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{measure();lt=-1;update()});
+C.afterLoad(()=>{measure();lt=-1;update();C.near(sec,'100% 0px',()=>{ready=true;applyMedia();syncPlay()})});
+applyMode();
+})();
+</script><!--/JS-->

@@ -43,7 +43,7 @@ async function run(browser, w, h, name, reduced) {
   for (const [spot, fn] of SPOTS) {
     const y = await p.evaluate(fn);
     if (y < 0) continue;
-    await p.evaluate((y) => scrollTo(0, y), y);
+    await p.evaluate((y) => window.scrollTo({ top: y, behavior: 'instant' }), y);
     await p.waitForTimeout(spot === 'zi-noapte' ? 3200 : 1600);
     await p.screenshot({ path: `screenshots/${tag}-${spot}-${w}x${h}.png` });
     const st = await p.evaluate(() => ({
