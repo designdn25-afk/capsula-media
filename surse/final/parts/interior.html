@@ -107,6 +107,7 @@
 .s-int--film .s-int-sub-l{display:inline}
 .s-int--film .s-int-sub-x{display:none}
 .s-int--film .s-int-plan{flex:none;width:clamp(320px,30vw,460px);max-width:none;margin:0;will-change:opacity,transform}
+.s-int--film .s-int-plan:focus-within{opacity:1!important;transform:none!important}
 .s-int--film .s-int-viewport{flex:1;min-height:0;margin-top:clamp(20px,3svh,36px);display:flex;align-items:flex-start;padding-bottom:44px;perspective:1400px;z-index:1}
 .s-int--film .s-int-track{flex:none;width:max-content;align-items:flex-end;gap:5vw;overflow:visible;scroll-snap-type:none;margin:0;padding:0 10vw 0 max(16px,calc((100% - 1240px)/2));transform-style:preserve-3d;will-change:transform}
 .s-int--film .s-int-room{flex:none;transform-style:preserve-3d}
@@ -216,6 +217,7 @@
 <section id="interior" class="s-int" aria-labelledby="intTitle">
  <div class="s-int-stage">
   <div class="s-int-glow" aria-hidden="true"></div>
+  <div class="wrap s-int-foot"><p>Capsula X7 din showroom-ul din Ciorogârla. Mobilierul și unele elemente prezentate sunt opționale.</p><a class="s-int-skip" href="#caracteristici">Sari peste ↓</a></div>
   <div class="wrap s-int-head">
    <div class="s-int-hl">
     <div class="eyebrow reveal" data-n="01">Interior</div>
@@ -263,7 +265,6 @@
     <div class="s-int-ruler" aria-hidden="true"><span>0 m</span><i></i><span>11,5 m</span></div>
    </figure>
   </div>
-  <div class="wrap s-int-foot"><p>Capsula X7 din showroom-ul din Ciorogârla. Mobilierul și unele elemente prezentate sunt opționale.</p><a class="s-int-skip" href="#caracteristici">Sari peste ↓</a></div>
   <div class="s-int-viewport"><div class="s-int-track" id="intTrack" role="group" aria-label="Camerele capsulei X7"></div></div>
  </div>
 </section><!--/HTML-->
@@ -374,8 +375,8 @@ function applyMedia(){
     if(o.useVid){const base=film?r.v:r.v+'_w';
       if(o.v.dataset.cur!==base){o.v.pause();o.v.poster=base+'.webp';o.v.src=base+'.mp4';o.v.dataset.cur=base}}
     else{if(o.v&&!o.v.paused)o.v.pause();const im=film?(r.frame||r.p||r.still):r.still;setImg(o.fi,im[0]);o.fi.alt=im[1]}
-    if(r.night&&o.fn&&useFN())setImg(o.fn,r.night[0]);
-    if(film&&!phone&&!CMP.matches){setImg(o.d,r.still[0]);if(o.n)setImg(o.n,r.night[0]);o.xs.forEach((im,k)=>setImg(im,r.extra[k][0]))}
+    if(r.night&&o.fn&&useFN()&&o.nightOn)setImg(o.fn,r.night[0]);
+    if(film&&!phone&&!CMP.matches){setImg(o.d,r.still[0]);if(o.n&&o.nightOn)setImg(o.n,r.night[0]);o.xs.forEach((im,k)=>setImg(im,r.extra[k][0]))}
   });
 }
 function syncPlay(){
@@ -469,7 +470,9 @@ function goTo(i,instant){
 function setNight(o,on){
   o.nightOn=on;o.segB.forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.t==='n')===on)));
   o.el.classList.toggle('is-night',on);
-  if(on&&ready&&o.fn&&useFN())setImg(o.fn,o.r.night[0]);
+  if(on&&o.r.night){if(o.fn&&useFN())setImg(o.fn,o.r.night[0]);if(o.n)setImg(o.n,o.r.night[0])}
+  // 20) poza de seară din cadru primește textul alternativ când e cea vizibilă
+  if(o.fn)o.fn.alt=on&&o.r.night?o.r.night[1]:'';
   const a=on&&o.r.night?o.r.night[1]:o.r.still[1];if(o.sb)o.sb.setAttribute('aria-label','Mărește: '+a);
   syncPlay();
 }
@@ -497,6 +500,7 @@ track.addEventListener('click',e=>{
   if(b===o.sb){C.lb(o.list,o.nightOn&&o.r.night?at(o.r.night[0]):0);return}
   const xi=o.xs.findIndex(im=>b.contains(im));if(xi>=0)C.lb(o.list,at(o.r.extra[xi][0]));
 });
+plan.addEventListener('focusin',()=>{if(film&&!rigUp){secTop=sec.getBoundingClientRect().top+scrollY;scrollTo({top:Math.round(secTop+E)+1,behavior:'auto'})}});
 zones.forEach(z=>{const i=RM.findIndex(r=>r.z===z.dataset.z);
   z.addEventListener('click',()=>goTo(i));
   z.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();goTo(i)}})});
@@ -507,10 +511,13 @@ track.addEventListener('focusin',e=>{if(!film)return;let f=false;try{f=e.target.
   // după derularea proprie a browserului pentru focus (altfel o anulează)
   fT=setTimeout(()=>{if(film&&i!==active)goTo(i,true)},30)});
 track.addEventListener('scroll',()=>{if(!film)req()},{passive:true});
+// preîncarcă poza de seară când mouse-ul sau focusul ajung pe „Seara”
+const pre=e=>{const b=e.target.closest&&e.target.closest('button[data-t="n"]');if(!b)return;const o=rooms.find(x=>x.el.contains(b));if(o&&o.r.night){const im=new Image();im.src=o.r.night[0]}};
+track.addEventListener('pointerover',pre);track.addEventListener('focusin',pre);
 addEventListener('scroll',()=>{if(film)req()},{passive:true});
 let rz=0;addEventListener('resize',()=>{cancelAnimationFrame(rz);rz=requestAnimationFrame(()=>{const ph=C.phone.matches;if(ph!==phone){applyMode();return}measure();lt=-1;update()})});
 [C.short,C.rm,C.phone,CMP,PSH].forEach(m=>{const f=()=>applyMode();m.addEventListener?m.addEventListener('change',f):m.addListener(f)});
-new IntersectionObserver(es=>{secVis=es[es.length-1].isIntersecting;if(!secVis&&rm())userPlay=-1;syncPlay()}).observe(sec);
+new IntersectionObserver(es=>{const en=es[es.length-1];secVis=en.isIntersecting&&en.intersectionRatio>0;if(!secVis&&rm())userPlay=-1;syncPlay()},{threshold:[0,.01]}).observe(sec);
 new IntersectionObserver(es=>{if(es[es.length-1].isIntersecting&&!film&&!rm())rig.classList.add('up')},{threshold:.35}).observe(plan);
 document.addEventListener('visibilitychange',syncPlay);
 if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{measure();lt=-1;update()});

@@ -143,7 +143,7 @@ let items=window.EXT.map(e=>{
  if(e.fp){src=document.createElement('source');src.media='(max-width:800px) and (min-height:621px)';src.dataset.srcset=e.fp;pic.appendChild(src)}
  const img=document.createElement('img');const wh=/real_v/.test(e.f)?[1600,900]:SIZE[e.kind];
  img.width=wh[0];img.height=wh[1];img.alt=e.t;img.decoding='async';img.draggable=false;img.dataset.src=e.f;pic.appendChild(img);
- const cap=document.createElement('figcaption');cap.className='caps-label';cap.setAttribute('aria-hidden','true');cap.textContent=e.t;
+ const cap=document.createElement('span');cap.className='caps-label';cap.setAttribute('aria-hidden','true');cap.textContent=e.t;
  const card=document.createElement('div');card.className='s-ext-c';card.append(pic,cap);fig.appendChild(card);T.appendChild(fig);
  const dot=document.createElementNS(NS,'g');dot.setAttribute('class','s-ext-dot');dot.setAttribute('role','button');dot.setAttribute('tabindex','0');
  dot.setAttribute('aria-label','Privește din: '+e.t);dot.setAttribute('transform',`translate(${e.x} ${e.y})`);

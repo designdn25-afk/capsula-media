@@ -8,6 +8,10 @@ a = s.index('<style>') + len('<style>'); b = s.index('</style>', a)
 css = s[a:b]
 rest = s[:a] + s[b:]
 rest_nocss = re.sub(r'<style[^>]*>.*?</style>', '', rest, flags=re.S)
+# fișiere suplimentare care pot folosi clasele (ex. părțile asamblate): --cu f1,f2
+if '--cu' in sys.argv:
+    for f in sys.argv[sys.argv.index('--cu')+1].split(','):
+        rest_nocss += open(f, encoding='utf-8').read()
 def used(tok):
     return re.search(r'(?<![\w-])' + re.escape(tok) + r'(?![\w-])', rest_nocss) is not None
 def sel_dead(sel):

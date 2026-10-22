@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
 """Construiește pagina din surse/final/home.base.html + surse/final/parts/<nume>.html.
 Fiecare parte are trei blocuri: <!--CSS-->…<!--/CSS-->, <!--HTML-->…<!--/HTML-->, <!--JS-->…<!--/JS-->.
-Folosire: python3 tools/asambleaza.py [--only interior,exterior] [--out site/home.html]"""
+Folosire: python3 tools/asambleaza.py [--only interior,exterior] [--out site/home.html]
+Fără --out scrie site/home.html și copia ei site/index.html."""
 import sys, os, re
 R = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 args = sys.argv[1:]
@@ -23,3 +24,6 @@ s = s.replace('<!--PARTCSS-->\n', '\n'.join(c for c in css if c) + ('\n' if any(
 s = s.replace('<!--PARTJS-->\n', '\n'.join(j for j in js if j) + ('\n' if any(js) else ''))
 open(out, 'w', encoding='utf-8').write(s)
 print('scris', os.path.relpath(out, R), len(s))
+# pagina principală e și index.html (ce deschide un hosting static la adresa de bază)
+if out == os.path.join(R, 'site/home.html'):
+    open(os.path.join(R, 'site/index.html'), 'w', encoding='utf-8').write(s); print('scris site/index.html (copie)')

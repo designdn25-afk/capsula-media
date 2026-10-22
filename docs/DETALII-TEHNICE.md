@@ -1,5 +1,10 @@
 # Detalii tehnice și istoric
 
+> **Din 22 oct 2026 (site-ul final):** prima pagină se generează din `surse/final/home.base.html` + `surse/final/parts/*.html`
+> cu `python3 tools/asambleaza.py`. Specificația completă a secțiunilor noi (texte, mărimi, comportamente) e în
+> `surse/final/SPEC.md`; ce arată fiecare poză/clip nou e în `surse/final/media.json`. Secțiunile 4 (hero V1) și 5 (hero V2)
+> de mai jos descriu variante scoase din pagină; rămân ca referință.
+
 Citește secțiunea potrivită înainte să lucrezi la hero, la turul 360 sau la imagini.
 Sursa de adevăr este întotdeauna `site/home.html`: tot CSS-ul și JavaScript-ul sunt inline acolo.
 
@@ -144,3 +149,24 @@ apoi aliniate cu `surse/hero-v2/align.py` (ECC afin pe hărți de contururi).
 - Python 3 cu `numpy`, `opencv-python`, `pillow`, `scipy` pentru scripturile din `surse/`.
 - Node + Playwright (Chromium) pentru `tools/test_pagini.js`.
 - Imaginile se salvează în WebP (calitate 82–86, `method=6`). PNG doar pentru măști.
+
+## 11. Site-ul final (22 oct 2026)
+- **Hero (#top):** doar `img/x7s_night.webp`, randată în WebGL cu harta de adâncime `img/x7s_depth.png` (canalul G):
+  cameră care „respiră” (perioade 24 s / 33 s), urmează puțin mouse-ul, se ridică la derulare; bucla se oprește când hero-ul
+  nu se vede. Textul: un rând de titlu, un rând de informații, două butoane. Butonul WhatsApp apare abia după hero (`body.at-top`).
+  Bara de sus rămâne închisă la culoare (`nav.dark`) peste noapte și peste intrarea întunecată din #interior.
+- **#interior** (`parts/interior.html`): mod „film” (scenă fixată, derularea mișcă pista de camere) pe ecrane de cel puțin
+  621px înălțime (telefon: 740px) fără mișcare redusă; altfel mod „glisare” (pistă orizontală, planul e meniul).
+  Intrarea: fundal de noapte, apoi lumina zilei se deschide ca un cerc din prima fereastră (`--rv`, `--cx`, `--cy`).
+  Camerele vin din `window.ROOMS` (clipuri din `img/vid`, poze din `img/int`). Ramele au forma ferestrei X7 (`--win-v/p/l`).
+  Planul e SVG după geometria turului 360, rotit 180° (livingul în stânga).
+- **#exterior** (`parts/exterior.html`): 8 opriri din `window.EXT` (poze din panoramele de exterior + 2 fotografii reale),
+  carusel cu scroll-snap nativ și rotire 3D după distanța de centru, hartă de sus cu conul camerei, un singur tur automat.
+- **#zi-noapte** (`parts/zi-noapte.html`): `x7s_night` (stânga) și `x7s_day` (dreapta) despărțite de o linie aurie;
+  „răsăritul” o singură dată; WebGL leneș pe calculator (același shader ca hero-ul), clip-path în rest.
+  Eticheta „Vizualizare realizată pornind de la fotografia capsulei X7.” e obligatorie (imaginile sunt făcute cu AI).
+- **Galerie:** `window.GAL` are la final `x7_photo.jpg`; afișarea urmează `ORD`, iar lightbox-ul comun
+  `window.openLB(listă, i)` primește lista în ordinea de pe ecran.
+- **Pozele noi:** `surse/final/pano_view.py` (decupaje din panoramele 360: exteriorul din release-ul GitHub `v1`, PNG 8192×4096;
+  interiorul din `site/p360/*_x.webp`). Clipurile: din video-urile `1020.*.mp4` (release `v1`), H.264 720×1280, fără sunet.
+- **Verificare:** `node tools/test_pagini.js` (5 mărimi + mișcare redusă). Ultima rulare: toate „ok”.
