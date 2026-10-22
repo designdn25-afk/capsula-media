@@ -85,6 +85,19 @@ apoi aliniate cu `surse/hero-v2/align.py` (ECC afin pe hărți de contururi).
 - Etichetele etapelor (vectorul `ST`): Terenul · Structura din oțel · Panouri și vitraj · Capsula finalizată · Seara, acasă.
 - Pe ecrane ≤800 px imaginea stă sus (de la 64 px, înălțime 50svh, `object-position:80% 50%`), iar textele sunt dedesubt.
 
+### Hero V2 în 3D (22 oct 2026)
+- Scriptul „hero V2 în 3D” din home.html randează cele 4 imagini într-o `<canvas id="bldGL">` (WebGL 1), în locul imaginilor `.L`
+  (clasa `gl3d` pe `.bld-cam` le ascunde). Cronometrul vechi rămâne sursa timpului: scrie `window.__bldT`, iar textele, etapele și
+  butoanele merg ca înainte.
+- `img/x7s_depth.png`: harta de adâncime (alb = aproape). Canalul R e pentru teren și structură (cu stiva de panouri), G pentru capsula
+  finalizată și seara. Se generează cu `surse/hero-v2-3d/depth.py` (rulează din `site/img`; orizontul e la rândul 815, iar linia de
+  contact a capsulei cu solul merge de la (900, 915) la (1930, 850)).
+- Camera: paralaxă după adâncime, cu capsula ca punct fix (`f=.42`). Amplitudinea e 0,045 pe calculator și 0,03 pe telefon
+  (`A` în script). Merge de la stânga la dreapta în 13,5 s, apoi se leagănă ușor. Pe calculator urmărește puțin mouse-ul.
+- Etapele: structura apare de jos în sus între 3,4 și 5,8 s, panourile între 6,3 și 9,2 s (cu linia aurie doar pe pixelii care se
+  schimbă), iar seara între 10,0 și 12,6 s (întâi se întunecă, apoi se aprind luminile).
+- Fără WebGL sau cu `prefers-reduced-motion` se văd imaginile obișnuite, ca înainte.
+
 ## 6. Turul 360 (`#tur`)
 - Motor: Pannellum (commit 99f4afd, compilat din sursă), inclus inline în home.html (`<style id="pnlm-css">` și scriptul lui).
 - Datele sunt în scriptul „tur virtual interior X7”:

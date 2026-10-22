@@ -20,6 +20,10 @@ Conținutul vine de pe casecapsula.ro. Proiectul a fost început într-o convers
   - **V1**: poza reală a capsulei, cu efect 3D (straturi și parallax). Încadrarea pe calculator e **aprobată**.
   - **V2**: construcția capsulei „ca un video” (teren gol → structură → panouri → capsula → seara).
     Rulează singură, **fără scroll**.
+    Din 22 oct 2026 e randată **în 3D (WebGL)**: camera se rotește lent în jurul capsulei, structura și panourile se
+    construiesc de jos în sus cu o linie aurie, seara luminile se aprind după ce se întunecă cerul (la cererea clientului:
+    „O refac în 3D”). Versiunea dinainte: `versiuni/home-inainte-v2-3d/`.
+- Sub hero, prima pagină are efecte 3D (apariție în perspectivă, carduri care se înclină). Versiunea dinainte: `versiuni/home-inainte-3d/`.
 - Turul virtual 360° a fost pus pe pauză de client („hai să lăsăm momentan turul 360”).
 
 ## Structura
