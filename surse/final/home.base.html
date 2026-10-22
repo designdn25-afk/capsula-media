@@ -263,13 +263,15 @@ footer li a:hover{color:var(--accent)}
 .reveal{opacity:0;transform:translateY(30px);transition:opacity .9s,transform .9s cubic-bezier(.2,.7,.2,1)}
 .reveal.in{opacity:1;transform:none}
 
-@media (max-width:1000px){
+/* meniul compact: sub 1200px cele 9 linkuri și butonul nu mai încap pe un rând */
+@media (max-width:1199px){
   .links,.lang{display:none}
   .burger{display:block}
   .links.open{display:flex;position:absolute;top:72px;left:0;right:0;flex-direction:column;gap:0;background:rgba(11,12,14,.97);border-bottom:1px solid var(--line);padding:8px 16px 20px}
   .links.open a{padding:14px 0;border-bottom:1px solid var(--line);color:var(--ink);font-size:16px}
   .navcta .btn{display:none}
-  
+}
+@media (max-width:1000px){
   .gal{grid-template-columns:1fr 1fr;grid-auto-rows:170px}
 }
 @media (max-width:800px){
@@ -722,7 +724,7 @@ nav.solid .burger{color:var(--ink)}
 nav.solid .btn-light{background:var(--ink);color:#fff}
 .btn-ghost{border:1px solid rgba(15,20,30,.22);color:var(--ink)}
 .btn-ghost:hover{background:rgba(15,20,30,.05)}
-@media (max-width:1100px){.links.open{background:rgba(255,255,255,.98)!important}.links.open a{color:var(--ink)!important}}
+@media (max-width:1199px){.links.open{background:rgba(255,255,255,.98)!important}.links.open a{color:var(--ink)!important}}
 /* hero rămâne pe poză: text alb */
 .stage3d{height:100vh!important;height:100svh!important;min-height:620px}
 
