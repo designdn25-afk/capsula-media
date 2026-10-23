@@ -69,6 +69,8 @@ Ordinea primei pagini: hero de noapte (#top) → 01 Interior (plimbare prin came
 - **Site-ul online, public (oricine are adresa, fără logare):** https://designdn25-afk.github.io/capsula-media/
   (GitHub Pages, ramura `gh-pages`; pus online pe 23 oct 2026 la cererea clientului: „pune-l online să-l vadă oricine”).
   Se actualizează cu `sh tools/publica_pages.sh` (reconstruiește pagina și urcă `site/` fără fișierele vechi).
+  **Ascuns de Google** (`noindex` în pagini + `site/robots.txt`): clientul nu vrea să fie public „gen .ro”, doar cu linkul.
+  Nu scoate `noindex` fără acordul lui.
 - **Site-ul final (prima pagină nouă), previzualizare privată:** https://claude.ai/artifact/9KFViWSHxSHJm3UR87sfr9
   (se actualizează din această sesiune Claude Code, cu același fișier `site/home.html`).
 - Linkurile publice vechi („oricine are linkul”), cu variantele dinainte: V2 https://claude.ai/artifact/XA6dNq77wKbmrcDCdum9Sm ·
