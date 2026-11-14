@@ -15,15 +15,17 @@ void main(){vec3 d=look((vUv*2.-1.)-off*2.);vec2 uv=vec2(.5+atan(d.x,-d.z)/6.283
 }` });
   const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false;
   const scene = new THREE.Scene(); scene.add(quad); const cam = new THREE.Camera();
-  const cache = new Map(), loader = new THREE.TextureLoader();
+  const cache = new Map(), loader = new THREE.TextureLoader(), order = [];   // order = cele folosite recent (se țin cel mult 3 în memorie)
+  const touch = url => { const i = order.indexOf(url); if (i >= 0) order.splice(i, 1); order.push(url); };
+  const trim = () => { while (order.length > 3) { const u = order.shift(), e = cache.get(u); if (e && e.tex && e.tex !== U.tA.value) { e.tex.dispose(); cache.delete(u); } else if (e && e.tex) { order.push(u); break; } } };
   // încarcă o panoramă (o singură dată); întoarce o promisiune cu textura sau null
   function load(url) {
     let e = cache.get(url); if (e) return e.p;
     e = { tex: null }; cache.set(url, e);
-    e.p = new Promise(res => loader.load(url, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; e.tex = t; res(t); }, undefined, () => { cache.delete(url); res(null); }));
+    e.p = new Promise(res => loader.load(url, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; e.tex = t; touch(url); trim(); res(t); }, undefined, () => { cache.delete(url); res(null); }));
     return e.p;
   }
-  const ready = url => { const e = cache.get(url); return e && e.tex ? e.tex : null; };
+  const ready = url => { const e = cache.get(url); if (e && e.tex) { touch(url); return e.tex; } return null; };
   // desenează fotografia peste ce e deja în cadru; yaw/pitch în grade (yaw 0 = centrul imaginii, plus = spre dreapta), fov vertical în grade
   function render(tex, texB, mixB, opacity, yaw, pitch, fov, asp, offX, offY) {
     U.tA.value = tex; U.tB.value = texB || tex; U.mixB.value = texB ? mixB : 0; U.op.value = opacity; U.yaw.value = yaw * Math.PI / 180; U.pitch.value = pitch * Math.PI / 180;

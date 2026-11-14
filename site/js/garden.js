@@ -46,6 +46,7 @@ async function boot() {
     if (r.status !== 'fulfilled') return;
     try {
       const c = CASE[i], api = r.value.build(G.M), inf = r.value.info || {}, s = api.size || { w: inf.w, d: inf.d, h: inf.h, cz: 0 };
+      try { mergeHouse(api); } catch (e) { console.warn('gradina: casa ' + c.cod + ' a rămas neunită', e); }
       const g = new THREE.Group(); g.position.set(c.x, 0, c.z); g.rotation.y = c.rot * DEG; g.add(api.root); G.scene.add(g);
       const hit = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.h, s.d), new THREE.MeshBasicMaterial({ visible: false })); hit.position.set(0, s.h / 2, s.cz || 0); g.add(hit);
       g.updateMatrixWorld(true);
@@ -115,7 +116,9 @@ async function boot() {
     W3.tyaw = jump ? p.yaw : W3.yaw + ((((p.yaw - W3.yaw) % 360) + 540) % 360 - 180); W3.tpitch = p.pitch; if (jump) { W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; }
     wake();
   }
-  const panoUrl = k => 'p360/' + k + '_m.webp';
+  // fotografiile mari (6144 px) doar pe ecrane mari, cu placă video care le duce; altfel cele de 4096 px
+  const bigPano = G.renderer.capabilities.maxTextureSize >= 6144 && fine.matches && Math.max(innerWidth, innerHeight) * Math.min(devicePixelRatio || 1, 2) > 1500;
+  const panoUrl = k => 'p360/' + k + (bigPano ? '_l' : '_m') + '.webp';
 
   /* unde stă camera: toată grădina, o casă văzută din față, o casă văzută de sus (în interior). L = ecran lat, P = ecran înalt */
   function station(out) {
@@ -143,7 +146,8 @@ async function boot() {
   }
 
   /* ---------- comenzi ---------- */
-  function select(i, keepAuto) { if (!keepAuto) stopAuto(); const w = walking(); if (w) startBlend(1.7); lvl = 1; if (i < 0) goTo('all', -1); else goTo('house', i); if (w) tr = 1; sync(); }
+  function select(i, keepAuto) { if (!keepAuto) stopAuto(); const w = walking(); if (w) startBlend(1.7); lvl = 1; if (i < 0) goTo('all', -1); else goTo('house', i); if (w) tr = 1; sync();
+    if (i >= 0 && H[i].c.pano && window.VTN) { const p = buildWalk(H[i]).pts[0]; if (p && p.k) pano.load(panoUrl(timeGoal > 15 && p.kn ? p.kn : p.k)); } }   // fotografia primei camere se cere din timp
   function enter(keepAuto, view) {
     if (sel < 0) return; if (!keepAuto) stopAuto(); lvl = 1; inView = view || 'walk';
     if (inView === 'walk' && !buildWalk(H[sel]).pts.length) inView = 'plan';
@@ -205,6 +209,9 @@ async function boot() {
   tourBtn.onclick = () => (auto ? stopAuto() : startAuto());
   if (rm) tourBtn.hidden = true;
   stage.addEventListener('keydown', e => { if (e.key === 'Escape' && mode !== 'all' && !document.querySelector('#cmodal.on')) { e.stopPropagation(); mode === 'in' ? leave() : select(-1); } });
+  // în casă, săgețile de pe tastatură rotesc privirea
+  stage.addEventListener('keydown', e => { if (!walking() || !/^Arrow/.test(e.key) || /^(INPUT|SELECT|TEXTAREA)$/.test(e.target.tagName)) return; e.preventDefault(); stopAuto();
+    if (e.key === 'ArrowLeft') W3.tyaw += 18; else if (e.key === 'ArrowRight') W3.tyaw -= 18; else W3.tpitch = clamp(W3.tpitch + (e.key === 'ArrowUp' ? 8 : -8), -40, 40); wake(); });
 
   /* ---------- apăsat și tras pe scenă ---------- */
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(), hits = H.map(h => h.hit);
@@ -300,4 +307,34 @@ async function boot() {
   addEventListener('resize', () => { needMeasure = 1; wake(); });
   sync();
   window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
+}
+
+/* Mai puține desene pe cadru (contează pe telefoane): piesele unei case care au același material și se mișcă împreună
+   (nu sunt despărțite de un acoperiș sau de un etaj care se ridică) devin o singură piesă. Forma rămâne exact aceeași. */
+function mergeHouse(api) {
+  const root = api.root, dyn = new Set(), y0 = new Map(); root.updateMatrixWorld(true);
+  root.traverse(o => y0.set(o, o.position.y));
+  for (let k = 1; k <= (api.levels || 1); k++) { api.openRoof(k - .4); root.traverse(o => { if (o !== root && Math.abs(o.position.y - y0.get(o)) > 1e-4) dyn.add(o); }); }
+  api.openRoof(0); root.updateMatrixWorld(true);
+  const buckets = new Map();
+  root.traverse(o => {
+    if (!o.isMesh || o.isInstancedMesh || !o.visible || Array.isArray(o.material) || o.children.length || !o.geometry.attributes.position || !o.geometry.attributes.normal) return;
+    let a = o.parent, vis = true; while (a && a !== root && !dyn.has(a)) { if (!a.visible) vis = false; a = a.parent; } if (!vis || !a) return;
+    const key = o.material.uuid + '|' + a.id + '|' + (o.castShadow ? 1 : 0) + (o.receiveShadow ? 1 : 0) + '|' + o.renderOrder + '|' + (o.geometry.attributes.color ? 1 : 0);
+    let b = buckets.get(key); if (!b) buckets.set(key, b = { base: a, list: [] }); b.list.push(o);
+  });
+  const inv = new THREE.Matrix4(), m4 = new THREE.Matrix4(), n3 = new THREE.Matrix3(), v = new THREE.Vector3(), nn = new THREE.Vector3();
+  buckets.forEach(({ base, list }) => {
+    if (list.length < 2) return; inv.copy(base.matrixWorld).invert();
+    const pos = [], nor = [], col = [], hasCol = !!list[0].geometry.attributes.color, o0 = list[0];
+    list.forEach(o => {
+      const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry, P = g.attributes.position, N = g.attributes.normal, C = g.attributes.color;
+      m4.multiplyMatrices(inv, o.matrixWorld); n3.getNormalMatrix(m4); const flip = m4.determinant() < 0;
+      const put = i => { v.fromBufferAttribute(P, i).applyMatrix4(m4); pos.push(v.x, v.y, v.z); nn.fromBufferAttribute(N, i).applyMatrix3(n3).normalize(); nor.push(nn.x, nn.y, nn.z); if (hasCol) col.push(C.getX(i), C.getY(i), C.getZ(i)); };
+      for (let i = 0; i + 2 < P.count; i += 3) { put(i); put(flip ? i + 2 : i + 1); put(flip ? i + 1 : i + 2); }
+      o.parent.remove(o); if (g !== o.geometry) g.dispose();
+    });
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); if (hasCol) geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    const m = new THREE.Mesh(geo, o0.material); m.castShadow = o0.castShadow; m.receiveShadow = o0.receiveShadow; m.renderOrder = o0.renderOrder; m.userData.cs = o0.castShadow; base.add(m);
+  });
 }
