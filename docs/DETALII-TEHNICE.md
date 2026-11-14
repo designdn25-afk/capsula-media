@@ -240,3 +240,11 @@ scoaterea secțiunii „Ziua și seara”. Copii: `versiuni/gradina-macheta/` (g
   devine mai limpede când camera e în casă; `genv.js` are gardul viu, aleile, straturile cu flori, copacii din „cartonașe” de frunze
   și umbrele de contact. Scena din pagină: ~100–150 de desene, ~150.000 de triunghiuri.
 
+
+## 14. Interior „real” cu AI în casele din grădină (14 nov 2026, noaptea)
+Clientul: „înăuntru la capsule… arată tot pătrățos, vreau să faci real, ca pe video” și a aprobat trimiterea imaginilor la ElevenLabs
+pentru toate casele. Pentru T7, E7, V3 și M9, fiecare cameră are acum o panoramă 360° realistă (`site/img/gd/ai/*.webp`, 19 fișiere,
+~11 MB în total, încărcate doar la cerere), făcută din imaginea 360° a machetei. `garden.js` le tratează ca pe fotografiile reale
+din X7 (`pano.js`), cu trei diferențe: cheia începe cu `ai:`, orientarea e `H = −rotirea casei` (imaginile sunt aliniate cu lumea)
+și seara nu se afișează (rămâne macheta). Fișa casei arată „Vizualizare realizată cu AI, orientativă”. La intrarea într-o cameră,
+privirea e îndreptată spre interior (cea mai lungă direcție care nu dă în geam). Pașii de refacere: `surse/ai360/CITESTE.md`.

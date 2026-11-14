@@ -1,0 +1,32 @@
+<!doctype html><meta charset="utf-8"><title>captură 360</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<canvas id="c"></canvas>
+<script type="module">
+// Imagine 360° (echirectangulară) a machetei, dintr-un punct din lume: ?x=&y=&z=&t=&w=4096&face=1536
+// Centrul imaginii privește spre −Z (în lume), iar spre dreapta e +X. Folosită ca sursă pentru vizualizările făcute cu AI.
+import { THREE } from './js/kit.js';
+import { createGScene } from './js/gscene.js';
+import { buildGarden } from './js/genv.js';
+import { CASE } from './js/gradina-data.js';
+const q = new URLSearchParams(location.search), n = (k, d) => (q.has(k) ? +q.get(k) : d);
+const cv = document.getElementById('c'), G = createGScene(cv, { half: 48 }), R = G.renderer;
+const H = [];
+for (const c of CASE) { const mod = await import('./js/' + c.mod + '.js'), api = mod.build(G.M), s = api.size, g = new THREE.Group(); g.position.set(c.x, 0, c.z); g.rotation.y = c.rot * Math.PI / 180; g.add(api.root); G.scene.add(g); g.updateMatrixWorld(true); H.push({ c, api, g, s, center: g.localToWorld(new THREE.Vector3(0, 0, s.cz || 0)) }); }
+const env = buildGarden(G, H), d = G.setTime(n('t', 10.6)); env.night(d.n);
+const W = n('w', 4096), P = new THREE.Vector3(n('x', 0), n('y', 2.2), n('z', 0));
+R.setPixelRatio(1); R.setSize(64, 64, false); G.camera.near = .08; G.camera.position.copy(P); G.camera.lookAt(P.x, P.y, P.z - 1); G.camera.updateProjectionMatrix();
+G.scene.fog.near = 70; G.scene.fog.far = 520; R.shadowMap.needsUpdate = true; G.render(); G.render();
+const rt = new THREE.WebGLCubeRenderTarget(n('face', 1536), { type: THREE.HalfFloatType }), cube = new THREE.CubeCamera(.08, 1200, rt); cube.position.copy(P); G.scene.add(cube);
+cube.update(R, G.scene);
+const mat = new THREE.ShaderMaterial({ uniforms: { cube: { value: rt.texture }, fx: { value: n('fx', 1) } }, depthTest: false,
+  vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
+  fragmentShader: `uniform samplerCube cube;uniform float fx;varying vec2 vUv;
+void main(){float lon=(vUv.x-.5)*6.2831853,lat=(vUv.y-.5)*3.14159265;vec3 d=vec3(sin(lon)*cos(lat),sin(lat),-cos(lon)*cos(lat));
+ gl_FragColor=vec4(textureCube(cube,vec3(fx*d.x,d.y,d.z)).rgb,1.);
+ #include <tonemapping_fragment>
+ #include <colorspace_fragment>
+}` });
+const sc = new THREE.Scene(); sc.add(new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat)); 
+R.setRenderTarget(null); R.setSize(W, W / 2, false); cv.style.width = W + 'px'; cv.style.height = W / 2 + 'px'; R.render(sc, new THREE.Camera());
+window.__ready = true;
+</script>

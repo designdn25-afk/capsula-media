@@ -105,7 +105,7 @@ async function boot() {
           for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, dx = Math.sin(a), dz = Math.cos(a); if (cast(x, fy + .35, z, dx, 0, dz, .5).length || cast(x, fy + 1.15, z, dx, 0, dz, .5).length) return false; } return true; };
         search: for (const rad of [0, .4, .8, 1.2, 1.6]) for (let i = 0; i < (rad ? 10 : 1); i++) { const a = i * Math.PI / 5, x = P.x + Math.sin(a) * rad, z = P.z + Math.cos(a) * rad; if (free(x, z)) { best = [x, z]; break search; } }
         const [x, z] = best || [P.x, P.z]; let yaw = h.c.rot, sc = -1;
-        for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6, hit = cast(x, fy + 1.5, z, Math.sin(a), 0, Math.cos(a), 14)[0], v = (hit ? hit.distance : 14) + (hit && fam(hit.object.material, M.glass) ? 3 : 0); if (v > sc) { sc = v; yaw = a / DEG; } }
+        for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6, hit = cast(x, fy + 1.5, z, Math.sin(a), 0, Math.cos(a), 14)[0], v = Math.min(hit ? hit.distance : 14, 9) * (!hit || fam(hit.object.material, M.glass) ? .1 : 1); if (v > sc) { sc = v; yaw = a / DEG; } }   // privirea merge spre interior (cea mai lungă direcție care nu dă în geam)
         pts.push({ n: r.n, p: new THREE.Vector3(x, fy + 1.55, z), yaw, pitch: -4, k: null });
       });
       // vizualizări 360° făcute cu AI din aceste puncte (aliniate cu lumea: centrul imaginii privește spre −Z)

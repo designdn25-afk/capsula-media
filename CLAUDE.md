@@ -122,10 +122,13 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
 ## Ce mai e de făcut (la 14 noiembrie 2026)
 - **Casele adevărate pentru grădină**: de cerut clientului lista caselor model comandate, cu poze / planuri, dimensiuni și
   preț. Până atunci grădina arată exemple din catalog. De întrebat și cum vrea să arate grădina (alei, flori, lămpi).
-- **Film „ca în realitate” făcut cu AI** (cerut de client pe 14 nov 2026, cu un filmuleț de pe Instagram: o animație 3D simplă
-  trecută printr-un generator video): se poate face cu conectorul ElevenLabs (imagine → imagine reală → video). Două cadre-sursă
-  ale grădinii sunt deja în `site/img/gd/sursa-1.jpg` și `sursa-2.jpg`. **Nu s-a generat nimic încă**: trimiterea imaginilor și
-  consumul de credite cer acordul clar al clientului. Orice imagine sau film făcut așa primește eticheta „Vizualizare realizată cu AI”.
+- **Interiorul caselor, „real” cu AI** (cerut de client pe 14 nov 2026: „înăuntru… arată tot pătrățos, vreau să faci real, ca pe
+  video”; a aprobat explicit trimiterea imaginilor la ElevenLabs și consumul de credite pentru toate casele): din fiecare cameră a
+  caselor T7, E7, V3 și M9 s-a scos o imagine 360° a machetei și a fost transformată în imagine realistă (19 imagini, în
+  `site/img/gd/ai/`, legate în `site/js/gradina-data.js` prin `ai: [...]`). Pe site apar cu mențiunea „Vizualizare realizată cu AI,
+  orientativă” — **nu scoate mențiunea** (generatorul schimbă detalii de mobilier și finisaje). Cum se refac: `surse/ai360/CITESTE.md`.
+  Dacă se schimbă forma sau mobila unei case, imaginile ei trebuie refăcute (altfel nu se mai potrivesc cu macheta). X7 rămâne cu
+  fotografiile reale. Un film de prezentare făcut la fel (animație → video cu AI) nu s-a făcut încă; cere din nou acordul pentru credite.
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle
   camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare.
 - **Interior real în fiecare casă**: singurul mod ca interiorul să arate „pe bune” e cu fotografii 360° făcute în casa
