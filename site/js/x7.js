@@ -5,7 +5,7 @@ import { THREE, perimeter, sweep, cap, arcBottom, arcTop, wrapPoly, wrapLine, gr
 
 export const X7 = { L: 11.5, W: 3.4, H: 3.45, R: 1.1, Y0: .15, YW0: .45, YW1: 3.17, GY0: .70, GY1: 2.84, YF: .62 };
 
-export function buildX7(M) {
+export function buildX7(M, { lamps: withLamps = true } = {}) {
   const D = X7, per = perimeter(D.L, D.W, D.R), T = per.total;
   const root = new THREE.Group(); root.name = 'X7';
   const P = {}; ['chassis', 'floor', 'frame', 'glazing', 'walls', 'roof'].forEach(n => { P[n] = new THREE.Group(); P[n].name = n; root.add(P[n]); });
@@ -138,7 +138,7 @@ export function buildX7(M) {
   items.forEach(o => { o.updateMatrix(); const e = new THREE.EdgesGeometry(o.geometry, 20); e.applyMatrix4(o.matrix); L.floor.push(...e.attributes.position.array); });
   line('floor', ring(D.YF, .1), true);
   // luminile din interior (se aprind seara)
-  const lamps = [[-3.6, 2.5, 0], [.3, 2.5, .8], [3.9, 2.5, 0]].map(p => { const l = new THREE.PointLight(0xffc27a, 0, 9, 1.6); l.position.set(...p); P.floor.add(l); return l; });
+  const lamps = (withLamps ? [[-3.6, 2.5, 0], [.3, 2.5, .8], [3.9, 2.5, 0]] : []).map(p => { const l = new THREE.PointLight(0xffc27a, 0, 9, 1.6); l.position.set(...p); P.floor.add(l); return l; });
 
   /* ---- liniile desenului tehnic ---- */
   const lineObjs = [];
@@ -151,7 +151,8 @@ export function buildX7(M) {
   const api = {
     root, parts: P, per, lamps, OFF,
     // k = 0 întreg … 1 desfăcut pe straturi
-    explode(k) { const e = ease(clamp(k)); Object.keys(P).forEach(n => { P[n].position.y = OFF[n] * e; }); P.frame.visible = k > .001; },
+    explode(k) { api._ex = ease(clamp(k)); api._lay(); P.frame.visible = k > .001; },
+    _lay() { Object.keys(P).forEach(n => { P[n].position.y = OFF[n] * (api._ex || 0) + (n === 'roof' ? (api._lift || 0) : 0); }); },
     // b = 0 machetă plină … 1 desen tehnic (linii pe fond închis)
     blueprint(b) {
       b = clamp(b); const on = b > .001; lineObjs.forEach(o => { o.visible = on; }); M.line.opacity = b * .95; M.lineGold.opacity = b;
@@ -160,6 +161,8 @@ export function buildX7(M) {
     },
     // acoperișul dispare (0…1), ca să se vadă împărțirea interioară
     openRoof(k) { k = clamp(k); [M.roof, M.ceil, M.ledIn, M.skyglass].forEach(m => { m.userData.fade = k > .001; const tr = k > .001 || (api._bp || 0) > .001; if (m.transparent !== tr && m !== M.skyglass) { m.transparent = tr; m.needsUpdate = true; } m.opacity = (m === M.skyglass ? .9 : 1) * (1 - k) * (1 - (api._bp || 0) * .93); }); P.roof.children.forEach(c => { if (c.isMesh) c.castShadow = k < .5; }); P.roof.visible = k < .995 || (api._bp || 0) > .001; api._roof = k; },
+    // varianta pentru grădină: acoperișul se ridică și dispare
+    liftRoof(k, h = 2.2) { k = clamp(k); api._lift = ease(k) * h; api._lay(); api.openRoof(clamp(k * 1.25)); },
     // n = 0 zi … 1 noapte: geamul devine transparent, se aprind luminile și banda LED
     night(n, glassColor) {
       n = clamp(n); const g = M.glass; if (glassColor) g.color.copy(glassColor); if (n > .02) g.color.lerp(new THREE.Color(0xffe2b8), n * .85);
