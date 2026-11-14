@@ -276,38 +276,39 @@ export function triplanar(mat, { map, scale = 1, space = 'local', gain = 1, amt 
 // geamul: valori comune tuturor geamurilor (și copiilor lor). base = opacitatea „de zi” a geamului întreg, inside = 1 când privitorul e în casă
 export const GLASS = { base: { value: .5 }, inside: { value: 0 } };
 // Geam LOW-E: reflectă cerul (mai tare când e privit pieziș), lasă să se vadă puțin interiorul; din casă se vede prin el grădina.
-export function glassMaterial(envMap) {
-  const m = new THREE.MeshStandardMaterial({ color: 0x7d8c98, metalness: 1, roughness: .04, envMap, envMapIntensity: 1.1, transparent: true, premultipliedAlpha: true, opacity: .5, depthWrite: false, side: THREE.DoubleSide });
+export function glassMaterial() {
+  const m = new THREE.MeshStandardMaterial({ color: 0x7d8c98, metalness: 1, roughness: .04, envMapIntensity: 1.1, transparent: true, premultipliedAlpha: true, opacity: .5, depthWrite: false, side: THREE.DoubleSide });
   m.onBeforeCompile = sh => {
     sh.uniforms.gBase = GLASS.base; sh.uniforms.gIn = GLASS.inside;
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float gBase; uniform float gIn;')
       .replace('#include <opaque_fragment>', `float gK = clamp( opacity / max( gBase, .001 ), 0.0, 1.0 );   // copiile care se sting odată cu acoperișul
       float gFr = pow( 1.0 - abs( dot( normalize( vViewPosition ), normal ) ), 4.0 );
-      outgoingLight *= gK * mix( 1.0, .1, gIn ); diffuseColor.a = mix( gBase, 1.0, gFr * .55 ) * gK * mix( 1.0, .22, gIn );
+      outgoingLight *= gK * mix( 1.0, .03, gIn ); diffuseColor.a = mix( gBase, 1.0, gFr * .55 ) * gK * mix( 1.0, .2, gIn );
       #include <opaque_fragment>`)
       .replace('#include <premultiplied_alpha_fragment>', '');   // reflexia se adună întreagă peste ce se vede prin geam
   };
   m.customProgramCacheKey = () => 'lowe'; return m;
 }
 
+// Materialele care își iau reflexiile direct din cer, fiecare cu tăria lui (celelalte folosesc scene.environmentIntensity). gscene.js le dă textura.
+export const ENVMAPPED = ['glass', 'skyglass', 'frame', 'inner', 'ceil', 'floor'];
 // Materialele comune ale caselor (M din kit.materials + x7Materials + houseMaterials), făcute să arate a materiale adevărate.
-export function realMaterials(M, T, envMap) {
+export function realMaterials(M, T) {
   const tp = triplanar;
-  tp(M.wood, { map: T.wood, scale: [1.7, 1.7], gain: 1.26, rough: .3, bump: .012 });                    // terase, blaturi, mobilă
+  tp(M.wood, { map: T.wood, scale: [1.7, 1.7], gain: 1.24, amt: .85, rough: .3, bump: .01, emis: 1 });                    // terase, blaturi, mobilă
   tp(M.floor, { map: T.planks, scale: [2.6, 1.52], gain: 1.3, rough: .3, emis: 1 });                    // parchet (scânduri de 19 cm)
-  tp(M.clad, { map: T.planks, scale: [2.2, .88], gain: 1.28, rough: .25, bump: .01 });                  // lambriu pe fațadă
+  tp(M.clad, { map: T.planks, scale: [2.2, .88], gain: 1.28, rough: .25, bump: .01, emis: 1 });                  // lambriu pe fațadă
   tp(M.stone, { map: T.stone, scale: 1.3, gain: 1.24, rough: .25 });
   tp(M.stoneWall, { map: T.ledger, scale: [1.5, 1.5], gain: 1.4, rough: .3, bump: .02 });
-  tp(M.fabric, { map: T.weave, scale: .11, gain: 1.2 }); tp(M.sofa, { map: T.weave, scale: .11, gain: 1.2 });
+  tp(M.fabric, { map: T.weave, scale: .11, gain: 1.2, emis: 1 }); tp(M.sofa, { map: T.weave, scale: .11, gain: 1.2, emis: 1 });
   tp(M.inner, { map: T.stone, scale: 2.1, gain: 1.24, amt: .32 }); tp(M.ceil, { map: T.stone, scale: 2.1, gain: 1.24, amt: .25 });   // tencuială: abia se simte
   [M.shell, M.roof].forEach(m => tp(m, { map: T.stone, scale: 3.1, gain: 1.24, amt: .1, rough: .5 }));   // panourile albe rămân curate: doar luciul variază puțin
   tp(M.steel, { map: T.stone, scale: .9, gain: 1.24, amt: .3, rough: .5 }); tp(M.roofDark, { map: T.stone, scale: 1.6, gain: 1.24, amt: .45, rough: .4 });
   M.wood.color.setHex(0xb08253); M.clad.color.setHex(0xa26b3c); M.floor.color.setHex(0xc9a67c);
   M.shell.roughness = M.roof.roughness = .42;
-  M.glass = glassMaterial(envMap);
-  M.skyglass.envMap = envMap; M.skyglass.envMapIntensity = 1.0; M.skyglass.color.setHex(0x23384c);
-  M.frame.envMap = envMap; M.frame.envMapIntensity = .6;
-  [[M.inner, .22], [M.ceil, .1], [M.floor, .3]].forEach(([m, k]) => { m.envMap = envMap; m.envMapIntensity = k; });   // interiorul ia puțină culoare din cer și din iarbă
+  M.glass = glassMaterial();
+  M.skyglass.envMapIntensity = 1.0; M.skyglass.color.setHex(0x23384c); M.frame.envMapIntensity = .6;
+  M.inner.envMapIntensity = .22; M.ceil.envMapIntensity = .1; M.floor.envMapIntensity = .3;   // interiorul ia doar puțină culoare din cer și din iarbă
   return M;
 }
 
@@ -416,7 +417,7 @@ export function makeEnv(renderer, sky, size = 256) {
   const rt = new THREE.WebGLCubeRenderTarget(size, { type: THREE.HalfFloatType, generateMipmaps: false }), cam = new THREE.CubeCamera(.1, 10, rt);
   const sc = new THREE.Scene(), m = new THREE.Mesh(sky.mesh.geometry, sky.mat); m.frustumCulled = false; sc.add(m);
   const pm = new THREE.PMREMGenerator(renderer); let out = null;
-  const env = { texture: null, update() { sky.U.uP.value.w = 1; cam.update(renderer, sc); sky.U.uP.value.w = 0; out = pm.fromCubemap(rt.texture, out || undefined); env.texture = out.texture; } };
+  const env = { texture: null, update() { sky.U.uP.value.w = 1; cam.update(renderer, sc); sky.U.uP.value.w = 0; out = pm.fromCubemap(rt.texture, out || undefined); env.texture = out.texture; } };   // aceeași textură la fiecare refacere
   env.update(); return env;
 }
 
@@ -469,14 +470,14 @@ export class Solid {
 function randDir(r, o) { const u = r() * 2 - 1, a = r() * TAU, s = Math.sqrt(1 - u * u); return o.set(s * Math.cos(a), u, s * Math.sin(a)); }
 const AX = V(1, 0, 0), AY = V(0, 1, 0);
 // coroană: cartonașe cu frunze așezate pe câțiva lobi (elipsoizi), aproape tangente la ei; mai întunecate spre interior și spre poale
-function crown(Q, r, lobes, { n, size, uv = UV, tint = [1, 1, 1], cut = -.6, tilt = .7 }) {
+function crown(Q, r, lobes, { n, size, uv = UV, tint = [1, 1, 1], cut = -.6, tilt = .7, inner = 0 }) {   // inner = partea de cartonașe puse mai în adânc (umplu golurile)
   const tot = lobes.reduce((s, l) => s + l.r[0] * l.r[2], 0), d = V(), p = V(), nn = V(), ax = V(), ay = V(), t = V(), C = lobes[0].c;
   let y0 = Infinity, y1 = -Infinity, R = 0; lobes.forEach(l => { y0 = Math.min(y0, l.c.y - l.r[1]); y1 = Math.max(y1, l.c.y + l.r[1]); R = Math.max(R, Math.hypot(l.c.x - C.x, l.c.z - C.z) + l.r[0]); });
   for (let i = 0, guard = 0; i < n && guard < n * 6; guard++) {
     let l = lobes[0], k = r() * tot; for (const o of lobes) { k -= o.r[0] * o.r[2]; l = o; if (k <= 0) break; }
     randDir(r, d); if (d.y < cut && r() < .85) continue;
-    const dp = .76 + .3 * r(); p.set(l.c.x + d.x * l.r[0] * dp, l.c.y + d.y * l.r[1] * dp, l.c.z + d.z * l.r[2] * dp);
-    if (lobes.some(o => o !== l && ((p.x - o.c.x) / o.r[0]) ** 2 + ((p.y - o.c.y) / o.r[1]) ** 2 + ((p.z - o.c.z) / o.r[2]) ** 2 < .5)) continue;
+    const deep = i < n * inner, dp = deep ? .42 + .3 * r() : .76 + .3 * r(); p.set(l.c.x + d.x * l.r[0] * dp, l.c.y + d.y * l.r[1] * dp, l.c.z + d.z * l.r[2] * dp);
+    if (!deep && lobes.some(o => o !== l && ((p.x - o.c.x) / o.r[0]) ** 2 + ((p.y - o.c.y) / o.r[1]) ** 2 + ((p.z - o.c.z) / o.r[2]) ** 2 < .5)) continue;
     nn.copy(d).addScaledVector(randDir(r, t), tilt).normalize();
     ax.crossVectors(nn, Math.abs(nn.y) > .9 ? AX : AY).normalize(); ay.crossVectors(ax, nn);
     const a = r() * TAU, ca = Math.cos(a), sa = Math.sin(a); t.copy(ax).multiplyScalar(ca).addScaledVector(ay, sa); ay.multiplyScalar(ca).addScaledVector(ax, -sa); ax.copy(t);
@@ -491,7 +492,7 @@ function crown(Q, r, lobes, { n, size, uv = UV, tint = [1, 1, 1], cut = -.6, til
 // Întoarce { crown (cartonașe cu frunze), wood (trunchi, ramuri și miezul întunecat al coroanei) }.
 export function treeGeo(kind, seed = 1) {
   const r = rng(seed), Q = new Cards(), S = new Solid(), mat = (sx, sy, sz, x, y, z) => new THREE.Matrix4().makeScale(sx, sy, sz).setPosition(x, y, z);
-  const core = [.03, .055, .022], ico = new THREE.IcosahedronGeometry(1, 1);
+  const core = [.042, .075, .03], ico = new THREE.IcosahedronGeometry(1, 1);
   if (kind === 1) {
     const H0 = .5, H1 = 4.3, p = V(), ax = V(), ay = V(), nn = V(), bark = [.16, .11, .08];
     for (let i = 0; i < 210; i++) {
@@ -513,11 +514,11 @@ export function treeGeo(kind, seed = 1) {
   } else {
     const tall = kind === 2, C = V(0, tall ? 2.75 : 2.55, 0), lobes = [{ c: C, r: tall ? [.82, 1.42, .82] : [1.2, 1.06, 1.2] }], nl = tall ? 5 : 6, bark = tall ? [.6, .58, .52] : [.19, .14, .1];
     for (let i = 0; i < nl; i++) { const a = i / nl * TAU + r() * .8, d = tall ? .3 + .2 * r() : .62 + .25 * r(), y = tall ? lerp(-1, .85, i / (nl - 1)) : lerp(-.36, .5, r()), rr = tall ? .5 + .18 * r() : .6 + .22 * r(); lobes.push({ c: V(Math.cos(a) * d, C.y + y, Math.sin(a) * d), r: [rr, rr * .9, rr] }); }
-    crown(Q, r, lobes, { n: tall ? 250 : 290, size: tall ? [.5, .78] : [.56, .9] });
+    crown(Q, r, lobes, { n: tall ? 290 : 330, size: tall ? [.5, .78] : [.56, .9], inner: .16 });
     const lean = (r() - .5) * .12;
     S.tube([{ x: 0, y: 0, z: 0, r: tall ? .1 : .13 }, { x: lean, y: .7, z: lean * .5, r: tall ? .08 : .1 }, { x: -lean * .5, y: 1.4, z: 0, r: tall ? .065 : .085 }, { x: 0, y: 2.1, z: 0, r: .06 }, { x: 0, y: C.y + .35, z: 0, r: .028 }], 7, bark);
     for (let i = 1; i <= 4; i++) { const l = lobes[i], y = 1.35 + .22 * i; S.tube([{ x: 0, y, z: 0, r: .045 }, { x: l.c.x * .5, y: lerp(y, l.c.y, .55), z: l.c.z * .5, r: .034 }, { x: l.c.x * .95, y: l.c.y, z: l.c.z * .95, r: .016 }], 5, bark); }
-    S.add(ico, mat(lobes[0].r[0] * .66, lobes[0].r[1] * .66, lobes[0].r[2] * .66, 0, C.y, 0), core);
+    S.add(ico, mat(lobes[0].r[0] * .6, lobes[0].r[1] * .6, lobes[0].r[2] * .6, 0, C.y, 0), core);
   }
   return { crown: Q.geo(), wood: S.p.length ? S.geo() : null };
 }

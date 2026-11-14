@@ -3,7 +3,7 @@
 // Scena de bază (cer, gazon, soare, seara): js/gscene.js; grădina: js/genv.js. Datele afișate (m², dimensiuni, preț) vin din window.CAT.
 // În casă se intră la nivelul ochilor (te uiți în jur, treci dintr-o cameră în alta); casele cu fotografii reale 360° (js/pano.js)
 // le arată peste machetă, aliniate cu ea. „Plan” = vederea de sus, cu acoperișul ridicat.
-import { THREE, clamp, lerp, ease, webglOK } from './kit.js';
+import { THREE, clamp, lerp, ease, webglOK, fit } from './kit.js';
 import { createGScene } from './gscene.js';
 import { buildGarden } from './genv.js';
 import { createPano } from './pano.js';
@@ -75,7 +75,7 @@ async function boot() {
   /* ---------- stare ---------- */
   const GZ = GRADINA.centruZ, CAMK = ['tx', 'ty', 'tz', 'az', 'el', 'fw', 'fh', 'fov'], cur = {}, from = {}, to = {};
   let mode = 'all', sel = -1, lvl = 1, W = 0, Hh = 0, mP = 0, tr = 1, dur = 1.7, uaz = 0, uel = 0, tuaz = 0, tuel = 0, offX = 0, offY = 0, tOffX = 0, tOffY = 0,
-    time = 10.6, timeGoal = 10.6, hover = -1, visible = false, raf = 0, last = 0, awake = 30, needMeasure = 2, started = false, auto = null, drag = null, lastN = -1, snap = 0, freeW = 1, freeH = 1;
+    time = 10.6, timeGoal = 10.6, hover = -1, visible = false, raf = 0, last = 0, awake = 30, needMeasure = 2, started = false, auto = null, drag = null, lastN = -1, snap = 0, freeW = 1, freeH = 1, px = 3e6, slow = 0;
   const wake = () => { awake = 40; kick(); };
   // în casă: 'walk' = la nivelul ochilor, 'plan' = de sus, cu acoperișul ridicat
   let inView = 'walk', pOp = 0, pA = null, pH = 0, noPano = false;
@@ -241,7 +241,9 @@ async function boot() {
     raf = 0; if (dead || !visible || document.hidden) return;
     raf = requestAnimationFrame(frame);
     const dt = Math.min(.05, (now - (last || now)) / 1000); last = now;
-    if (G.fit(stage, innerWidth < 800 ? 1.6 : 2) || !W) { needMeasure = 1; awake = 40; }
+    // dacă placa video nu ține pasul, desenul se face la o rezoluție ceva mai mică (ca mișcarea să rămână lină)
+    if (awake > 0 && dt > .03) { if (++slow > 40 && px > 1.2e6) { px *= .72; slow = 0; } } else if (slow > 0) slow--;
+    if (fit(G.renderer, cam, stage, innerWidth < 800 ? 1.6 : 2, px) || !W) { needMeasure = 1; awake = 40; }
     if (needMeasure && !--needMeasure) { measure(); if (!started) { offX = tOffX; offY = tOffY; } }
     if (!W) { measure(); }
     if (snap) { snap--; measure(); offX = tOffX; offY = tOffY; uaz = tuaz; uel = tuel; awake = 40; }

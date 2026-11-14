@@ -33,12 +33,14 @@ function boot() {
     { p: [.67, .76], t: 21.2, L: { az: -27, el: 5.5, fw: 23, fh: 9, tx: -.5, ty: 1.8, ox: .235, oy: 0 }, P: { az: -62, el: 5, fw: 9, fh: 9, tx: -1.6, ty: 1.8, ox: 0, oy: -.13 } },
     { p: [.86, 1], t: 21.2, bp: 1, ex: 1, L: { az: -38, el: 13, fw: 27, fh: 21, tx: 0, ty: 5.3, ox: .1, oy: 0 }, P: { az: -58, el: 11, fw: 10.5, fh: 19, tx: 0, ty: 5.3, ox: 0, oy: -.08 } },
   ];
-  const PTS = []; KEYS.forEach(k => { PTS.push([k.p[0], k]); PTS.push([k.p[1], k]); });
+  // Camera trece prin mijlocul fiecărui capitol și nu se oprește niciodată de tot între ele: mișcarea curge odată cu derularea
+  // (înainte stătea pe loc în fiecare capitol și sărea repede la următorul, ceea ce părea sacadat).
+  const PTS = KEYS.map((k, i) => [i === 0 ? .03 : i === KEYS.length - 1 ? .9 : (k.p[0] + k.p[1]) / 2, k]);
   const CAM = ['az', 'el', 'fw', 'fh', 'tx', 'ty', 'ox', 'oy'], cur = {}, a = {}, b = {};
   const pick = (k, m, out) => { CAM.forEach(n => { out[n] = lerp(k.L[n], k.P[n], m); }); out.t = k.t; out.roof = k.roof || 0; out.bp = k.bp || 0; out.ex = k.ex || 0; return out; };
   function sample(p, m) {
     let i = 0; while (i < PTS.length - 2 && p > PTS[i + 1][0]) i++;
-    const p0 = PTS[i][0], p1 = PTS[i + 1][0], f = p1 > p0 ? clamp((p - p0) / (p1 - p0)) : 0, g = f * f * f * (f * (f * 6 - 15) + 10);
+    const p0 = PTS[i][0], p1 = PTS[i + 1][0], f = p1 > p0 ? clamp((p - p0) / (p1 - p0)) : 0, g = .3 * f + .7 * f * f * f * (f * (f * 6 - 15) + 10);
     pick(PTS[i][1], m, a); pick(PTS[i + 1][1], m, b);
     for (const n in a) cur[n] = lerp(a[n], b[n], g);
     return cur;
@@ -68,7 +70,7 @@ function boot() {
     if (dt > .027) { if (++slow > 45 && px > 1.3e6) { px *= .72; slow = 0; } } else if (slow > 0) slow--;
     if (S.fit(pin, innerWidth < 800 ? 1.75 : 2, px) || !W) { W = pin.clientWidth; H = pin.clientHeight; }
     // derularea e urmărită lin (la fel de lin la orice număr de cadre pe secundă), ca rotița mouse-ului să nu dea mișcări în trepte
-    const p = progress(); ps = ps < 0 ? p : ps + (p - ps) * (1 - Math.exp(-dt * 5.2)); if (Math.abs(p - ps) < .0003) ps = p;
+    const p = progress(); ps = ps < 0 ? p : ps + (p - ps) * (1 - Math.exp(-dt * 3.6)); if (Math.abs(p - ps) < .0003) ps = p;
     const asp = W / H, m = clamp((1.25 - asp) / .5), c = sample(ps, m);
     mx += (tmx - mx) * .05; my += (tmy - my) * .05;
     const idle = (now - t0) / 1000, fov = lerp(30, 42, m), tn = Math.tan(fov * Math.PI / 360);

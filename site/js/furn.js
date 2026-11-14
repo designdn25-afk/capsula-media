@@ -62,7 +62,7 @@ export function railing(M, len, h = 1.0, glass = true) {
   return g;
 }
 // lampă de grădină (se aprinde seara: M.lamp.emissiveIntensity)
-export function lampPost(M, h = 2.6) { const g = G(); add(g, cyl(.05, h, M.frame, 0, h / 2, 0, 10), box(.34, .06, .34, M.frame, 0, h + .03, 0)); const b = new THREE.Mesh(new THREE.BoxGeometry(.26, .22, .26), M.lamp || M.ledIn || M.white); b.position.y = h - .12; b.castShadow = false; g.add(b); g.children.forEach(c => { if (c !== b) c.castShadow = true; }); return g; }
+export function lampPost(M, h = 2.6) { const g = G(); add(g, cyl(.04, h - .3, M.frame, 0, (h - .3) / 2, 0, 10), cyl(.085, .14, M.frame, 0, .07, 0, 12), box(.2, .03, .2, M.frame, 0, h - .3, 0), box(.3, .05, .3, M.frame, 0, h + .025, 0)); const b = new THREE.Mesh(new THREE.BoxGeometry(.17, .29, .17), M.lamp || M.ledIn || M.white); b.position.y = h - .145; b.castShadow = false; g.add(b); g.children.forEach(c => { if (c !== b) c.castShadow = true; }); return g; }
 
 // materialele în plus pentru casele din grădină
 export function houseMaterials(M) {

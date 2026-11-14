@@ -122,6 +122,12 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
 ## Ce mai e de făcut (la 14 noiembrie 2026)
 - **Casele adevărate pentru grădină**: de cerut clientului lista caselor model comandate, cu poze / planuri, dimensiuni și
   preț. Până atunci grădina arată exemple din catalog. De întrebat și cum vrea să arate grădina (alei, flori, lămpi).
+- **Film „ca în realitate” făcut cu AI** (cerut de client pe 14 nov 2026, cu un filmuleț de pe Instagram: o animație 3D simplă
+  trecută printr-un generator video): se poate face cu conectorul ElevenLabs (imagine → imagine reală → video). Două cadre-sursă
+  ale grădinii sunt deja în `site/img/gd/sursa-1.jpg` și `sursa-2.jpg`. **Nu s-a generat nimic încă**: trimiterea imaginilor și
+  consumul de credite cer acordul clar al clientului. Orice imagine sau film făcut așa primește eticheta „Vizualizare realizată cu AI”.
+- **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle
+  camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare.
 - **Interior real în fiecare casă**: singurul mod ca interiorul să arate „pe bune” e cu fotografii 360° făcute în casa
   respectivă (ca la X7). Când clientul are casele, de făcut 4–5 poze 360° în fiecare; se leagă în `site/js/gradina-data.js` (rândul `pano`).
 

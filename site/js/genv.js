@@ -1,7 +1,8 @@
 // Grădina din jurul caselor: gard viu, alei cu lespezi, rond, straturi cu flori, tufe, copaci, lămpi, umbre de contact.
 // Folosit de js/garden.js după ce casele au fost așezate. Întoarce { night(n) } (lumina lămpilor pe iarbă, seara).
 // Pe fiecare casă pune: h.ring (inelul auriu de la alegere) și h.door (punctul din fața ușii).
-// Plantele sunt „cartonașe” cu frunze desenate (js/real.js), adunate în puține plase mari: toată grădina are în jur de 60 de desene.
+// Plantele sunt „cartonașe” cu frunze desenate (js/real.js), adunate în puține plase mari: toată grădina (fără case) are în jur de 40 de desene
+// și 130 de mii de triunghiuri. Nu are nimic animat: se desenează doar când se mișcă ceva.
 import { THREE, clamp, lerp, perimeter, sweep, cap, box } from './kit.js';
 import { lampPost } from './furn.js';
 import { GRADINA } from './gradina-data.js';
@@ -21,7 +22,7 @@ export function buildGarden(G, H) {
     mulch: tp(S({ color: 0xffffff, roughness: 1, vertexColors: true }), { map: T.mulch, scale: .9, space: 'world', gain: 2.1 }),
     hedge: tp(S({ color: 0xffffff, roughness: .92, vertexColors: true }), { map: T.hedge, scale: 1.05, space: 'world', gain: 1.5 }),
     leaf: R.leafMaterial(T.leaf), leafS: R.leafMaterial(T.leafS), spray: R.leafMaterial(T.spray), flower: R.leafMaterial(T.flowers, { alphaTest: .5, trans: 0 }),
-    wood: S({ color: 0xffffff, roughness: 1, vertexColors: true }),
+    wood: tp(S({ color: 0xffffff, roughness: 1, vertexColors: true }), { map: T.wood, scale: [1.3, .32], gain: 1.3, vert: true, bump: .03 }),   // scoarță (și miezul întunecat al coroanelor)
     gold: () => new THREE.MeshBasicMaterial({ color: 0xd4a24c, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }),
     glow: new THREE.MeshBasicMaterial({ map: R.blobTexture([[0, 'rgba(255,190,112,.6)'], [.35, 'rgba(255,186,108,.3)'], [1, 'rgba(255,180,100,0)']]), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }),
     blob: decal({ map: R.blobTexture([[0, 'rgba(0,0,0,.62)'], [.5, 'rgba(0,0,0,.36)'], [1, 'rgba(0,0,0,0)']]), opacity: .7 }),
@@ -47,8 +48,9 @@ export function buildGarden(G, H) {
     H.forEach(h => h.g.traverse(o => {
       const mt = o.material; if (!o.isMesh || !mt || !mt.isMeshStandardMaterial || known.has(mt) || seen.has(mt)) return; seen.add(mt);
       if (mt.map || mt.transparent || mt.visible === false || mt.emissiveIntensity > 1) return; mt.color.getHSL(c);
-      if (c.s > .28 && c.h > .04 && c.h < .13 && c.l > .25 && c.l < .8 && mt.roughness < .88) tp(mt, { map: T.planks, scale: [2.2, .96], gain: 1.28, rough: .25 });
-      else if (mt.roughness > .97) tp(mt, { map: T.weave, scale: .13, gain: 1.2, amt: .7 });
+      if (mt.emissive.getHex() === 0) G.lit.push(mt);   // seara se luminează cald, ca mobila din setul comun
+      if (c.s > .28 && c.h > .04 && c.h < .13 && c.l > .25 && c.l < .8 && mt.roughness < .88) tp(mt, { map: T.planks, scale: [2.2, .96], gain: 1.28, rough: .25, emis: 1 });
+      else if (mt.roughness > .97) tp(mt, { map: T.weave, scale: .13, gain: 1.2, amt: .7, emis: 1 });
       else tp(mt, { map: T.stone, scale: 1.6, gain: 1.24, amt: .3, rough: .2 });
     }));
   }
@@ -173,11 +175,12 @@ export function buildGarden(G, H) {
   const trees = [[-26.5, 24.5, 0, 1.25], [26.8, 25, 1, 1.3], [-28, -9.5, 1, 1.5], [28, -12, 0, 1.4], [27.5, -37, 0, 1.6], [-26.5, -38, 0, 1.7], [9.5, GZ - GD / 2 + 4, 1, 1.5], [-10.5, GZ - GD / 2 + 4, 1, 1.45], [28, 10, 1, 1.2], [-28.5, 10.5, 0, 1.25]];
   for (let i = 0; i < 30; i++) { const a = (-125 + 250 * (i + rr(-.3, .3)) / 29) * DEG, Rd = rr(50, 70); trees.push([Math.sin(a) * Rd, GZ - Math.cos(a) * Rd, rnd() < .45 ? 1 : 0, rr(1.7, 2.9)]); }
   for (let i = 0; i < 26; i++) { const a = (-132 + 264 * (i + rr(-.35, .35)) / 25) * DEG, Rd = rr(80, 118); trees.push([Math.sin(a) * Rd, GZ - Math.cos(a) * Rd, rnd() < .4 ? 1 : 0, rr(2.4, 3.6)]); }
-  const TL = [[], [], []], tint = [[1, 1, .9], [.92, 1, .96], [1.12, 1.12, .86]];
-  const plant = (x, z, kind, s, y = 0) => { const q = tint[kind], k = rr(.82, 1.08), w = s * rr(.92, 1.1); TL[kind].push({ x, y, z, ry: rnd() * TAU, s: [w, s * rr(.92, 1.1), w], c: [q[0] * k * rr(.86, 1.06), q[1] * k, q[2] * k * rr(.8, 1.05)] }); blobs.push([x, z, s * (kind === 1 ? 1.25 : 1.45)]); };
+  // patru forme de copac: 0 și 3 = foios rotund (două coroane diferite), 1 = conifer, 2 = foios înalt (mesteacăn)
+  const TL = [[], [], [], []], KIND = [0, 1, 2, 0], SEED = [3, 5, 7, 19], tint = [[1, 1, .9], [.92, 1, .96], [1.12, 1.12, .86], [.96, 1.02, .82]];
+  const plant = (x, z, f, s, y = 0) => { const q = tint[f], k = rr(.82, 1.08), w = s * rr(.92, 1.1); TL[f].push({ x, y, z, ry: rnd() * TAU, s: [w, s * rr(.92, 1.1), w], c: [q[0] * k * rr(.86, 1.06), q[1] * k, q[2] * k * rr(.8, 1.05)] }); blobs.push([x, z, s * (f === 1 ? 1.25 : 1.45)]); };
   plant(0, 0, 0, 1.42, .45);   // copacul din rond
-  trees.forEach(([x, z, kind, s], i) => (kind ? plant(x, z, 1, s) : i % 3 === 1 ? plant(x, z, 2, s * .9) : plant(x, z, 0, s * .95)));
-  TL.forEach((list, kind) => { if (!list.length) return; const t = R.treeGeo(kind, 3 + kind * 2); g.add(sh(R.instances(t.crown, kind === 1 ? m.spray : m.leaf, list)), sh(R.instances(t.wood, m.wood, list))); });
+  trees.forEach(([x, z, kind, s], i) => (kind ? plant(x, z, 1, s) : i % 3 === 1 ? plant(x, z, 2, s * .9) : plant(x, z, i % 2 ? 3 : 0, s * .95)));
+  TL.forEach((list, f) => { if (!list.length) return; const t = R.treeGeo(KIND[f], SEED[f]); g.add(sh(R.instances(t.crown, f === 1 ? m.spray : m.leaf, list)), sh(R.instances(t.wood, m.wood, list))); });
 
   /* ---------- lămpile de grădină, lumina lor pe iarbă (seara) și umbrele moi de la baza lucrurilor ---------- */
   lamps.forEach(([x, z], i) => { if (i > 1) { const l = lampPost(M, 2.5); l.position.set(x, 0, z); fixed.add(l); blobs.push([x, z, .55]); } });
@@ -185,5 +188,5 @@ export function buildGarden(G, H) {
   const qd = new THREE.PlaneGeometry(2, 2); qd.rotateX(-Math.PI / 2);
   const pools = R.instances(qd, m.glow, lamps.map(([x, z, r]) => ({ x, y: .06, z, s: [r, 1, r] })), { cast: false, recv: false }); pools.renderOrder = 2; pools.visible = false; g.add(pools);
   const bm = R.instances(qd, m.blob, blobs.map(([x, z, r]) => ({ x, y: .05, z, s: [r, 1, r] })), { cast: false, recv: false }); bm.renderOrder = 1; g.add(bm);
-  return { night(n) { const on = n > .01; m.glow.opacity = n * .62; pools.visible = on; glows.forEach(q => { q.visible = on; }); } };
+  return { night(n) { const on = n > .01; m.glow.opacity = n * .8; pools.visible = on; glows.forEach(q => { q.visible = on; }); } };
 }

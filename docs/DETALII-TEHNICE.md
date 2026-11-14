@@ -227,3 +227,16 @@ scoaterea secțiunii „Ziua și seara”. Copii: `versiuni/gradina-macheta/` (g
 - **Realism** (`real.js`, `gscene.js`, `genv.js`): vezi comentariile din fișiere (cer cu soare și nori, iarbă, copaci din frunze,
   texturi desenate local și așezate după poziția din lume, geam transparent cu reflexii). `genv.js` = fosta parte de grădină din `garden.js`.
 - Pagina de probă `site/_t_env.html` arată grădina fără meniuri (din afară sau din interiorul unei case) și nu depinde de `garden.js`.
+- **Mișcarea de la deschidere** (clientul: „nu se mișcă lin… când dau în jos”, cu filmare de pe MacBook): pe ecrane mari și dese
+  desenul se face cu un buget de pixeli (`kit.fit(..., maxPx)`, implicit 3,6 MP, scade singur dacă placa video nu ține pasul);
+  umbra se recalculează doar când se mută soarele sau capsula (`stage.shadow()`), cel mult o dată la două cadre; straturile
+  capsulei sunt unite în câteva piese mari (`kit.mergeMeshes`, ~50 de desene în loc de 200). Camera nu mai stă pe loc în fiecare
+  capitol ca să sară apoi la următorul: trece prin mijlocul capitolelor și curge continuu (`PTS` în `story.js`), iar derularea e
+  urmărită cu o netezire după timp (`1 − e^(−3,6·dt)`). La fel, `garden.js` unește piesele fiecărei case (`mergeHouse`) și
+  construiește casele pe rând, câte una pe cadru.
+- **Realismul grădinii**, pe scurt: `real.js` desenează local texturile (iarbă, frunze, lemn, piatră, pavaj, țesătură) și le așază
+  după poziția din lume (`triplanar`, fără coordonate de textură pe modele); `gscene.js` are cerul (soare, nori, dealuri, stele),
+  lumina zilei și a serii, mediul pentru reflexii (refăcut doar când ora s-a schimbat destul) și geamul LOW-E transparent, care
+  devine mai limpede când camera e în casă; `genv.js` are gardul viu, aleile, straturile cu flori, copacii din „cartonașe” de frunze
+  și umbrele de contact. Scena din pagină: ~100–150 de desene, ~150.000 de triunghiuri.
+
