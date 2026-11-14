@@ -108,6 +108,8 @@ async function boot() {
         for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6, hit = cast(x, fy + 1.5, z, Math.sin(a), 0, Math.cos(a), 14)[0], v = (hit ? hit.distance : 14) + (hit && fam(hit.object.material, M.glass) ? 3 : 0); if (v > sc) { sc = v; yaw = a / DEG; } }
         pts.push({ n: r.n, p: new THREE.Vector3(x, fy + 1.55, z), yaw, pitch: -4, k: null });
       });
+      // vizualizări 360° făcute cu AI din aceste puncte (aliniate cu lumea: centrul imaginii privește spre −Z)
+      (h.c.ai || []).forEach((f, i) => { if (f && pts[i]) { pts[i].k = 'ai:' + f; pts[i].H = -h.c.rot; pts[i].ai = true; pts[i].kn = null; } });
     }
     h.walk = { pts, i: 0 }; return h.walk;
   }
@@ -119,7 +121,7 @@ async function boot() {
   }
   // fotografiile mari (6144 px) doar pe ecrane mari, cu placă video care le duce; altfel cele de 4096 px
   const bigPano = G.renderer.capabilities.maxTextureSize >= 6144 && fine.matches && Math.max(innerWidth, innerHeight) * Math.min(devicePixelRatio || 1, 2) > 1500;
-  const panoUrl = k => 'p360/' + k + (bigPano ? '_l' : '_m') + '.webp';
+  const panoUrl = k => (k.slice(0, 3) === 'ai:' ? 'img/gd/ai/' + k.slice(3) + '.webp' : 'p360/' + k + (bigPano ? '_l' : '_m') + '.webp');
 
   /* unde stă camera: toată grădina, o casă văzută din față, o casă văzută de sus (în interior). L = ecran lat, P = ecran înalt */
   function station(out) {
@@ -148,7 +150,7 @@ async function boot() {
 
   /* ---------- comenzi ---------- */
   function select(i, keepAuto) { if (!keepAuto) stopAuto(); const w = walking(); if (w) startBlend(1.7); lvl = 1; if (i < 0) goTo('all', -1); else goTo('house', i); if (w) tr = 1; sync();
-    if (i >= 0 && H[i].c.pano && window.VTN) { const p = buildWalk(H[i]).pts[0]; if (p && p.k) pano.load(panoUrl(timeGoal > 15 && p.kn ? p.kn : p.k)); } }   // fotografia primei camere se cere din timp
+    if (i >= 0 && ((H[i].c.pano && window.VTN) || H[i].walk)) { const p = buildWalk(H[i]).pts[0]; if (p && p.k) pano.load(panoUrl(timeGoal > 15 && p.kn ? p.kn : p.k)); } }   // fotografia primei camere se cere din timp
   function enter(keepAuto, view) {
     if (sel < 0) return; if (!keepAuto) stopAuto(); lvl = 1; inView = view || 'walk';
     if (inView === 'walk' && !buildWalk(H[sel]).pts.length) inView = 'plan';
@@ -185,7 +187,7 @@ async function boot() {
     if (walk) { cRoomsT.textContent = 'Mergi în'; cRoomsV.innerHTML = w.pts.map((p, i) => `<button type="button" class="gd-rm${i === w.i ? ' on' : ''}" data-i="${i}" aria-pressed="${i === w.i}">${esc(p.n)}</button>`).join(''); }
     else if (inside) { cRoomsT.textContent = two ? (lvl === 1 ? 'La etaj' : 'La parter') : 'Camere'; cRoomsV.textContent = [...new Set(rs.map(r => r.n))].join(' · '); }
     viewBox.hidden = !inside; viewBtns.forEach(b => { const on = b.dataset.v === inView; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
-    cReal.hidden = !walk; if (walk) cReal.textContent = w.pts.some(p => p.k) ? 'Fotografii reale 360°, făcute în showroom' : 'Machetă 3D orientativă';
+    cReal.hidden = !walk; if (walk) cReal.textContent = w.pts.some(p => p.ai) ? 'Vizualizare realizată cu AI, orientativă' : w.pts.some(p => p.k) ? 'Fotografii reale 360°, făcute în showroom' : 'Machetă 3D orientativă';
     sec.dataset.view = inside ? inView : '';
     lvlBox.hidden = !(inside && !walk && two); lvlBtns.forEach(b => { const on = +b.dataset.l === lvl; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
     enterBtn.textContent = inside ? 'Ieși din casă' : 'Intră în casă';
@@ -268,7 +270,7 @@ async function boot() {
     if (blend.k < 1) { blend.k = Math.min(1, blend.k + dt / blend.dur); busy = true; }
     // fotografia reală a camerei (dacă există): apare după ce camera a ajuns; la mers și la schimbarea zi/seară se vede macheta
     let pt = null;
-    if (wk && W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k) { const night = timeGoal > 15 && p.kn, k = night ? p.kn : p.k, u = panoUrl(k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); else if (pt !== pA && pOp < .02) { pA = pt; pH = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; } } }
+    if (wk && W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k && !(p.ai && timeGoal > 15)) { const night = timeGoal > 15 && p.kn, k = night ? p.kn : p.k, u = panoUrl(k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); else if (pt !== pA && pOp < .02) { pA = pt; pH = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; } } }
     const pg = pt && pt === pA && blend.k > .82 && time === timeGoal && !noPano ? 1 : 0;
     if (pOp !== pg) { pOp += clamp(pg - pOp, -dt * 2.4, dt * 2.4); busy = true; }
     // acoperișurile și inelul auriu
