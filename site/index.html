@@ -20,6 +20,7 @@
 <meta name="description" content="Case capsulă de vânzare în România: modelul X7, 36,5 m² utili, preț 39.500 € cu TVA, rate prin TBI Bank. Pentru locuit, vacanță sau glamping. Vezi capsula în showroom-ul din Ciorogârla, Ilfov.">
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Casă capsulă X7","brand":{"@type":"Brand","name":"Capsula România"},"description":"Casă capsulă 36,5 m² utili, 39 m² construiți, dormitor separat, baie completă, smart home.","image":"https://casecapsula.ro/images/real/exterior-evening.webp","offers":{"@type":"Offer","price":"39500","priceCurrency":"EUR","url":"https://casecapsula.ro/model-x7"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Capsula România","url":"https://casecapsula.ro/","telephone":"+40731166070","address":{"@type":"PostalAddress","streetAddress":"Calea București nr. 41","postalCode":"077055","addressLocality":"Ciorogârla","addressRegion":"Ilfov","addressCountry":"RO"}}</script>
+<link rel="modulepreload" href="vendor/three.module.min.js">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -883,6 +884,13 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .ft h3{font-family:var(--serif);font-weight:500;font-size:clamp(30px,2.8vw,44px);line-height:1.02;letter-spacing:-.01em}
 .links{gap:clamp(13px,1.45vw,24px)}
 .lang{white-space:nowrap}
+.nums{position:relative;background:linear-gradient(#0c1326,#070b16);color:#fff;padding:clamp(60px,7.5vw,112px) 0}
+.nums::before{content:"";position:absolute;left:50%;top:0;width:min(1240px,100% - 32px);height:1px;transform:translateX(-50%);background:linear-gradient(90deg,transparent,rgba(212,162,76,.65),transparent)}
+.nums-g{display:grid;grid-template-columns:repeat(4,auto);justify-content:space-between;gap:36px clamp(20px,3vw,48px)}
+.num b{display:flex;align-items:baseline;gap:8px;font:500 clamp(56px,6.6vw,108px)/.88 var(--serif);letter-spacing:-.02em;font-variant-numeric:lining-nums tabular-nums;white-space:nowrap}
+.num small{font:500 clamp(22px,2.3vw,38px)/1 var(--serif);color:var(--accent)}
+.num i{display:block;margin-top:16px;font:600 11.5px/1.4 var(--body);font-style:normal;letter-spacing:.2em;text-transform:uppercase;color:rgba(255,255,255,.62)}
+@media (max-width:900px){.nums-g{grid-template-columns:1fr 1fr;justify-content:stretch}.num b{font-size:clamp(46px,13vw,76px)}}
 </style>
 <style id="s-st-css">
 /* ===================== #top — povestea 3D de la deschidere =====================
@@ -935,7 +943,7 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .st-lab.layer span{display:block;margin-top:5px;font:600 10.5px/1 var(--body);letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.6)}
 @media (max-width:1100px){.st-lab.layer{display:none}}
 /* telefon și panoul îngust: modelul sus, textul jos */
-@media (max-width:800px){
+@media (max-width:800px),(max-width:1100px) and (max-aspect-ratio:1/1){
   #top.st{height:620vh}
   .st-veil{display:block;position:absolute;left:0;right:0;bottom:0;height:58%;z-index:1;pointer-events:none;background:linear-gradient(to top,var(--st-bot) 34%,transparent)}
   .st-ch{top:auto;bottom:clamp(40px,7svh,72px);right:0;width:auto;transform:translateY(18px)}
@@ -965,7 +973,7 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .st--static .st-copy{position:relative;top:auto;left:auto;transform:none;margin:0 auto;padding:112px 0 56px;display:grid;gap:clamp(40px,6vw,72px);pointer-events:auto}
 .st--static .st-ch{position:relative;top:auto;bottom:auto;width:auto;opacity:1;visibility:visible;transform:none;display:grid;grid-template-columns:1fr 1.25fr;gap:8px clamp(24px,4vw,56px);align-items:center;align-content:center}
 .st--static .st-ch>*{grid-column:1}
-.st--static .st-still{display:block;grid-column:2;grid-row:1/span 5;width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:18px;background:#eceef2}
+.st--static .st-still{display:block;grid-column:2;grid-row:1/span 5;width:100%;height:auto;aspect-ratio:16/10;object-fit:cover;border-radius:18px;background:#eceef2}
 .st--static .st-ch .btn-light{background:var(--ink);color:#fff}
 .st--static .st-ch .btn-ghost{border-color:rgba(15,20,30,.22);color:var(--ink)}
 @media (max-width:800px){.st--static .st-ch{grid-template-columns:1fr}.st--static .st-still{grid-column:1;grid-row:auto;order:-1}}
@@ -1516,6 +1524,16 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
  </div>
 </section>
 
+<!-- CIFRE: bandă cu numere mari, imediat după desenul pe straturi (ca în filmul de referință) -->
+<section class="nums" id="cifre" aria-label="Capsula X7 în cifre">
+  <div class="wrap nums-g">
+    <div class="num"><b><span data-n="36.5" data-d="1">36,5</span><small>m²</small></b><i>suprafață utilă</i></div>
+    <div class="num"><b><span data-n="39">39</span><small>m²</small></b><i>suprafață construită</i></div>
+    <div class="num"><b><span data-n="11.5" data-d="1">11,5</span><small>m</small></b><i>lungime · 3,4 m lățime</i></div>
+    <div class="num"><b><span data-n="39500" data-g="1">39.500</span><small>€</small></b><i>cu TVA · rate prin TBI Bank</i></div>
+  </div>
+</section>
+
 <!-- 01 INTERIOR: plimbarea prin capsula X7 -->
 <section id="interior" class="s-int" aria-labelledby="intTitle">
  <div class="s-int-stage">
@@ -1913,10 +1931,11 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const nav=$('#nav'),heroEl=document.getElementById('top'),intEl=document.getElementById('interior');
 // bara rămâne închisă la culoare peste capsula de noapte și peste intrarea întunecată din interior
-let heroH=heroEl?heroEl.offsetHeight:0,navRaf=0;
+let heroH=heroEl?heroEl.offsetHeight:0,navRaf=0;const numEl=document.getElementById('cifre');
 // peste povestea 3D de la deschidere bara e transparentă: text închis ziua, deschis seara (window.__skyDark, pus de js/story.js)
 const navU=()=>{const y=scrollY,inStory=!!heroEl&&y<heroH-72;let dark=inStory&&!!window.__skyDark;
  if(!dark&&intEl&&intEl.classList.contains('is-dark')){const r=intEl.getBoundingClientRect();dark=r.top<=72&&r.bottom>72}
+ if(!dark&&numEl){const r=numEl.getBoundingClientRect();dark=r.top<=72&&r.bottom>72}
  nav.classList.toggle('solid',!inStory&&y>40);nav.classList.toggle('ink',inStory&&!dark);nav.classList.toggle('dark',dark)};
 addEventListener('scroll',()=>{if(!navRaf)navRaf=requestAnimationFrame(()=>{navRaf=0;navU()})},{passive:true});
 addEventListener('resize',()=>{heroH=heroEl?heroEl.offsetHeight:0;navU()});navU();window.navU=navU;
@@ -1995,6 +2014,11 @@ document.querySelectorAll('section .title').forEach(t=>{
 });
 const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('split-in');io.unobserve(e.target)}}),{threshold:.3});
 document.querySelectorAll('.title').forEach(t=>io.observe(t));
+// 2) cifrele mari cresc de la zero când banda intră în ecran
+(function(){const els=[...document.querySelectorAll('.nums [data-n]')];if(!els.length||rm||!('IntersectionObserver' in window))return;
+ const fmt=(v,e)=>{const d=+e.dataset.d||0;let t=v.toFixed(d).replace('.',',');if(e.dataset.g)t=t.replace(/\B(?=(\d{3})+(?!\d))/g,'.');return t};
+ const run=()=>{const t0=performance.now();const step=now=>{const k=Math.min(1,(now-t0)/1500),q=1-Math.pow(1-k,3);els.forEach(e=>{e.textContent=fmt(+e.dataset.n*q,e)});if(k<1)requestAnimationFrame(step)};requestAnimationFrame(step)};
+ const o=new IntersectionObserver(es=>{if(es.some(x=>x.isIntersecting)){o.disconnect();run()}},{threshold:.35});o.observe(document.getElementById('cifre'));})();
 // 3) parallax ușor în galerie
 if(!rm){const g=[...document.querySelectorAll('#gal button img')],gs=document.getElementById('gal');let on=false,pr=0;
  const par=()=>{pr=0;if(!on)return;const h=innerHeight;const rs=g.map(i=>i.parentElement.getBoundingClientRect());

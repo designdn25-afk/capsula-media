@@ -1,5 +1,5 @@
 // Unelte comune pentru scenele 3D ale site-ului (three.js e local, în site/vendor; nimic de pe alte site-uri).
-// Folosit de: js/x7.js (modelul capsulei), js/story.js (povestea de la deschidere), js/houses.js + js/garden.js (grădina cu case).
+// Folosit de: js/x7.js (modelul capsulei), js/story.js (povestea de la deschidere), js/garden.js + js/h_*.js (grădina cu case).
 import * as THREE from '../vendor/three.module.min.js';
 import { RoomEnvironment } from '../vendor/RoomEnvironment.js';
 export { THREE };

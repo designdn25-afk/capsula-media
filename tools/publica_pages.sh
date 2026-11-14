@@ -1,6 +1,6 @@
 #!/bin/sh
 # Publică folderul site/ pe GitHub Pages (ramura gh-pages): https://designdn25-afk.github.io/capsula-media/
-# Fișierele vechi nefolosite (home_v1.html, hero_*, x7s_frame, x7s_lot) nu se publică.
+# Fișierele vechi nefolosite (home_v1.html, hero_*, x7s_frame, x7s_lot) și paginile de probă (_t_*.html) nu se publică.
 # Folosire (din rădăcina proiectului): sh tools/publica_pages.sh
 set -eu
 ROOT=$(pwd)
@@ -8,7 +8,7 @@ python3 tools/asambleaza.py
 TMP=$(mktemp -d)
 cp -r site/. "$TMP/"
 cd "$TMP"
-rm -f home_v1.html img/hero_far_* img/hero_near_* img/hero_glass.png img/x7s_frame.webp img/x7s_lot.webp
+rm -f home_v1.html img/hero_far_* img/hero_near_* img/hero_glass.png img/x7s_frame.webp img/x7s_lot.webp _t_*.html
 find . -name __pycache__ -prune -exec rm -rf {} +
 touch .nojekyll
 git init -q -b gh-pages

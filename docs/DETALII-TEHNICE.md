@@ -151,6 +151,7 @@ apoi aliniate cu `surse/hero-v2/align.py` (ECC afin pe hărți de contururi).
 - Imaginile se salvează în WebP (calitate 82–86, `method=6`). PNG doar pentru măști.
 
 ## 11. Site-ul final (22 oct 2026)
+> Din 14 nov 2026 hero-ul descris mai jos a fost înlocuit de povestea 3D (vezi secțiunea 12); restul secțiunilor au rămas.
 - **Hero (#top):** doar `img/x7s_night.webp`, randată în WebGL cu harta de adâncime `img/x7s_depth.png` (canalul G):
   cameră care „respiră” (perioade 24 s / 33 s), urmează puțin mouse-ul, se ridică la derulare; bucla se oprește când hero-ul
   nu se vede. Textul: un rând de titlu, un rând de informații, două butoane. Butonul WhatsApp apare abia după hero (`body.at-top`).
@@ -170,3 +171,37 @@ apoi aliniate cu `surse/hero-v2/align.py` (ECC afin pe hărți de contururi).
 - **Pozele noi:** `surse/final/pano_view.py` (decupaje din panoramele 360: exteriorul din release-ul GitHub `v1`, PNG 8192×4096;
   interiorul din `site/p360/*_x.webp`). Clipurile: din video-urile `1020.*.mp4` (release `v1`), H.264 720×1280, fără sunet.
 - **Verificare:** `node tools/test_pagini.js` (5 mărimi + mișcare redusă). Ultima rulare: toate „ok”.
+
+## 12. Site-ul în 3D (14 nov 2026)
+Clientul a trimis un filmuleț de pe Instagram (un site cu o casă 3D care trece din zi în noapte la derulare, apoi se desface
+pe straturi, urmată de o bandă cu cifre) și un filmuleț cu o grădină cu case model prin care se plimbă vizitatorul.
+A cerut ca site-ul să fie „fix așa” și un tur 3D prin case, „mai jos un pic la site”. Copia dinainte: `versiuni/inainte-v3-3d/`.
+
+- **three.js 0.170 e ținut local** în `site/vendor/` (plus `RoomEnvironment.js`, `RoundedBoxGeometry.js`, licența). Modulele din
+  `site/js/` îl importă cu `'../vendor/three.module.min.js'`; pagina îl cere din timp cu `<link rel="modulepreload">`.
+- **`js/kit.js`** — unelte comune: conturul în plan cu colțuri rotunjite (`perimeter`), suprafețe plimbate de-a lungul lui
+  (`sweep`, `cap`), poligoane „desfășurate” așezate pe carcasă (`wrapPoly`, cu culori pe vârfuri pentru reflexia cerului pe geam),
+  materialele comune, copaci, texturi desenate local, cheile de lumină pe ore (`DAY`, `dayAt`, `clock`).
+- **`js/x7.js`** — capsula X7 construită din cod (11,5 × 3,4 × 3,45 m): carcasă, ferestre, ușă, acoperiș cu luminator, șasiu,
+  structură din oțel, interior ca în showroom. Comenzi: `explode`, `blueprint`, `openRoof`, `liftRoof`, `night`.
+- **Deschiderea** (`parts/story.html`, `js/stage.js`, `js/story.js`): secțiune de 680vh cu scenă fixată; derularea mișcă ora
+  (06:50 → 21:10), camera (chei separate pentru ecran lat și ecran înalt, amestecate după proporția ecranului) și cele 6 capitole
+  de text. Bara de sus își schimbă culoarea după cer (`window.__skyDark`). Pe tablete ținute în picioare se folosește așezarea de
+  telefon (`max-aspect-ratio:1/1`). Fără WebGL sau cu mișcare redusă: capitolele apar unul sub altul, cu imaginile `img/st/ch0…5.webp`.
+- **Banda cu cifre** (`#cifre`, în `home.base.html`): 36,5 m² utili · 39 m² construiți · 11,5 m · 39.500 €; numerele cresc de la zero
+  când intră în ecran. Bara de sus rămâne închisă la culoare peste ea.
+- **Grădina cu case** (`parts/gradina.html`, `js/garden.js`, `js/gscene.js`, `js/gradina-data.js`):
+  - casele sunt o listă în `gradina-data.js` (cod din catalog, fișierul modelului, loc, rotire); datele afișate vin din `window.CAT`;
+  - fiecare casă e un modul `js/h_<nume>.js` cu `info` și `build(M)` → `{ root, levels, openRoof(k), rooms, size }`
+    (regulile sunt în `surse/final/CASE-3D.md`). Acoperișul și etajul folosesc `F.fadeSet(M)` + `F.lift(...)` din `js/furn.js`,
+    ca să se ridice și să dispară singure; seara, toate casele se aprind din `gscene.js` (materiale comune + copiile lor);
+  - trei stări: toată grădina → o casă (fișa cu m², dimensiuni, împărțire, preț) → în casă (acoperișul ridicat, etichete pe
+    camere; la M9 se alege Etaj / Parter). Se ajunge cu apăsare pe casă, pe eticheta ei, din meniul de jos sau cu „Tur ghidat”;
+  - camera se potrivește în zona liberă (fără fișă și fără meniul de jos) și alege singură partea din care nu stă altă casă în față;
+  - umbra se recalculează doar când se schimbă ora sau se mișcă un acoperiș; scena se desenează doar cât se mișcă ceva;
+  - „Fotografii” deschide fișa modelului din catalog (`window.CATopen`), „Cere ofertă” duce pe WhatsApp cu modelul completat;
+  - fără WebGL: imaginea `img/gd/gradina.webp` și lista caselor. Cu mișcare redusă: 3D fără zboruri și fără tur ghidat.
+- **Titluri**: `.title` folosește `--serif` (Cormorant Garamond), cuvântul din `<em>` e auriu și italic.
+- **Meniul de sus** are un link în plus („Grădina”); „Capsule la comandă” a devenit „La comandă” ca să încapă.
+- **Verificare:** `node tools/test_pagini.js` are și opririle „poveste-mijloc”, „cifre” și „gradina”. Ultima rulare (14 nov 2026):
+  toate cele 7 treceri „ok” (5 mărimi + 2 cu mișcare redusă).

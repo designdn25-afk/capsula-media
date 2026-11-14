@@ -3,7 +3,8 @@
 Site static (HTML + CSS + JavaScript, fără framework și fără build) pentru Capsula România:
 case capsulă și case modulare, cu modelul X7 expus în showroom-ul din Ciorogârla (Ilfov).
 Conținutul vine de pe casecapsula.ro. Proiectul a fost început într-o conversație Claude (claude.ai)
-și mutat aici pe 22 octombrie 2026. Detaliile tehnice și istoricul complet sunt în `docs/DETALII-TEHNICE.md`.
+și mutat aici pe 22 octombrie 2026. Din 14 noiembrie 2026 prima pagină are scene 3D adevărate (three.js, ținut local):
+povestea de la deschidere și grădina cu case model. Detaliile tehnice și istoricul complet sunt în `docs/DETALII-TEHNICE.md`.
 
 ## Cum lucrezi cu clientul
 - Răspunde mereu în **română**, simplu, fără jargon. Clientul scrie mesaje scurte și trimite des capturi de ecran.
@@ -16,10 +17,21 @@ Conținutul vine de pe casecapsula.ro. Proiectul a fost început într-o convers
 - Interfața e **albă** („capsula e albă”). Accent auriu `#d4a24c`.
 - Vitrajul este **geam triplu LOW-E** peste tot (niciodată „dublu”).
 - Secțiunea „De la prima vizită la casa ta” a fost **scoasă** la cererea clientului. Nu o readuce.
-- **Deschiderea site-ului = doar capsula X7 seara** (`img/x7s_night.webp`), cu o cameră 3D lentă (WebGL + harta de adâncime).
-  Cerința clientului (22 oct 2026): „vreau să rămână doar așa partea pe noapte când se deschide site-ul”.
-  Variantele vechi V1 / V2 (poza 3D de zi, construcția „ca un video”) și comutatorul lor au fost **scoase**;
-  copiile sunt în `versiuni/inainte-site-final/` și `versiuni/home-inainte-v2-3d/`.
+- **Deschiderea site-ului (din 14 nov 2026) = povestea 3D legată de derulare**: capsula X7 ca model 3D adevărat, de dimineața
+  până seara („Seara, capsula devine felinar”), apoi desfăcută pe straturi; după ea, banda cu cifre mari. Clientul a trimis un
+  filmuleț de pe Instagram (un site cu o casă 3D care se schimbă la derulare) și a cerut: „vreau și site-ul meu să fie fix așa…
+  că nu-mi place cum arată, să fie mult mai interactiv, să fie frumos ochiului”. Varianta dinainte (doar capsula seara,
+  `img/x7s_night.webp`, cerută pe 22 oct) e salvată în `versiuni/inainte-v3-3d/`. Variantele și mai vechi V1 / V2 sunt în
+  `versiuni/inainte-site-final/` și `versiuni/home-inainte-v2-3d/`.
+- **Titlurile mari sunt cu serife** (Cormorant Garamond, cuvântul auriu în italic), ca în filmulețul de referință. Logo-ul și
+  etichetele mici rămân în Unbounded / Manrope.
+- **Grădina cu case model (secțiunea 05, din 14 nov 2026)**: o grădină 3D în care apeși pe o casă, intri în ea (acoperișul se
+  ridică) și vezi camerele, m², dimensiunile și prețul. Cerința clientului: „o grădină frumoasă… clientul să meargă frumos prin
+  fiecare casă, apasă pe casă și să poată intra în casă, să vadă configurația, metri pătrați, tot, ca un fel de tur 3D”.
+  **Acum casele sunt exemple din catalog** (X7, T7, E7, V3, M9), cu datele adevărate din `window.CAT`. Clientul a spus că va
+  trimite casele model pe care le-a comandat („nu toate casele alea din video le-am luat… o să-ți dau eu casele model”):
+  se schimbă în `site/js/gradina-data.js`, iar modelul 3D al fiecărei case se face după `surse/final/CASE-3D.md`.
+  Machetele sunt orientative (scrie și sub scenă); nu inventa dotări, prețuri sau suprafețe.
 - Sub hero, prima pagină are efecte 3D (apariție în perspectivă, carduri care se înclină). Versiunea dinainte: `versiuni/home-inainte-3d/`.
 - Turul virtual 360° a fost pus pe pauză de client („hai să lăsăm momentan turul 360”).
 
@@ -30,11 +42,17 @@ site/                    tot ce se publică
   index.html             copie identică a home.html (generată odată cu ea)
   complet.html           pagina lungă: configurator, specificații, finanțare, investitori, legal, livrare, FAQ (se editează direct)
   home_v1.html           veche (varianta V1), nefolosită și nelegată; nu se publică
-  img/                   imaginile; img/ext (exterior), img/int (interior), img/vid (clipuri .mp4 + postere .webp)
+  js/                    scenele 3D (module): kit.js (unelte comune), x7.js (modelul capsulei), stage.js + story.js (deschiderea),
+                         gscene.js + garden.js + gradina-data.js (grădina), furn.js (mobilier, terase), h_<casă>.js (câte o casă)
+  vendor/                three.js 0.170 ținut local (nu se încarcă nimic de pe alte site-uri)
+  img/                   imaginile; img/ext (exterior), img/int (interior), img/vid (clipuri .mp4 + postere .webp),
+                         img/st și img/gd (imaginile de rezervă pentru deschidere și grădină, când 3D-ul nu poate porni)
   p360/                  panoramele turului: <punct>_{s,m,l,x}.webp și miniaturile t_<punct>.jpg
-surse/final/home.base.html   SURSA paginii principale: tot în afară de cele 3 secțiuni noi (hero, caracteristici, model,
-                             tur, la comandă, galerie, contact, subsol, CSS/JS comun, Pannellum)
-surse/final/parts/           secțiunile noi: interior.html, exterior.html, zi-noapte.html (fiecare cu blocurile CSS/HTML/JS)
+surse/final/home.base.html   SURSA paginii principale: tot în afară de părțile de mai jos (banda cu cifre, caracteristici,
+                             model, tur, la comandă, galerie, contact, subsol, CSS/JS comun, Pannellum)
+surse/final/parts/           părțile: story.html (deschiderea 3D), interior.html, exterior.html, zi-noapte.html, gradina.html
+                             (fiecare cu blocurile CSS/HTML/JS)
+surse/final/CASE-3D.md       cum se face modelul 3D al unei case pentru grădină (reguli, materiale, testare)
 surse/final/SPEC.md          specificația designului final (ordine, texte, comportamente, mărimi)
 surse/final/media.json       ce arată fiecare poză/clip nou (din ce sursă, ce legendă)
 surse/final/pano_view.py     scoate o poză obișnuită dintr-o panoramă 360
@@ -47,9 +65,10 @@ versiuni/                versiuni salvate la cererea clientului
 istoric/                 copii vechi ale paginilor, făcute înainte de schimbările mari
 ```
 
-Ordinea primei pagini: hero de noapte (#top) → 01 Interior (plimbare prin camere, cu planul 3D) → caracteristici →
-02 Exterior (ocolul capsulei, carusel 3D + hartă) → 03 Zi și seară (linie aurie) → 04 Modelul X7 → 05 Tur 360° →
-06 Capsule la comandă → 07 Galerie („De ce noi”) → 08 Tot ce mai vrei să știi → 09 Contact → subsol.
+Ordinea primei pagini: povestea 3D de la deschidere (#top) → banda cu cifre (#cifre) → 01 Interior (plimbare prin camere,
+cu planul 3D) → caracteristici → 02 Exterior (ocolul capsulei, carusel 3D + hartă) → 03 Zi și seară (linie aurie) →
+04 Modelul X7 → 05 Grădina cu case (#gradina) → 06 Tur 360° → 07 Capsule la comandă → 08 Galerie („De ce noi”) →
+09 Tot ce mai vrei să știi → 10 Contact → subsol.
 
 ## Flux de lucru
 1. Previzualizare locală. Pagina trebuie deschisă prin server, altfel turul 360 nu încarcă panoramele:
@@ -62,7 +81,10 @@ Ordinea primei pagini: hero de noapte (#top) → 01 Interior (plimbare prin came
    (pagina are derulare lină și capturile făcute în timpul ei mint).
    Dimensiunile obligatorii sunt panou îngust 506×506, telefon 390×844, tabletă 820×1180, laptop 1440×900
    și desktop 1920×960. Clientul se uită des la site în panoul lateral îngust din aplicația Claude.
-4. Fișierele de pe alte site-uri nu se încarcă în pagini: totul stă local în `site/img`.
+   Scenele 3D se testează în Chromium pornit cu `--use-angle=swiftshader --enable-unsafe-swiftshader --ignore-gpu-blocklist`
+   (așa face și `tools/test_pagini.js`); merge încet, dar arată exact ce vede clientul. O singură casă se vede în pagina de
+   probă `site/_t_house.html?m=<casă>` (nu se urcă în git și nu se publică).
+4. Fișierele de pe alte site-uri nu se încarcă în pagini: totul stă local în `site/img`, `site/js` și `site/vendor`.
    Excepții acceptate: Google Fonts (Manrope, Unbounded), linkurile EN/BG și PDF-urile de pe casecapsula.ro.
 
 ## Unde e publicat acum
@@ -85,7 +107,12 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
 - TikTok: @multimester. X7: 36,5 m² utili, 39 m² construiți, 11,5 × 3,4 m, h 3,45 m, 39.500 € cu TVA, rate prin TBI Bank.
 - PDF-uri: https://casecapsula.ro/docs/oferta-capsula-x7-v2.pdf și https://casecapsula.ro/docs/prezentare-tehnica-x7.pdf
 
-## Ce mai e de făcut (la 22 octombrie 2026, după site-ul final)
+## Ce mai e de făcut (la 14 noiembrie 2026)
+- **Casele adevărate pentru grădină**: de cerut clientului lista caselor model comandate, cu poze / planuri, dimensiuni și
+  preț. Până atunci grădina arată exemple din catalog. De întrebat și cum vrea să arate grădina (alei, flori, lămpi).
+- Dacă vrea și interioare „la nivelul ochilor” (nu doar văzute de sus), fiecare casă are nevoie de poze sau de un tur 360 propriu.
+
+## Mai vechi (la 22 octombrie 2026, după site-ul final)
 0. **Înainte de lansare (obligatoriu legal):** datele firmei în subsol. Acum sunt ascunse într-un comentariu
    `<!-- DE COMPLETAT … -->` în `surse/final/home.base.html` (și vizibile ca „____” în complet.html). Trebuie cerute clientului.
 0b. La publicarea pe domeniu: `og:image` (adresă completă a `img/x7s_night.webp`) și imaginea din JSON-LD (azi pe casecapsula.ro).
