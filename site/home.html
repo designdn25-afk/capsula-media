@@ -2430,6 +2430,9 @@ CAPS.afterLoad(()=>{const m=document.querySelector('#model .model-img[data-bg]')
  const v=document.querySelector('.visit');if(v)CAPS.near(v,'100% 0px',()=>v.classList.add('bg-on'))});
 </script>
 <script type="module" src="js/story.js"></script>
+<script>/* dacă scena 3D nu a putut porni deloc (browser foarte vechi, module blocate): capitolele cu imagini */
+addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('top');if(!s||!s.classList.contains('st')||s.classList.contains('st--live')||s.classList.contains('st--static'))return;
+s.classList.add('st--static');s.querySelectorAll('.st-still[data-src]').forEach(i=>{i.src=i.dataset.src;i.removeAttribute('data-src')})},400));</script>
 <script>
 /* ===== #interior: camerele X7 (doar fișiere verificate cu ls pe 22 oct 2026) ===== */
 window.ROOMS=[
@@ -3053,5 +3056,7 @@ C.afterLoad(()=>{
 })();
 </script>
 <script type="module" src="js/garden.js"></script>
+<script>/* dacă modulul grădinii nu s-a putut încărca: rămâne imaginea grădinii */
+addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('gradina');if(!s||window.__gdMod)return;s.classList.add('gd--static');const i=s.querySelector('.gd-still[data-src]');if(i){i.src=i.dataset.src;i.removeAttribute('data-src')}},400));</script>
 </body>
 </html>

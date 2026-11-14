@@ -6,6 +6,7 @@ import { createGScene } from './gscene.js';
 import { lampPost } from './furn.js';
 import { CASE, GRADINA } from './gradina-data.js';
 
+window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel pagina arată imaginea de rezervă)
 const DEG = Math.PI / 180;
 const sec = document.getElementById('gradina');
 const fmtA = a => String(a).replace('.', ',') + ' m²';

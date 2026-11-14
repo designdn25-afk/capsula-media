@@ -138,4 +138,7 @@
  </div>
 </section><!--/HTML-->
 
-<!--JS--><script type="module" src="js/story.js"></script><!--/JS-->
+<!--JS--><script type="module" src="js/story.js"></script>
+<script>/* dacă scena 3D nu a putut porni deloc (browser foarte vechi, module blocate): capitolele cu imagini */
+addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('top');if(!s||!s.classList.contains('st')||s.classList.contains('st--live')||s.classList.contains('st--static'))return;
+s.classList.add('st--static');s.querySelectorAll('.st-still[data-src]').forEach(i=>{i.src=i.dataset.src;i.removeAttribute('data-src')})},400));</script><!--/JS-->

@@ -167,4 +167,6 @@
 <!--/HTML-->
 <!--JS-->
 <script type="module" src="js/garden.js"></script>
+<script>/* dacă modulul grădinii nu s-a putut încărca: rămâne imaginea grădinii */
+addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('gradina');if(!s||window.__gdMod)return;s.classList.add('gd--static');const i=s.querySelector('.gd-still[data-src]');if(i){i.src=i.dataset.src;i.removeAttribute('data-src')}},400));</script>
 <!--/JS-->
