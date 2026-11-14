@@ -15,8 +15,8 @@ export function buildGarden(G, H) {
   const { latime: GW, adancime: GD, centruZ: GZ, intrareZ: EZ } = GRADINA, tp = R.triplanar;
   const decal = (o) => new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, ...o });
   const m = {
-    pave: tp(S({ color: 0xffffff, roughness: .9 }), { map: T.pavers, scale: 2.4, gain: 1.04, rough: .3, bump: .012 }),                                   // dale mari, aliniate cu fiecare casă
-    paveW: tp(S({ color: 0xffffff, roughness: .9 }), { map: T.pavers, scale: 2.4, space: 'world', gain: 1.04, rough: .3, bump: .012 }),
+    pave: tp(S({ color: 0xffffff, roughness: .9 }), { map: T.pavers, scale: 2.4, gain: .9, rough: .3, bump: .012 }),                                    // dale mari, aliniate cu fiecare casă
+    paveW: tp(S({ color: 0xffffff, roughness: .9 }), { map: T.pavers, scale: 2.4, space: 'world', gain: .9, rough: .3, bump: .012 }),
     stone: tp(S({ color: 0xd2cabb, roughness: .92, vertexColors: true }), { map: T.stone, scale: 1.1, space: 'world', gain: 1.24, rough: .35, bump: .02 }),   // lespezile aleilor
     mulch: tp(S({ color: 0xffffff, roughness: 1, vertexColors: true }), { map: T.mulch, scale: .9, space: 'world', gain: 2.1 }),
     hedge: tp(S({ color: 0xffffff, roughness: .92, vertexColors: true }), { map: T.hedge, scale: 1.05, space: 'world', gain: 1.5 }),
@@ -40,6 +40,18 @@ export function buildGarden(G, H) {
   G.sun.target.position.set(0, 0, GZ); G.sun.target.updateMatrixWorld();
   G.lawnU.lwH.value.set(0, GZ, GW / 2, GD / 2); G.lawnU.lwR.value.set(9, 1.13, 4.2);
   H.forEach(h => { h.g.updateMatrixWorld(true); G.boxes.push({ inv: h.g.matrixWorld.clone().invert(), w: h.s.w, d: h.s.d, h: h.s.h, cz: h.s.cz || 0 }); });
+
+  // materialele proprii ale unei case (cele care nu sunt în setul comun M) primesc și ele textură: lemnul → scânduri, textilele → țesătură, restul → o variație fină
+  {
+    const known = new Set(Object.values(M)), seen = new Set(), c = {}; (M.clones || []).forEach(q => known.add(q[1]));
+    H.forEach(h => h.g.traverse(o => {
+      const mt = o.material; if (!o.isMesh || !mt || !mt.isMeshStandardMaterial || known.has(mt) || seen.has(mt)) return; seen.add(mt);
+      if (mt.map || mt.transparent || mt.visible === false || mt.emissiveIntensity > 1) return; mt.color.getHSL(c);
+      if (c.s > .28 && c.h > .04 && c.h < .13 && c.l > .25 && c.l < .8 && mt.roughness < .88) tp(mt, { map: T.planks, scale: [2.2, .96], gain: 1.28, rough: .25 });
+      else if (mt.roughness > .97) tp(mt, { map: T.weave, scale: .13, gain: 1.2, amt: .7 });
+      else tp(mt, { map: T.stone, scale: 1.6, gain: 1.24, amt: .3, rough: .2 });
+    }));
+  }
 
   /* ---------- gardul viu, cu poartă în față ---------- */
   const hp = perimeter(GW, GD, 9), s0 = hp.a + 4.1, s1 = hp.total + hp.a - 4.1;
@@ -135,7 +147,7 @@ export function buildGarden(G, H) {
   beds.forEach(([x, z, rx, rz, pi]) => {
     BD.add(cyl, new THREE.Matrix4().makeScale(rx, 1, rz).setPosition(x, .07, z)); BD.add(rim, new THREE.Matrix4().makeScale(rx, 1, rz).setPosition(x, .085, z), [.1, .09, .08]);
     const ar = rx * rz * Math.PI, pt = (q = .93) => { const a = rnd() * TAU, r = Math.sqrt(rnd()) * q; return [x + Math.cos(a) * r * rx, z + Math.sin(a) * r * rz]; }, P = PAL[pi], tw = P.reduce((s, e) => s + e.w, 0);
-    for (let i = 0; i < ar * 3; i++) { const p = pt(), k = rr(.75, 1.1); tufts.push({ x: p[0], y: .12, z: p[1], ry: rnd() * TAU, s: [rr(.85, 1.5), rr(.8, 1.35), rr(.85, 1.5)], c: [k * rr(.82, 1), k, k * rr(.7, .95)] }); }
+    for (let i = 0; i < ar * 4.2; i++) { const p = pt(.97), k = rr(.75, 1.1); tufts.push({ x: p[0], y: .12, z: p[1], ry: rnd() * TAU, s: [rr(.85, 1.5), rr(.8, 1.35), rr(.85, 1.5)], c: [k * rr(.82, 1), k, k * rr(.7, .95)] }); }
     for (let i = 0; i < ar * 5.2; i++) { const p = pt(.9); let e = P[0], q = rnd() * tw; for (const o of P) { q -= o.w; e = o; if (q <= 0) break; } const k = rr(.82, 1.08);
       fl[e.k].push({ x: p[0], y: rr(e.h[0], e.h[1]), z: p[1], ry: rnd() * TAU, rx: e.k === 1 ? rr(-.12, .12) : rr(-.3, .3), s: e.s * rr(.8, 1.25), c: [e.c[0] * k, e.c[1] * k, e.c[2] * k] }); }
   });

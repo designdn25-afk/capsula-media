@@ -11,7 +11,7 @@ import { THREE, clamp, lerp, smooth } from './kit.js';
 
 const TAU = Math.PI * 2;
 export const rng = (s = 1) => () => (s = (s * 16807) % 2147483647) / 2147483647;
-const cv = (w, h = w) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d')]; };
+const cv = (w, h = w, read = false) => { const c = document.createElement('canvas'); c.width = w; c.height = h; return [c, c.getContext('2d', read ? { willReadFrequently: true } : undefined)]; };   // read = pixelii se citesc înapoi (texturile cu transparență)
 const css = (c, a = 1) => `rgba(${c[0] | 0},${c[1] | 0},${c[2] | 0},${a})`;
 const mix3 = (a, b, t) => [a[0] + (b[0] - a[0]) * t, a[1] + (b[1] - a[1]) * t, a[2] + (b[2] - a[2]) * t];
 const V = (x = 0, y = 0, z = 0) => new THREE.Vector3(x, y, z);
@@ -53,9 +53,9 @@ function noiseCanvas() {   // trei canale independente, mai multe octave (nori, 
 
 function grassCanvas() {
   const W = 512, [c, x] = cv(W), r = rng(5);
-  x.fillStyle = '#4a682b'; x.fillRect(0, 0, W, W);
-  noise(x, W, W, 5, 5, r, { a: .3, op: 'overlay' }); noise(x, W, W, 21, 21, r, { a: .3, op: 'overlay' }); noise(x, W, W, 128, 128, r, { a: .22, op: 'overlay' });
-  const pal = [[52, 78, 30], [60, 90, 34], [70, 100, 38], [80, 112, 44], [92, 122, 50], [104, 132, 58], [58, 84, 36], [46, 68, 28], [118, 136, 66]];
+  x.fillStyle = '#5b7838'; x.fillRect(0, 0, W, W);
+  noise(x, W, W, 9, 9, r, { a: .14, op: 'overlay' }); noise(x, W, W, 37, 37, r, { a: .22, op: 'overlay' }); noise(x, W, W, 128, 128, r, { a: .22, op: 'overlay' });
+  const pal = [[66, 92, 40], [74, 102, 44], [84, 112, 48], [94, 122, 54], [104, 132, 60], [116, 142, 68], [72, 96, 46], [58, 80, 38], [130, 146, 78]];
   x.lineCap = 'round';
   for (let i = 0; i < 7000; i++) {
     const px = r() * W, py = r() * W, a = r() * TAU, l = 4 + r() * 9, dx = Math.cos(a) * l, dy = Math.sin(a) * l;
@@ -73,8 +73,8 @@ function drawLeaf(x, r, l, col) {
   x.strokeStyle = css(mix3(col, [16, 26, 8], .5), .7); x.lineWidth = .9; x.beginPath(); x.moveTo(0, l / 2); x.lineTo(0, -l / 2); x.stroke();
 }
 // mănunchi de frunze pe fond transparent (un „cartonaș” din coroana unui copac / dintr-o tufă)
-function leafCanvas(seed, { n = 86, len = [24, 38], dark = [30, 54, 24], mid = [66, 106, 42], light = [116, 152, 62], spread = .37 } = {}) {
-  const W = 256, [c, x] = cv(W), r = rng(seed); x.lineCap = 'round';
+function leafCanvas(seed, { n = 86, len = [24, 38], dark = [36, 62, 28], mid = [74, 114, 46], light = [124, 158, 68], spread = .37 } = {}) {
+  const W = 256, [c, x] = cv(W, W, true), r = rng(seed); x.lineCap = 'round';
   x.strokeStyle = 'rgba(60,46,32,.9)'; x.lineWidth = 2;
   for (let i = 0; i < 5; i++) { const a = r() * TAU, l = W * (.16 + .2 * r()); x.beginPath(); x.moveTo(W / 2, W / 2); x.quadraticCurveTo(W / 2 + Math.cos(a + .5) * l * .5, W / 2 + Math.sin(a + .5) * l * .5, W / 2 + Math.cos(a) * l, W / 2 + Math.sin(a) * l); x.stroke(); }
   for (let i = 0; i < n; i++) {
@@ -96,7 +96,7 @@ function hedgeCanvas() {
 }
 // rămurică de conifer; vârful e sus (v = 0)
 function sprayCanvas() {
-  const W = 256, [c, x] = cv(W), r = rng(29), pal = [[20, 40, 24], [28, 54, 30], [38, 68, 36], [50, 84, 42], [66, 100, 50]]; x.lineCap = 'round';
+  const W = 256, [c, x] = cv(W, W, true), r = rng(29), pal = [[20, 40, 24], [28, 54, 30], [38, 68, 36], [50, 84, 42], [66, 100, 50]]; x.lineCap = 'round';
   const needles = (x0, y0, x1, y1, k) => {
     const L = Math.hypot(x1 - x0, y1 - y0), ux = (x1 - x0) / L, uy = (y1 - y0) / L, an = Math.atan2(uy, ux);
     for (let s = 0; s < L; s += 2.4) for (const sd of [-1, 1]) { const a = an + sd * (.7 + .55 * r()), l = (6 + 6 * r()) * k, px = x0 + ux * s, py = y0 + uy * s; x.strokeStyle = css(pal[(r() * pal.length) | 0], .96); x.lineWidth = 1.5 + r(); x.beginPath(); x.moveTo(px, py); x.lineTo(px + Math.cos(a) * l, py + Math.sin(a) * l); x.stroke(); }
@@ -110,7 +110,7 @@ function sprayCanvas() {
 }
 // patru feluri de flori, albe (culoarea o dă fiecare strat): margarete · spice (lavandă, salvie) · trandafiri / bujori · flori mărunte
 function flowersCanvas() {
-  const W = 512, [c, x] = cv(W), r = rng(23), g = (lo = 212, hi = 255) => { const v = lo + r() * (hi - lo); return css([v, v, v]); };
+  const W = 512, [c, x] = cv(W, W, true), r = rng(23), g = (lo = 212, hi = 255) => { const v = lo + r() * (hi - lo); return css([v, v, v]); };
   const spots = (n, m, ox, oy, min) => { const P = []; let k = 0; while (P.length < n && k++ < 4000) { const px = ox + m + r() * (256 - 2 * m), py = oy + m + r() * (256 - 2 * m); if (P.every(q => Math.hypot(q[0] - px, q[1] - py) > min)) P.push([px, py]); } return P; };
   spots(10, 30, 0, 0, 54).forEach(([px, py]) => {
     const R = 21 + 8 * r(), n = 11 + ((r() * 4) | 0); x.save(); x.translate(px, py); x.rotate(r() * TAU);
@@ -222,13 +222,14 @@ export function blobTexture(stops) {   // pată rotundă moale: [[poziție, 'cul
 let TEX = null;
 export function textures() {
   if (TEX) return TEX;
-  const wood = woodCanvas();
+  const t0 = performance.now(), wood = woodCanvas();
   TEX = {
     noise: toTex(noiseCanvas(), { srgb: false, aniso: 2 }), grass: toTex(grassCanvas(), { aniso: 16 }),
-    leaf: alphaTex(leafCanvas(11), [58, 92, 38]), leafS: alphaTex(leafCanvas(13, { n: 120, len: [15, 24], spread: .4 }), [58, 92, 38]), spray: alphaTex(sprayCanvas(), [34, 62, 34]),
+    leaf: alphaTex(leafCanvas(11, { n: 104, spread: .385 }), [62, 98, 40], 2.6), leafS: alphaTex(leafCanvas(13, { n: 170, len: [15, 24], spread: .41 }), [62, 98, 40], 2.6), spray: alphaTex(sprayCanvas(), [34, 62, 34], 2.4),
     hedge: toTex(hedgeCanvas()), flowers: alphaTex(flowersCanvas(), [226, 226, 226], 2.2),
     wood: toTex(wood), planks: toTex(planksCanvas(wood, 8, 37)), pavers: toTex(paversCanvas(), { aniso: 16 }), stone: toTex(stoneCanvas()), ledger: toTex(ledgerCanvas()), weave: toTex(weaveCanvas(), { aniso: 4 }), mulch: toTex(mulchCanvas()),
   };
+  textures.ms = performance.now() - t0;   // cât a durat desenarea (pentru verificare)
   return TEX;
 }
 
@@ -276,7 +277,7 @@ export function triplanar(mat, { map, scale = 1, space = 'local', gain = 1, amt 
 export const GLASS = { base: { value: .5 }, inside: { value: 0 } };
 // Geam LOW-E: reflectă cerul (mai tare când e privit pieziș), lasă să se vadă puțin interiorul; din casă se vede prin el grădina.
 export function glassMaterial(envMap) {
-  const m = new THREE.MeshStandardMaterial({ color: 0x8fa3b0, metalness: 1, roughness: .04, envMap, envMapIntensity: 1.1, transparent: true, premultipliedAlpha: true, opacity: .5, depthWrite: false, side: THREE.DoubleSide });
+  const m = new THREE.MeshStandardMaterial({ color: 0x7d8c98, metalness: 1, roughness: .04, envMap, envMapIntensity: 1.1, transparent: true, premultipliedAlpha: true, opacity: .5, depthWrite: false, side: THREE.DoubleSide });
   m.onBeforeCompile = sh => {
     sh.uniforms.gBase = GLASS.base; sh.uniforms.gIn = GLASS.inside;
     sh.fragmentShader = sh.fragmentShader.replace('#include <common>', '#include <common>\nuniform float gBase; uniform float gIn;')
@@ -306,6 +307,7 @@ export function realMaterials(M, T, envMap) {
   M.glass = glassMaterial(envMap);
   M.skyglass.envMap = envMap; M.skyglass.envMapIntensity = 1.0; M.skyglass.color.setHex(0x23384c);
   M.frame.envMap = envMap; M.frame.envMapIntensity = .6;
+  [[M.inner, .22], [M.ceil, .1], [M.floor, .3]].forEach(([m, k]) => { m.envMap = envMap; m.envMapIntensity = k; });   // interiorul ia puțină culoare din cer și din iarbă
   return M;
 }
 
@@ -320,20 +322,21 @@ export function lawnMaterial(T) {
       uniform sampler2D lwG; uniform sampler2D lwN; uniform vec4 lwH; uniform vec3 lwR; varying vec2 vLw;
       float lwBox( vec2 p, vec2 b, float r ) { vec2 q = abs( p ) - b + r; return length( max( q, 0.0 ) ) + min( max( q.x, q.y ), 0.0 ) - r; }`)
       .replace('#include <map_fragment>', `
-      vec3 lg1 = texture2D( lwG, vLw * .41 ).rgb, lg2 = texture2D( lwG, vLw.yx * .083 + .37 ).rgb;
-      vec3 ln1 = texture2D( lwN, vLw * .019 ).rgb, ln2 = texture2D( lwN, vLw * .0047 + .21 ).rgb;
-      float lMac = smoothstep( .3, .7, ln1.r * .6 + ln2.g * .4 ), lDry = smoothstep( .35, .75, ln1.b * .5 + ln2.r * .5 );
-      vec3 lc = lg1 * mix( 1.0, dot( lg2, vec3( 4.2 ) ), .55 );
-      lc *= mix( .8, 1.16, lMac ); lc = mix( lc, lc * vec3( 1.2, 1.04, .72 ), lDry * .5 );
-      float lIn = 0.0, lAo = 1.0;
+      vec2 lq = vec2( vLw.x * .829 - vLw.y * .559, vLw.x * .559 + vLw.y * .829 );                      // același gazon, rotit: ascunde repetarea
+      vec3 ln0 = texture2D( lwN, lq * .061 ).rgb, ln1 = texture2D( lwN, vLw * .0173 ).rgb, ln2 = texture2D( lwN, lq * .0041 + .21 ).rgb;
+      vec3 lc = mix( texture2D( lwG, vLw * .41 ).rgb, texture2D( lwG, lq * .263 + .37 ).rgb, smoothstep( .38, .62, ln0.g ) );
+      lc *= mix( 1.0, dot( texture2D( lwG, lq * 1.57 + .11 ).rgb, vec3( 3.0 ) ), .55 );                 // fire de iarbă, de aproape
+      float lMac = smoothstep( .3, .7, ln1.r * .55 + ln2.g * .45 ), lDry = smoothstep( .4, .75, ln1.b * .5 + ln2.r * .5 );
+      lc *= mix( .9, 1.08, ln0.r ) * mix( .86, 1.12, lMac ); lc = mix( lc, lc * vec3( 1.16, 1.05, .78 ), lDry * .45 );
+      float lIn = 1.0, lAo = 1.0;
       if ( lwH.z > 0.0 ) {
         float dh = lwBox( vLw - lwH.xy, lwH.zw, lwR.x );
         lIn = smoothstep( .3, -.3, dh + lwR.y );
-        lAo = 1.0 - .55 * ( 1.0 - smoothstep( 0.0, .95, abs( dh + lwR.y * .5 ) - lwR.y * .5 ) );
+        lAo = 1.0 - .5 * ( 1.0 - smoothstep( 0.0, .95, abs( dh + lwR.y * .5 ) - lwR.y * .5 ) );
         lAo = mix( lAo, 1.0, step( lwH.y + lwH.w - 3.0, vLw.y ) * ( 1.0 - smoothstep( lwR.z - .5, lwR.z + .4, abs( vLw.x - lwH.x ) ) ) );
-      } else lIn = 1.0;
-      lc *= 1.0 + lIn * .05 * ( smoothstep( -.35, .35, sin( vLw.x * 2.3 + sin( vLw.y * .07 ) * .8 ) ) - .5 );
-      lc = mix( lc * vec3( 1.1, 1.0, .8 ) * mix( .78, 1.12, ln2.b ), lc, lIn );
+      }
+      lc *= 1.0 + lIn * .045 * ( smoothstep( -.35, .35, sin( vLw.x * 2.3 + sin( vLw.y * .07 ) * .8 ) ) - .5 );   // dungile de la tuns, abia vizibile
+      lc = mix( lc * vec3( 1.14, 1.03, .74 ) * mix( .74, 1.1, ln2.b * .6 + ln0.b * .4 ), lc, lIn );              // în afara gardului: fâneață, mai uscată
       diffuseColor.rgb *= lc * lAo;`);
   };
   mat.customProgramCacheKey = () => 'lawn';
@@ -341,8 +344,8 @@ export function lawnMaterial(T) {
 }
 
 // Frunziș din „cartonașe”: lumina cade ca pe un volum (normalele nu se întorc pe dos), puțină lumină trece prin frunze.
-export function leafMaterial(map, { color = 0xffffff, alphaTest = .42, rough = .82, trans = 1 } = {}) {
-  const m = new THREE.MeshStandardMaterial({ map, color, roughness: rough, metalness: 0, alphaTest, side: THREE.DoubleSide, vertexColors: true });
+export function leafMaterial(map, { color = 0xffffff, alphaTest = .32, trans = 1 } = {}) {
+  const m = new THREE.MeshLambertMaterial({ map, color, alphaTest, side: THREE.DoubleSide, vertexColors: true });   // fără luciu: frunzele nu sclipesc și costă puțin
   m.onBeforeCompile = sh => {
     sh.fragmentShader = sh.fragmentShader.replace('#include <normal_fragment_begin>', 'float faceDirection = 1.0;\nvec3 normal = normalize( vNormal );\nvec3 nonPerturbedNormal = normal;')
       .replace('#include <lights_fragment_end>', `#include <lights_fragment_end>
@@ -386,17 +389,22 @@ export function makeSky(noiseTex) {
         }
         float az = atan( d.z, d.x ) * .15915;
         float prof = .011 + .03 * texture2D( uN, vec2( az * 3.0, .37 ) ).r * texture2D( uN, vec2( az * 11.0, .61 ) ).g * 2.0;
-        if ( uP.w > .5 ) {   // pentru reflexii: pământ luminat, copaci și case în jur
+        if ( uP.w > .5 ) {   // pentru reflexii: cer mai puțin albastru, pământ luminat (cu pete, ca o grădină), copaci și case în jur
+          col = mix( vec3( dot( col, vec3( .25, .6, .15 ) ) ), col, .68 );
           prof = prof * 4.0 + .035;
-          col = mix( col, uTree, smoothstep( prof, prof - .02, y ) ); col = mix( col, uGround, smoothstep( 0.0, -.03, y ) );
+          col = mix( col, uTree * ( .6 + .9 * texture2D( uN, vec2( az * 9.0, y * 2.0 ) ).b ), smoothstep( prof, prof - .02, y ) );
+          vec2 gp = d.xz / max( - y, .04 );
+          vec3 gnd = uGround * ( .5 + 1.1 * texture2D( uN, gp * .05 ).r ); gnd = mix( gnd, uGround.ggg * 2.6, smoothstep( .56, .6, texture2D( uN, gp * .021 + .4 ).g ) );
+          col = mix( col, gnd, smoothstep( 0.0, -.03, y ) );
+          col = mix( col, uGround.ggg * 3.4, smoothstep( .66, .7, texture2D( uN, vec2( az * 4.0, .13 ) ).b ) * smoothstep( -.1, -.08, y ) * smoothstep( .06, .04, y ) );
         }
         gl_FragColor = vec4( col, 1.0 );
         #include <tonemapping_fragment>
         #include <colorspace_fragment>
         if ( uP.w < .5 ) {   // orizontul se topește în culoarea ceții (aceeași cu a gazonului îndepărtat); peste el, o linie de copaci în zare
-          gl_FragColor.rgb = mix( gl_FragColor.rgb, uFog, smoothstep( .075, 0.0, y ) * .9 );
-          gl_FragColor.rgb = mix( gl_FragColor.rgb, mix( uFog, uTree, .34 ), smoothstep( prof, prof - .0035, y ) );
-          gl_FragColor.rgb = mix( gl_FragColor.rgb, uFog, smoothstep( .001, -.004, y ) );
+          gl_FragColor.rgb = mix( gl_FragColor.rgb, mix( uFog, vec3( 1.0 ), .3 ), smoothstep( .06, 0.0, y ) * .5 );
+          gl_FragColor.rgb = mix( gl_FragColor.rgb, uFog * vec3( .8, .86, .9 ), smoothstep( prof, prof - .0035, y ) );
+          gl_FragColor.rgb = mix( gl_FragColor.rgb, uFog, smoothstep( .003, -.002, y ) );
         }
       }` });
   const mesh = new THREE.Mesh(new THREE.BoxGeometry(2, 2, 2), mat); mesh.frustumCulled = false; mesh.renderOrder = 10; mesh.matrixAutoUpdate = false;
@@ -505,7 +513,7 @@ export function treeGeo(kind, seed = 1) {
   } else {
     const tall = kind === 2, C = V(0, tall ? 2.75 : 2.55, 0), lobes = [{ c: C, r: tall ? [.82, 1.42, .82] : [1.2, 1.06, 1.2] }], nl = tall ? 5 : 6, bark = tall ? [.6, .58, .52] : [.19, .14, .1];
     for (let i = 0; i < nl; i++) { const a = i / nl * TAU + r() * .8, d = tall ? .3 + .2 * r() : .62 + .25 * r(), y = tall ? lerp(-1, .85, i / (nl - 1)) : lerp(-.36, .5, r()), rr = tall ? .5 + .18 * r() : .6 + .22 * r(); lobes.push({ c: V(Math.cos(a) * d, C.y + y, Math.sin(a) * d), r: [rr, rr * .9, rr] }); }
-    crown(Q, r, lobes, { n: tall ? 215 : 250, size: tall ? [.46, .7] : [.52, .82] });
+    crown(Q, r, lobes, { n: tall ? 250 : 290, size: tall ? [.5, .78] : [.56, .9] });
     const lean = (r() - .5) * .12;
     S.tube([{ x: 0, y: 0, z: 0, r: tall ? .1 : .13 }, { x: lean, y: .7, z: lean * .5, r: tall ? .08 : .1 }, { x: -lean * .5, y: 1.4, z: 0, r: tall ? .065 : .085 }, { x: 0, y: 2.1, z: 0, r: .06 }, { x: 0, y: C.y + .35, z: 0, r: .028 }], 7, bark);
     for (let i = 1; i <= 4; i++) { const l = lobes[i], y = 1.35 + .22 * i; S.tube([{ x: 0, y, z: 0, r: .045 }, { x: l.c.x * .5, y: lerp(y, l.c.y, .55), z: l.c.z * .5, r: .034 }, { x: l.c.x * .95, y: l.c.y, z: l.c.z * .95, r: .016 }], 5, bark); }
