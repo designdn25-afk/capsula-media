@@ -21,3 +21,8 @@ export const CASE = [
 
 // Grădina: mărimea gardului viu și locul intrării (metri)
 export const GRADINA = { latime: 64, adancime: 72, centruZ: -8, intrareZ: 28 };
+
+// Imagini 360° realiste (făcute cu AI pornind de la machetă) pentru vederile din afară: toată grădina și fiecare casă din față.
+// Pentru fiecare: [imaginea pe ecran lat, imaginea pe ecran înalt] (fișiere din img/gd/ai/, fără .webp). Se arată doar ziua.
+// Locurile din care sunt făcute se citesc din pagină cu __gradina.views(); dacă muți o casă sau grădina, imaginile trebuie refăcute.
+export const VEDERI = {};

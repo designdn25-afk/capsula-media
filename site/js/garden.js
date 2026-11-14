@@ -7,7 +7,7 @@ import { THREE, clamp, lerp, ease, webglOK, fit } from './kit.js';
 import { createGScene } from './gscene.js';
 import { buildGarden } from './genv.js';
 import { createPano } from './pano.js';
-import { CASE, GRADINA } from './gradina-data.js';
+import { CASE, GRADINA, VEDERI } from './gradina-data.js';
 
 window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel pagina arată imaginea de rezervă)
 const DEG = Math.PI / 180;
@@ -73,12 +73,12 @@ async function boot() {
   let rooms = [];
 
   /* ---------- stare ---------- */
-  const GZ = GRADINA.centruZ, CAMK = ['tx', 'ty', 'tz', 'az', 'el', 'fw', 'fh', 'fov'], cur = {}, from = {}, to = {};
+  const GZ = GRADINA.centruZ, CAMK = ['tx', 'ty', 'tz', 'az', 'el', 'fw', 'fh', 'dist'], cur = {}, from = {}, to = {};
   let mode = 'all', sel = -1, lvl = 1, W = 0, Hh = 0, mP = 0, tr = 1, dur = 1.7, uaz = 0, uel = 0, tuaz = 0, tuel = 0, offX = 0, offY = 0, tOffX = 0, tOffY = 0,
     time = 10.6, timeGoal = 10.6, hover = -1, visible = false, raf = 0, last = 0, awake = 30, needMeasure = 2, started = false, auto = null, drag = null, lastN = -1, snap = 0, freeW = 1, freeH = 1, px = 3e6, slow = 0;
   const wake = () => { awake = 40; kick(); };
   // în casă: 'walk' = la nivelul ochilor, 'plan' = de sus, cu acoperișul ridicat
-  let inView = 'walk', pOp = 0, pA = null, pH = 0, noPano = false;
+  let inView = 'walk', pOp = 0, pA = null, pH = 0, noPano = false, ly = 0, lp = 0, tly = 0, tlp = 0;   // ly, lp = privitul în jur din afară (grade)
   const W3 = { pos: new THREE.Vector3(), from: new THREE.Vector3(), to: new THREE.Vector3(), k: 1, yaw: 0, tyaw: 0, pitch: -4, tpitch: -4 },
     blend = { k: 1, dur: 1.6, fov0: 34, p0: new THREE.Vector3(), q0: new THREE.Quaternion() }, tP = new THREE.Vector3(), tQ = new THREE.Quaternion(), pano = createPano(G.renderer);
   const walking = () => mode === 'in' && inView === 'walk';
@@ -123,29 +123,34 @@ async function boot() {
   const bigPano = G.renderer.capabilities.maxTextureSize >= 6144 && fine.matches && Math.max(innerWidth, innerHeight) * Math.min(devicePixelRatio || 1, 2) > 1500;
   const panoUrl = k => (k.slice(0, 3) === 'ai:' ? 'img/gd/ai/' + k.slice(3) + '.webp' : 'p360/' + k + (bigPano ? '_l' : '_m') + '.webp');
 
-  /* unde stă camera: toată grădina, o casă văzută din față, o casă văzută de sus (în interior). L = ecran lat, P = ecran înalt */
-  function station(out) {
+  /* Unde stă camera: toată grădina, o casă văzută din față, o casă văzută de sus (planul). Pentru fiecare există un loc pe ecran
+     lat (pv = 0) și unul pe ecran înalt (pv = 1). Locul e fix, iar unghiul de vedere se potrivește după ecran: așa, din același
+     loc se poate arăta și o imagine 360° realistă (VEDERI din gradina-data.js), pe orice mărime de ecran. */
+  const REF = [{ fov: 34, asp: 1.6 }, { fov: 46, asp: .5 }];
+  function view(m, i, l, pv) {
     let L, P;
-    if (mode === 'all' || sel < 0) {
+    if (m === 'all' || i < 0) {
       L = { tx: 0, ty: 1, tz: GZ + 3, az: 0, el: 31, fw: 82, fh: 47 }; P = { tx: 0, ty: 1, tz: GZ + 2, az: 0, el: 50, fw: 50, fh: 78 };
     } else {
-      const h = H[sel], s = h.s, r = h.c.rot, c = h.center, long = s.w >= s.d, two = h.api.levels > 1;
-      if (mode === 'house') {
+      const h = H[i], s = h.s, r = h.c.rot, c = h.center, long = s.w >= s.d, two = h.api.levels > 1;
+      if (m === 'house') {
         const a = 30 * DEG, b = 56 * DEG;
         L = { tx: c.x, ty: s.h * .42, tz: c.z, az: r + h.side * 30, el: 13, fw: (s.w * Math.cos(a) + s.d * Math.sin(a)) * 1.12 + 3.5, fh: s.h * 1.7 + 3 };
         P = { tx: c.x, ty: s.h * .45, tz: c.z, az: r + h.sideP * (long ? 56 : 26), el: 21, fw: (long ? s.w * Math.cos(b) + s.d * Math.sin(b) : s.w * 1.2) + 2.5, fh: s.h * 2.2 + 5 };
       } else {
-        const y = two && lvl === 1 ? s.h * .5 + .8 : 1.1;
+        const y = two && l === 1 ? s.h * .5 + .8 : 1.1;
         L = { tx: c.x, ty: y, tz: c.z, az: r + h.side * 14, el: 58, fw: s.w + 4.5, fh: s.d * .95 + 5.5 };
         P = { tx: c.x, ty: y, tz: c.z, az: r + h.sideP * (long ? 90 : 10), el: 72, fw: (long ? s.d : s.w) + 3.2, fh: (long ? s.w : s.d) + 4.5 };
       }
     }
-    const q = mode === 'in' ? Math.round(mP) : mP; L.fov = 34; P.fov = 46;
-    CAMK.forEach(k => { out[k] = lerp(L[k], P[k], q); }); return out;
+    const o = pv ? P : L, rf = REF[pv], tn = Math.tan(rf.fov * DEG / 2); o.dist = Math.max((o.fh / 2) / tn, (o.fw / 2) / (tn * rf.asp)); return o;
   }
+  function station(out) { const o = view(mode, sel, lvl, mP > .5 ? 1 : 0); CAMK.forEach(k => { out[k] = o[k]; }); return out; }
+  // imaginea 360° realistă a vederii de acum (doar ziua, doar din afară), dacă există
+  const extKey = () => { if (mode === 'in' || timeGoal > 15) return null; const e = VEDERI[mode === 'all' || sel < 0 ? 'all' : H[sel].c.cod]; return (e && e[mP > .5 ? 1 : 0]) || null; };
   function goTo(m, i, d = 1.7) {
     CAMK.forEach(k => { from[k] = cur[k]; }); from.az += uaz; from.el = clamp(from.el + uel, 5, 86); uaz = uel = tuaz = tuel = 0;
-    mode = m; sel = i; tr = rm ? 1 : 0; dur = d; needMeasure = 2; wake();
+    mode = m; sel = i; tr = rm ? 1 : 0; dur = d; needMeasure = 2; tly = tlp = 0; wake();
   }
 
   /* ---------- comenzi ---------- */
@@ -225,6 +230,7 @@ async function boot() {
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy);
       if (drag.moved > 6) { stopAuto(); canvas.classList.add('drag'); wake();
         if (walking()) { W3.tyaw += dx * .2; if (!drag.touch) W3.tpitch = clamp(W3.tpitch + dy * .16, -40, 40); }
+        else if (extKey() && !noPano) { tly = clamp(tly + dx * .1, -70, 70); if (!drag.touch) tlp = clamp(tlp + dy * .08, -20, 20); }
         else { tuaz -= dx * .3; if (!drag.touch) tuel += dy * .2; if (mode === 'all') tuaz = clamp(tuaz, -80, 80); tuel = clamp(tuel, 6 - to.el, 82 - to.el); } }
     } else if (fine.matches && !walking()) { const i = pick(e); if (i !== hover) { hover = i; canvas.classList.toggle('can', i >= 0 && !(mode === 'in' && i === sel)); wake(); } }
   });
@@ -233,7 +239,7 @@ async function boot() {
   canvas.addEventListener('pointerleave', () => { if (hover >= 0) { hover = -1; canvas.classList.remove('can'); wake(); } });
 
   /* ---------- cadrul ---------- */
-  const v = new THREE.Vector3();
+  const v = new THREE.Vector3(), UP = new THREE.Vector3(0, 1, 0);
   function measure() {
     W = stage.clientWidth; Hh = stage.clientHeight; let x0 = 0, y0 = 0, y1 = Hh - 64;
     if (mode !== 'all') { if (W >= 900) x0 = card.offsetWidth + 28; else { y0 = 46; y1 = Math.max(y0 + 120, Hh - card.offsetHeight - 70); } }
@@ -252,11 +258,12 @@ async function boot() {
     if (auto && now >= auto.at) stepAuto(now);
     // camera: zbor lin spre locul ales
     station(to);
-    if (!started) { started = true; CAMK.forEach(k => { cur[k] = to[k]; }); if (!rm) { CAMK.forEach(k => { from[k] = to[k]; }); from.el = to.el + 30; from.fw = to.fw * 1.5; from.fh = to.fh * 1.5; from.az = -34; tr = 0; dur = 2.8; } }
+    if (!started) { started = true; CAMK.forEach(k => { cur[k] = to[k]; }); if (!rm) { CAMK.forEach(k => { from[k] = to[k]; }); from.el = to.el + 30; from.dist = to.dist * 1.5; from.az = -34; tr = 0; dur = 2.8; } }
     let busy = false;
     if (tr < 1) { tr = Math.min(1, tr + dt / dur); const k = ease(tr); CAMK.forEach(n => { cur[n] = lerp(from[n], to[n], k); }); cur.az = from.az + ((((to.az - from.az) % 360) + 540) % 360 - 180) * k; busy = true; }
     else CAMK.forEach(n => { cur[n] = to[n]; });
     if (Math.abs(tuaz - uaz) + Math.abs(tuel - uel) > .02) { uaz += (tuaz - uaz) * .16; uel += (tuel - uel) * .16; busy = true; }
+    if (Math.abs(tly - ly) + Math.abs(tlp - lp) > .02) { ly += (tly - ly) * .16; lp += (tlp - lp) * .16; busy = true; } else { ly = tly; lp = tlp; }
     if (Math.abs(tOffX - offX) + Math.abs(tOffY - offY) > .0008) { offX += (tOffX - offX) * .09; offY += (tOffY - offY) * .09; busy = true; }
     // ora zilei
     if (time !== timeGoal) { time += clamp(timeGoal - time, -dt * 3.4, dt * 3.4); busy = true; lastN = -2; }
@@ -269,8 +276,10 @@ async function boot() {
     }
     if (blend.k < 1) { blend.k = Math.min(1, blend.k + dt / blend.dur); busy = true; }
     // fotografia reală a camerei (dacă există): apare după ce camera a ajuns; la mers și la schimbarea zi/seară se vede macheta
-    let pt = null;
-    if (wk && W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k && !(p.ai && timeGoal > 15)) { const night = timeGoal > 15 && p.kn, k = night ? p.kn : p.k, u = panoUrl(k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); else if (pt !== pA && pOp < .02) { pA = pt; pH = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; } } }
+    let pt = null, ph = 180;
+    if (wk) { if (W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k && !(p.ai && timeGoal > 15)) { const night = timeGoal > 15 && p.kn, u = panoUrl(night ? p.kn : p.k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); ph = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; } } }
+    else if (tr >= 1 && blend.k >= 1 && Math.abs(uaz) + Math.abs(uel) < .05) { const k = extKey(); if (k) { const u = panoUrl('ai:' + k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); } }   // din afară: imaginea realistă a vederii
+    if (pt && pt !== pA && pOp < .02) { pA = pt; pH = ph; }
     const pg = pt && pt === pA && blend.k > .82 && time === timeGoal && !noPano ? 1 : 0;
     if (pOp !== pg) { pOp += clamp(pg - pOp, -dt * 2.4, dt * 2.4); busy = true; }
     // acoperișurile și inelul auriu
@@ -281,7 +290,7 @@ async function boot() {
       if (Math.abs(rg - h.ro) > .004) { h.ro += (rg - h.ro) * .14; busy = true; } else h.ro = rg;
       h.ring.material.opacity = h.ro; h.ring.visible = h.ro > .004;
     });
-    const sway = mode === 'all' && !rm && !drag;
+    const sway = mode === 'all' && !rm && !drag && !extKey();
     if (busy || sway) awake = Math.max(awake, 12);
     if (awake <= 0) return; awake--;
     const asp = W / Hh; let fov;
@@ -290,15 +299,17 @@ async function boot() {
       cam.lookAt(W3.pos.x + Math.sin(a) * Math.cos(e), W3.pos.y + Math.sin(e), W3.pos.z + Math.cos(a) * Math.cos(e));
       G.scene.fog.near = 70; G.scene.fog.far = 520;
     } else {
-      fov = cur.fov; const tn = Math.tan(fov * DEG / 2), dist = Math.max((cur.fh / 2) / tn * (Hh / freeH), (cur.fw / 2) / (tn * asp) * (W / freeW));
+      const dist = cur.dist; fov = clamp(2 * Math.atan(Math.max((cur.fh / 2) / dist * (Hh / freeH), (cur.fw / 2) / (dist * asp) * (W / freeW))) / DEG, 14, 84);
       const az = (cur.az + uaz + (sway ? Math.sin(now / 1000 * .17) * 4 : 0)) * DEG, el = clamp(cur.el + uel, 5, 86) * DEG;
       cam.position.set(cur.tx + Math.sin(az) * Math.cos(el) * dist, cur.ty + Math.sin(el) * dist, cur.tz + Math.cos(az) * Math.cos(el) * dist); cam.lookAt(cur.tx, cur.ty, cur.tz);
+      if (ly || lp) { cam.rotateOnWorldAxis(UP, ly * DEG); cam.rotateX(lp * DEG); }
       G.scene.fog.near = dist * 1.25; G.scene.fog.far = dist * 1.25 + 430;
     }
     if (blend.k < 1) { const e = ease(blend.k); tP.copy(cam.position); tQ.copy(cam.quaternion); cam.position.lerpVectors(blend.p0, tP, e); cam.quaternion.slerpQuaternions(blend.q0, tQ, e); fov = lerp(blend.fov0, fov, e); }
     cam.fov = fov; cam.near = wk || blend.k < 1 ? .08 : .5; cam.setViewOffset(W, Hh, -offX * W, -offY * Hh, W, Hh);
+    cam.updateMatrixWorld(); cam.matrixWorldInverse.copy(cam.matrixWorld).invert();   // (etichetele se așază corect și când scena 3D nu se mai desenează)
     if (pOp < .995) G.render();
-    if (pOp > .004 && pA) pano.render(pA, null, 0, pOp, pH - W3.yaw, W3.pitch, fov, asp, offX, offY);
+    if (pOp > .004 && pA) { cam.getWorldDirection(v); pano.render(pA, null, 0, pOp, pH - Math.atan2(v.x, v.z) / DEG, Math.asin(clamp(v.y, -1, 1)) / DEG, fov, asp, offX, offY); }
     // etichetele caselor și ale camerelor
     pins.forEach((p, i) => { v.copy(H[i].top).project(cam); const ok = v.z < 1 && Math.abs(v.x) < 1.05 && v.y < 1.1 && v.y > -1; p.style.visibility = ok ? 'visible' : 'hidden'; if (ok) p.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; p.classList.toggle('hov', i === hover); });
     if (rooms.length && wk) { const cw = H[sel].walk.i, sh = W3.k >= 1 && blend.k >= 1; rooms.forEach(r => { v.copy(r.w).project(cam); const ok = sh && r.i !== cw && v.z < 1 && Math.abs(v.x) < .96 && Math.abs(v.y) < .9; r.el.style.opacity = ok ? '1' : '0'; r.el.style.pointerEvents = ok ? 'auto' : 'none'; if (ok) r.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; }); }
@@ -311,7 +322,7 @@ async function boot() {
   document.addEventListener('visibilitychange', () => { awake = 40; kick(); });
   addEventListener('resize', () => { needMeasure = 1; wake(); });
   sync();
-  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
+  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, views() { const o = []; [['all', -1], ...H.map((h, i) => [h.c.cod, i])].forEach(([k, i]) => [0, 1].forEach(pv => { const q = view(i < 0 ? 'all' : 'house', i, 1, pv), a = q.az * DEG, e = q.el * DEG; o.push([k, pv, +(q.tx + Math.sin(a) * Math.cos(e) * q.dist).toFixed(3), +(q.ty + Math.sin(e) * q.dist).toFixed(3), +(q.tz + Math.cos(a) * Math.cos(e) * q.dist).toFixed(3)]); })); return o; }, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; ly = tly; lp = tlp; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
 }
 
 /* Mai puține desene pe cadru (contează pe telefoane): piesele unei case care au același material și se mișcă împreună
