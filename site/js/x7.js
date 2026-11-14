@@ -90,7 +90,7 @@ export function buildX7(M, { lamps: withLamps = true } = {}) {
   mesh(cap(per, D.H, .28, true), M.roof, P.roof);
   mesh(cap(per, 3.02, .1, false), M.ceil, P.roof, { cast: false });
   const sky = { x: -3.6, z: 0, w: 1.6, d: 1.5 };
-  P.roof.add(box(sky.w + .16, .07, sky.d + .16, M.frame, sky.x, D.H + .03, sky.z));
+  P.roof.add(box(sky.w + .16, .07, sky.d + .16, M.skyframe || M.frame, sky.x, D.H + .03, sky.z));
   const skg = box(sky.w, .08, sky.d, M.skyglass, sky.x, D.H + .04, sky.z); skg.castShadow = false; P.roof.add(skg);
   [-.95, .95].forEach(z => { const l = box(8.2, .02, .05, M.ledIn, 0, 3.0, z); l.castShadow = false; P.roof.add(l); });
   line('roof', ring(D.YW1)); line('roof', ring(D.H, .28)); line('roof', ring(D.H - .1, .04));

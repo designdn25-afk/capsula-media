@@ -37,9 +37,15 @@ export function build(M) {            // M = materialele comune (kit.materials()
      `M.roofDark`, `M.stoneWall`, `M.orange`, `M.lamp` (lămpi exterioare, luminează seara), `M.railglass`, `M.showerglass`
    - Nu schimba culorile materialelor comune. Dacă ai nevoie de altă culoare, fă un material nou, local.
    - Fără `PointLight`/`SpotLight` în case (sunt prea multe case în scenă).
-3. **Acoperișul**: toate piesele lui (și tavanul) stau într-un grup separat, cu materiale **clonate local**
-   (`M.shell.clone()` etc.), ca să le poți face transparente: în `openRoof(k)` grupul urcă (`position.y = ease(k) * ~2.2`)
-   și se stinge (`opacity`), apoi `visible = false`. Pune `material.transparent = true` doar cât k > 0.
+3. **Acoperișul**: toate piesele lui (și tavanul, benzile LED din tavan, luminatorul) stau într-un grup separat, construit cu un
+   **set propriu de materiale**: `const R = F.fadeSet(M)`. `R` are aceleași nume ca `M` (`R.shell`, `R.ceil`, `R.ledIn`, `R.roofDark`,
+   `R.frame`, `R.skyglass`, `R.wood`, `R.clad` …): sunt copii făcute la prima folosire, care se pot stinge singure și care seara se
+   aprind odată cu originalele. Ridicarea: `openRoof(k) { F.lift(roofGroup, R, k, 2.2); }` (urcă, se stinge, apoi devine invizibil).
+   Nu pune în grupul acoperișului piese cu materiale din `M` (ar rămâne opace în timp ce restul se stinge).
+   **Case cu etaj** (`levels: 2`): tot etajul (pereți, geamuri, pardoseala lui, mobilier, terasa de sus, balustrade) se construiește cu
+   alt set, `const U = F.fadeSet(M)`, dat și pieselor de mobilier (`F.bed(U)`, `F.glazing(U, …)`, `F.pane(w, h, U.glass)`), iar
+   `openRoof(k) { F.lift(roofGroup, R, Math.min(k, 1), 2.2); F.lift(upperGroup, U, k - 1, 2.6); }` (acoperișul e copil al scenei
+   casei, nu al etajului, ca să nu fie ridicat de două ori).
 4. **Interiorul** trebuie să se vadă de sus când acoperișul e ridicat: pardoseală, pereți despărțitori (`F.wallBox`), mobilier din
    `furn.js` (`bed`, `sofa`, `armchair`, `tableRound`, `tableRect`, `coffee`, `chair`, `kitchen`, `wardrobe`, `desk`, `rug`, `shower`,
    `wc`, `vanity`, `curtain`). Împărțirea urmează camerele din catalog; e o **schemă orientativă**, nu inventa dotări care nu apar

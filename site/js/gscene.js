@@ -42,6 +42,7 @@ export function createGScene(canvas, { shadowSize = 2048, half = 46 } = {}) {
     const n = d.n; glassNight(M.glass, n, d.gl);
     M.led.emissiveIntensity = n * 2.6; M.ledIn.emissiveIntensity = n * 3.2; M.lamp.emissiveIntensity = n * 3.4;
     M.inner.emissive.copy(warm); M.inner.emissiveIntensity = n * .6; M.ceil.emissive.copy(warm); M.ceil.emissiveIntensity = n * .7; M.floor.emissive.copy(warm); M.floor.emissiveIntensity = n * .22;
+    if (M.clones) for (const [m, c] of M.clones) { c.color.copy(m.color); if (c.emissive) { c.emissive.copy(m.emissive); c.emissiveIntensity = m.emissiveIntensity; } c.metalness = m.metalness; c.roughness = m.roughness; if (m.envMapIntensity !== undefined) c.envMapIntensity = m.envMapIntensity; c.opacity = m.opacity * (1 - (c.userData.k || 0)); }
     return d;
   }
   setTime(12.5);

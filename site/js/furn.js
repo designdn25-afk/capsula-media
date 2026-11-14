@@ -1,6 +1,6 @@
 // Piese comune pentru casele din grădină: geamuri, mobilier simplu, terase, trepte, balustrade.
 // Toate piesele au originea pe podea (y = 0) în centrul lor și folosesc materialele din kit.materials().
-import { THREE, box } from './kit.js';
+import { THREE, box, clamp, ease } from './kit.js';
 
 const G = () => new THREE.Group();
 const add = (g, ...o) => { o.forEach(x => g.add(x)); return g; };
@@ -83,4 +83,22 @@ export function houseMaterials(M) {
 export function glassNight(mat, n, dayColor) {
   if (dayColor) mat.color.copy(dayColor); if (n > .02) mat.color.lerp(new THREE.Color(0xffe2b8), n * .85);
   mat.opacity = .96 + (.16 - .96) * n; mat.metalness = .92 * (1 - n); mat.envMapIntensity = 1.25 + (.25 - 1.25) * n; mat.roughness = .05 + .07 * n;
+}
+
+// Set propriu de materiale (copii ale celor comune, cu aceleași nume), pentru o parte a casei care trebuie să poată dispărea singură:
+// acoperișul sau etajul. Seara, copiile se aprind odată cu originalele (vezi gscene.js: M.clones).
+export function fadeSet(M) {
+  const own = {}, src = {};
+  const S = new Proxy(own, { get(t, k) {
+    if (k in t) return t[k]; const m = M[k]; if (!m || !m.isMaterial) return m;
+    const c = m.clone(); c.userData = { k: 0 }; t[k] = c; src[k] = m; (M.clones || (M.clones = [])).push([m, c]); return c; } });
+  Object.defineProperty(own, 'fade', { enumerable: false, value: k => { for (const n in src) { const c = own[n], m = src[n], tr = k > .001 || m.transparent;
+    c.userData.k = k; if (c.transparent !== tr) { c.transparent = tr; c.needsUpdate = true; } c.opacity = m.opacity * (1 - k); c.depthWrite = k < .5 ? m.depthWrite : false; } } });
+  return S;
+}
+// ridică un grup (acoperiș / etaj) și îl stinge: k = 0 la loc … 1 dispărut. S = setul lui de materiale (fadeSet).
+export function lift(group, S, k, h = 2.2) {
+  k = clamp(k); const u = group.userData; if (u.y0 === undefined) { u.y0 = group.position.y; group.traverse(o => { if (o.isMesh) o.userData.cs = o.castShadow; }); }
+  group.position.y = u.y0 + ease(k) * h; S.fade(clamp(k * 1.3)); group.visible = k < .77;
+  const sh = k < .3; if (u.sh !== sh) { u.sh = sh; group.traverse(o => { if (o.isMesh) o.castShadow = sh && o.userData.cs; }); }
 }

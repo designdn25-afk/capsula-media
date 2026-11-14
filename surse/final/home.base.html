@@ -875,6 +875,14 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .caps-round:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .caps-sr{position:absolute!important;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);clip-path:inset(50%);white-space:nowrap}
 @media (max-width:800px){.caps-seg button{min-height:40px}}
+/* ===== V3 (nov 2026): titluri cu serife, ca la deschidere; meniul de sus are un link în plus (Grădina) ===== */
+:root{--serif:'Cormorant Garamond',Georgia,'Times New Roman',serif}
+.title{font-family:var(--serif);font-weight:500;font-size:clamp(42px,5.9vw,90px);line-height:.98;letter-spacing:-.015em;text-wrap:balance}
+.title em{font-style:italic;color:var(--accent-ink)}
+.title .w{padding-inline:.08em;margin-inline:-.08em}
+.ft h3{font-family:var(--serif);font-weight:500;font-size:clamp(30px,2.8vw,44px);line-height:1.02;letter-spacing:-.01em}
+.links{gap:clamp(13px,1.45vw,24px)}
+.lang{white-space:nowrap}
 </style>
 <!--PARTCSS-->
 <style id="pnlm-css">/* Pannellum 99f4afd, https://github.com/mpetroff/pannellum */
@@ -892,8 +900,9 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
       <a href="#interior" class="navhl">Interior</a>
       <a href="#exterior">Exterior</a>
       <a href="#model">X7</a>
+      <a href="#gradina">Grădina</a>
       <a href="#tur">Tur virtual</a>
-      <a href="#la-comanda">Capsule la comandă</a>
+      <a href="#la-comanda">La comandă</a>
       <a href="#galerie">Galerie</a>
       <a href="complet.html#configurator">Preț</a>
       <a href="complet.html#investitori">Investitori</a>
@@ -967,7 +976,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <div class="wrap">
     <div class="head-row">
       <div>
-        <div class="eyebrow reveal" data-n="05">Tur virtual 360°</div>
+        <div class="eyebrow reveal" data-n="06">Tur virtual 360°</div>
         <h2 class="title">Intră în capsula <em>X7.</em></h2>
       </div>
       <p class="note reveal" style="max-width:400px">Fotografii 360° reale, făcute în showroom-ul din Ciorogârla. Trage ca să te uiți în jur și apasă cercurile aurii de pe podea ca să mergi prin capsulă. Vezi capsula și seara, cu lumina aprinsă.</p>
@@ -1023,7 +1032,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <div class="wrap">
     <div class="head-row">
       <div>
-        <div class="eyebrow reveal" data-n="06">Capsule la comandă</div>
+        <div class="eyebrow reveal" data-n="07">Capsule la comandă</div>
         <h2 class="title reveal">Sau alege<br>un model <em>la comandă.</em></h2>
       </div>
       <p class="note reveal" style="max-width:380px">Pe lângă X7 din showroom, aducem la comandă orice model din gama producătorului. Alege modelul și primești oferta cu preț, termen și transport.</p>
@@ -1070,7 +1079,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <div class="wrap">
     <div class="head-row">
       <div>
-        <div class="eyebrow reveal" data-n="07">De ce noi</div>
+        <div class="eyebrow reveal" data-n="08">De ce noi</div>
         <h2 class="title">Capsule reale,<br>pe care le <em>vezi azi.</em></h2>
       </div>
       <a href="complet.html#galerie" class="btn btn-ghost reveal">Toată galeria →</a>
@@ -1091,7 +1100,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 <!-- HUB -->
 <section id="mai-mult" class="alt">
   <div class="wrap">
-    <div class="eyebrow reveal" data-n="08">Tot ce mai vrei să știi</div>
+    <div class="eyebrow reveal" data-n="09">Tot ce mai vrei să știi</div>
     <div class="hub">
       <a href="complet.html#configurator" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></i><b>Preț și configurator</b><span>Alege dotările, vezi totalul</span></a>
       <a href="complet.html#finantare" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 4l9 5.5M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7M3 20h18"/></svg></i><b>Rate TBI Bank</b><span>Calculează rata lunară</span></a>
@@ -1107,7 +1116,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 <section class="visit" id="contact">
   <div class="wrap visit-grid" id="vizita">
     <div>
-      <div class="eyebrow reveal" data-n="09">Ciorogârla</div>
+      <div class="eyebrow reveal" data-n="10">Ciorogârla</div>
       <h2 class="title reveal">Vino să o vezi<br>înainte să <em>alegi.</em></h2>
       <p class="lead reveal">Vezi capsule finalizate și capsule în asamblare.</p>
       <div class="addr reveal"><i class="addr-i" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i><div><b>Calea București nr. 41</b><small>077055 Ciorogârla, Ilfov</small></div></div>
@@ -1228,6 +1237,7 @@ g('cmth').innerHTML=m.img.length>1?m.img.map((s,i)=>`<button data-i="${i}"><img 
 g('cmth').querySelectorAll('button').forEach(b=>b.onclick=()=>show(+b.dataset.i));show(0);
 g('cmcta').href='https://wa.me/40731166070?text='+encodeURIComponent('Bună! Aș dori o ofertă pentru modelul '+m.c+' ('+fmt(m.a)+', '+m.l+'). Locația mea: ');
 window.__cmBack=document.activeElement;g('cmodal').classList.add('on');g('cmodal').setAttribute('aria-hidden','false');document.body.style.overflow='hidden';g('cmx').focus({preventScroll:true});}
+window.CATopen=open;
 function close(){if(!g('cmodal').classList.contains('on'))return;g('cmodal').classList.remove('on');g('cmodal').setAttribute('aria-hidden','true');document.body.style.overflow='';const b=window.__cmBack;if(b&&b.focus)b.focus({preventScroll:true});}
 g('cmx').onclick=close;g('cmodal').onclick=e=>{if(e.target.id==='cmodal')close()};addEventListener('keydown',e=>{if(e.key==='Escape')close()});
 const sel=document.querySelector('#form select[name=model]');if(sel){sel.innerHTML='<option>X7 (în stoc)</option>'+D.filter(m=>m.c!=='X7').map(m=>`<option>${m.c} · ${fmt(m.a)} (la comandă)</option>`).join('')+'<option>Am nevoie de ajutor să aleg</option>'}
