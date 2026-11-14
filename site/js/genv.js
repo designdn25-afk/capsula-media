@@ -173,8 +173,8 @@ export function buildGarden(G, H) {
   g.add(sh(R.instances(bush.crown, m.leafS, bl)), sh(R.instances(bush.wood, m.wood, bl)));
   // copacii: [x, z, fel (0 foios, 1 conifer), mărime]; cei din afara gardului stau pe un arc, în spate și pe laturi (în față rămâne liber)
   const trees = [[-26.5, 24.5, 0, 1.25], [26.8, 25, 1, 1.3], [-28, -9.5, 1, 1.5], [28, -12, 0, 1.4], [27.5, -37, 0, 1.6], [-26.5, -38, 0, 1.7], [9.5, GZ - GD / 2 + 4, 1, 1.5], [-10.5, GZ - GD / 2 + 4, 1, 1.45], [28, 10, 1, 1.2], [-28.5, 10.5, 0, 1.25]];
-  for (let i = 0; i < 30; i++) { const a = (-125 + 250 * (i + rr(-.3, .3)) / 29) * DEG, Rd = rr(50, 70); trees.push([Math.sin(a) * Rd, GZ - Math.cos(a) * Rd, rnd() < .45 ? 1 : 0, rr(1.7, 2.9)]); }
-  for (let i = 0; i < 26; i++) { const a = (-132 + 264 * (i + rr(-.35, .35)) / 25) * DEG, Rd = rr(80, 118); trees.push([Math.sin(a) * Rd, GZ - Math.cos(a) * Rd, rnd() < .4 ? 1 : 0, rr(2.4, 3.6)]); }
+  for (let i = 0; i < 16; i++) { const a = (-125 + 250 * (i + rr(-.3, .3)) / 15) * DEG, Rd = rr(50, 66); trees.push([Math.sin(a) * Rd, GZ - Math.cos(a) * Rd, rnd() < .45 ? 1 : 0, rr(1.7, 2.9)]); }
+  for (let i = 0; i < 8; i++) { const a = (-132 + 264 * (i + rr(-.35, .35)) / 7) * DEG, Rd = rr(128, 150); trees.push([Math.sin(a) * Rd, GZ - Math.cos(a) * Rd, rnd() < .4 ? 1 : 0, rr(2.4, 3.6)]); }
   // patru forme de copac: 0 și 3 = foios rotund (două coroane diferite), 1 = conifer, 2 = foios înalt (mesteacăn)
   const TL = [[], [], [], []], KIND = [0, 1, 2, 0], SEED = [3, 5, 7, 19], tint = [[1, 1, .9], [.92, 1, .96], [1.12, 1.12, .86], [.96, 1.02, .82]];
   const plant = (x, z, f, s, y = 0) => { const q = tint[f], k = rr(.82, 1.08), w = s * rr(.92, 1.1); TL[f].push({ x, y, z, ry: rnd() * TAU, s: [w, s * rr(.92, 1.1), w], c: [q[0] * k * rr(.86, 1.06), q[1] * k, q[2] * k * rr(.8, 1.05)] }); blobs.push([x, z, s * (f === 1 ? 1.25 : 1.45)]); };
@@ -188,5 +188,17 @@ export function buildGarden(G, H) {
   const qd = new THREE.PlaneGeometry(2, 2); qd.rotateX(-Math.PI / 2);
   const pools = R.instances(qd, m.glow, lamps.map(([x, z, r]) => ({ x, y: .06, z, s: [r, 1, r] })), { cast: false, recv: false }); pools.renderOrder = 2; pools.visible = false; g.add(pools);
   const bm = R.instances(qd, m.blob, blobs.map(([x, z, r]) => ({ x, y: .05, z, s: [r, 1, r] })), { cast: false, recv: false }); bm.renderOrder = 1; g.add(bm);
+  /* ---------- împrejurimile: hale ca în zona showroom-ului din Ciorogârla (cerut de client: „să vadă că suntem în România, în Ciorogârla”) ---------- */
+  const hm = { wall: S({ color: 0xdfe2e4, roughness: .7, metalness: .1 }), wall2: S({ color: 0xb9c0c6, roughness: .7, metalness: .15 }), base: S({ color: 0x6f757b, roughness: .8 }),
+    door: S({ color: 0x3b4046, roughness: .6, metalness: .3 }), stripe: S({ color: 0x1f5fa8, roughness: .6 }), asphalt: S({ color: 0x55585c, roughness: .95 }) };
+  const hall = (x, z, w, d, hgt, ry, alt) => { const q = new THREE.Group(); q.position.set(x, 0, z); q.rotation.y = ry * DEG;
+    const body = new THREE.Mesh(new THREE.BoxGeometry(w, hgt, d), alt ? hm.wall2 : hm.wall); body.position.y = hgt / 2; body.castShadow = true; body.receiveShadow = true; q.add(body);
+    const bs = new THREE.Mesh(new THREE.BoxGeometry(w + .1, 1.1, d + .1), hm.base); bs.position.y = .55; q.add(bs);
+    const st = new THREE.Mesh(new THREE.BoxGeometry(w + .12, .7, d + .12), hm.stripe); st.position.y = hgt - 1.1; q.add(st);
+    const n = Math.max(2, Math.round(w / 9)); for (let i = 0; i < n; i++) { const dr = new THREE.Mesh(new THREE.BoxGeometry(3.6, 4.2, .2), hm.door); dr.position.set(-w / 2 + (i + .5) * w / n, 2.1, d / 2 + .06); q.add(dr); }
+    g.add(q); };
+  [[-78, -58, 62, 30, 10.5, 12, 0], [8, -98, 80, 34, 11.5, 0, 1], [86, -54, 58, 28, 9.5, -14, 0], [108, 22, 44, 26, 9, -80, 1], [-106, 14, 50, 26, 10, 78, 0]].forEach(a => hall(...a));
+  // curtea de asfalt din fața porții
+  const asf = new THREE.Mesh(new THREE.PlaneGeometry(96, 24), hm.asphalt); asf.rotation.x = -Math.PI / 2; asf.position.set(0, .02, EZ + 24); asf.receiveShadow = true; g.add(asf);
   return { night(n) { const on = n > .01; m.glow.opacity = n * .8; pools.visible = on; glows.forEach(q => { q.visible = on; }); } };
 }
