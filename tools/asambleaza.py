@@ -11,7 +11,7 @@ if '--only' in args: only = args[args.index('--only') + 1].split(',')
 if '--out' in args: out = os.path.join(R, args[args.index('--out') + 1]) if not os.path.isabs(args[args.index('--out') + 1]) else args[args.index('--out') + 1]
 s = open(os.path.join(R, 'surse/final/home.base.html'), encoding='utf-8').read()
 css = []; js = []
-for name in ['interior', 'exterior', 'zi-noapte']:
+for name in ['story', 'interior', 'exterior', 'zi-noapte', 'gradina']:
     f = os.path.join(R, 'surse/final/parts', name + '.html')
     mark = f'<!--PART:{name}-->'
     if (only and name not in only) or not os.path.exists(f):

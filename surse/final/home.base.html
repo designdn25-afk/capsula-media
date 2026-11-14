@@ -22,7 +22,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Capsula România","url":"https://casecapsula.ro/","telephone":"+40731166070","address":{"@type":"PostalAddress","streetAddress":"Calea București nr. 41","postalCode":"077055","addressLocality":"Ciorogârla","addressRegion":"Ilfov","addressCountry":"RO"}}</script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
 :root{
   --bg:#0b0c0e; --bg2:#121418; --card:#171a1f; --card2:#1d2026; --line:rgba(255,255,255,.1);
@@ -727,6 +727,9 @@ nav.solid{background:rgba(255,255,255,.92);backdrop-filter:blur(14px);-webkit-ba
 nav.solid .links{color:var(--mute)}nav.solid .links a:hover{color:var(--ink)}
 nav.solid .lang{color:var(--mute)}nav.solid .lang b{color:var(--ink)}
 nav.solid .burger{color:var(--ink)}
+/* peste scena 3D luminoasă: text închis pe fond transparent */
+nav.ink{color:var(--ink)}nav.ink .links{color:rgba(14,17,22,.72)}nav.ink .links a:hover{color:var(--ink)}nav.ink .lang{color:rgba(14,17,22,.6)}nav.ink .lang b,nav.ink .burger{color:var(--ink)}nav.ink .btn-light{background:var(--ink);color:#fff}
+nav.dark:not(.solid) .btn-light{background:#fff;color:var(--ink)}
 nav.solid.dark{background:rgba(7,11,22,.72);border-bottom-color:rgba(255,255,255,.08);color:#fff}
 nav.solid.dark .links{color:rgba(255,255,255,.75)}nav.solid.dark .links a:hover{color:#fff}
 nav.solid.dark .lang{color:rgba(255,255,255,.6)}nav.solid.dark .lang b,nav.solid.dark .burger{color:#fff}
@@ -854,36 +857,6 @@ footer{background:var(--bg2)}
 /* butonul WhatsApp apare după ce treci de capsula de sus */
 .wa{transition:opacity .35s,transform .35s}
 body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
-/* ===================== HERO: capsula X7 seara ===================== */
-.nh{position:relative;height:100vh;height:100svh;min-height:560px;background:#070b16;color:#fff;overflow:hidden;isolation:isolate;padding:0!important}
-.nh-media{position:absolute;inset:0;overflow:hidden}
-.nh-img,.nh-gl{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:80% 55%;display:block}
-.nh-img{transform:scale(1.06);animation:nhZoom 3.6s cubic-bezier(.2,.7,.2,1) both}
-@keyframes nhZoom{from{transform:scale(1.13)}to{transform:scale(1.06)}}
-.nh-gl{display:none}
-.nh.gl .nh-gl{display:block}.nh.gl .nh-img{visibility:hidden}
-.nh-shade{position:absolute;inset:0;pointer-events:none;background:linear-gradient(180deg,rgba(4,9,24,.5),rgba(4,9,24,0) 20%),linear-gradient(0deg,rgba(4,9,24,.85),rgba(4,9,24,.35) 22%,rgba(4,9,24,0) 40%)}
-.nh-copy{position:absolute;z-index:3;left:0;right:0;bottom:clamp(28px,5vh,56px)}
-.nh-in{display:flex;align-items:flex-end;justify-content:space-between;gap:24px 40px;flex-wrap:wrap}
-.nh-h1{font-family:var(--display);font-weight:600;font-size:clamp(28px,3.1vw,50px);line-height:1.02;letter-spacing:-.03em;text-shadow:0 4px 40px rgba(0,0,0,.4)}
-.nh-h1 em{font-style:normal;color:var(--accent)}
-.nh-sub{margin:12px 0 0;color:rgba(255,255,255,.78);font-size:clamp(14px,1.1vw,16px)}.nh-sub b{color:#fff;font-weight:700}
-.nh-in>*{opacity:0;transform:translateY(18px);animation:nhIn .9s cubic-bezier(.2,.7,.2,1) forwards}
-.nh-in>:nth-child(1){animation-delay:.5s}.nh-in>:nth-child(2){animation-delay:.75s}
-@keyframes nhIn{to{opacity:1;transform:none}}
-/* ecrane late: capsula mai spre dreapta, ca textul să stea pe cer și pe pavaj */
-@media (min-aspect-ratio:7/5) and (min-width:801px){.nh-img,.nh-gl{object-position:45% 50%}}
-@media (max-width:800px){
-  .nh{height:auto;min-height:100svh}
-  .nh-media{top:64px;bottom:auto;height:58svh}
-  .nh-img,.nh-gl{object-position:80% 50%}
-  .nh-shade{background:linear-gradient(0deg,#070b16 0,rgba(7,11,22,0) 30%),linear-gradient(180deg,rgba(4,9,24,.35),rgba(4,9,24,0) 30%)}
-  .nh-copy{position:relative;bottom:auto;padding:calc(64px + 58svh + 14px) 0 36px}
-  .nh-h1{font-size:clamp(32px,9vw,46px)}
-  .nh-sub{margin:10px 0 18px}
-  .nh-in{display:block}
-}
-@media (prefers-reduced-motion:reduce){.nh-img{animation:none}.nh-in>*{animation:none;opacity:1;transform:none}}
 </style>
 <style id="caps-shared-css">
 /* ===== componente comune pentru secțiunile noi (interior, exterior, zi-noapte) ===== */
@@ -936,26 +909,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 
 
 
-<!-- HERO: capsula X7 seara (3D, WebGL + hartă de adâncime) -->
-<section class="nh" id="top">
-  <div class="nh-media">
-    <img class="nh-img" id="nhImg" src="img/x7s_night.webp" alt="Capsula X7 seara, cu luminile aprinse" fetchpriority="high">
-    <canvas class="nh-gl" id="nhGL" aria-hidden="true"></canvas>
-    <div class="nh-shade"></div>
-  </div>
-  <div class="nh-copy wrap">
-    <div class="nh-in">
-      <div class="nh-txt">
-        <h1 class="nh-h1">Case Capsula și Case <em>Modulare</em></h1>
-        <p class="nh-sub">Capsula X7 · 36,5 m² utili · <b>39.500 €</b> cu TVA · showroom în Ciorogârla</p>
-      </div>
-      <div class="hero-ctas">
-        <a href="#interior" class="btn btn-light">Intră în capsulă ↓</a>
-        <a href="#la-comanda" class="btn btn-accent">Capsule la comandă</a>
-      </div>
-    </div>
-  </div>
-</section>
+<!--PART:story-->
 
 <!--PART:interior-->
 
@@ -1005,6 +959,8 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
     <!-- dotări -->
       </div>
 </section>
+
+<!--PART:gradina-->
 
 <!-- TUR VIRTUAL INTERIOR -->
 <section id="tur" class="vt-sec">
@@ -1208,9 +1164,10 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const nav=$('#nav'),heroEl=document.getElementById('top'),intEl=document.getElementById('interior');
 // bara rămâne închisă la culoare peste capsula de noapte și peste intrarea întunecată din interior
 let heroH=heroEl?heroEl.offsetHeight:0,navRaf=0;
-const navU=()=>{const y=scrollY;nav.classList.toggle('solid',y>40);let dark=!!heroEl&&y<heroH-72;
+// peste povestea 3D de la deschidere bara e transparentă: text închis ziua, deschis seara (window.__skyDark, pus de js/story.js)
+const navU=()=>{const y=scrollY,inStory=!!heroEl&&y<heroH-72;let dark=inStory&&!!window.__skyDark;
  if(!dark&&intEl&&intEl.classList.contains('is-dark')){const r=intEl.getBoundingClientRect();dark=r.top<=72&&r.bottom>72}
- nav.classList.toggle('dark',dark)};
+ nav.classList.toggle('solid',!inStory&&y>40);nav.classList.toggle('ink',inStory&&!dark);nav.classList.toggle('dark',dark)};
 addEventListener('scroll',()=>{if(!navRaf)navRaf=requestAnimationFrame(()=>{navRaf=0;navU()})},{passive:true});
 addEventListener('resize',()=>{heroH=heroEl?heroEl.offsetHeight:0;navU()});navU();window.navU=navU;
 const burger=$('#burger'),links=$('#links');burger.setAttribute('aria-controls','links');burger.setAttribute('aria-expanded','false');
@@ -1677,69 +1634,7 @@ new IntersectionObserver(es=>{visible=es[0].isIntersecting;if(visible&&!V)init()
 })();
 </script>
 
-<script>
-/* ===== HERO de noapte în 3D: imaginea de seară + harta de adâncime (img/x7s_depth.png, canalul G), randate în WebGL.
-   Camera „respiră” lent în jurul capsulei, urmărește puțin mouse-ul și se ridică ușor la derulare.
-   Fără WebGL sau cu mișcare redusă rămâne imaginea simplă. ===== */
-(function(){
-  const sec=document.getElementById('top'),cv=document.getElementById('nhGL'),img=document.getElementById('nhImg');
-  if(!sec||!cv||matchMedia('(prefers-reduced-motion:reduce)').matches)return;
-  const gl=cv.getContext('webgl',{antialias:false});if(!gl)return;
-  const dep=new Image();dep.src='img/x7s_depth.png';
-  const VS='attribute vec2 p;varying vec2 v;void main(){v=p*.5+.5;v.y=1.-v.y;gl_Position=vec4(p,0.,1.);}';
-  const FS=`precision highp float;varying vec2 v;uniform sampler2D t0,td;uniform vec2 res,isz,pos,camo;uniform float zm,dol;
-  void main(){
-    float s=max(res.x/isz.x,res.y/isz.y);vec2 ds=isz*s;vec2 off=(res-ds)*pos;
-    vec2 c=vec2(.62,.6);float f=.42;
-    vec2 dst=c+((v*res-off)/ds-c)/zm;
-    vec2 u=dst;
-    for(int i=0;i<7;i++){float d=texture2D(td,u).g;u=c+(dst-c-camo*(d-f))/(1.+dol*(d-f));}
-    gl_FragColor=vec4(texture2D(t0,clamp(u,vec2(.001),vec2(.999))).rgb,1.);
-  }`;
-  function sh(t,src){const o=gl.createShader(t);gl.shaderSource(o,src);gl.compileShader(o);return gl.getShaderParameter(o,gl.COMPILE_STATUS)?o:null}
-  const vs=sh(gl.VERTEX_SHADER,VS),fs=sh(gl.FRAGMENT_SHADER,FS);if(!vs||!fs)return;
-  const pr=gl.createProgram();gl.attachShader(pr,vs);gl.attachShader(pr,fs);gl.linkProgram(pr);if(!gl.getProgramParameter(pr,gl.LINK_STATUS))return;
-  gl.useProgram(pr);
-  const b=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,b);gl.bufferData(gl.ARRAY_BUFFER,new Float32Array([-1,-1,1,-1,-1,1,1,1]),gl.STATIC_DRAW);
-  const ap=gl.getAttribLocation(pr,'p');gl.enableVertexAttribArray(ap);gl.vertexAttribPointer(ap,2,gl.FLOAT,false,0,0);
-  const U=n=>gl.getUniformLocation(pr,n);
-  function tex(i,im){const t=gl.createTexture();gl.activeTexture(gl.TEXTURE0+i);gl.bindTexture(gl.TEXTURE_2D,t);
-    [gl.TEXTURE_WRAP_S,gl.TEXTURE_WRAP_T].forEach(k=>gl.texParameteri(gl.TEXTURE_2D,k,gl.CLAMP_TO_EDGE));
-    [gl.TEXTURE_MIN_FILTER,gl.TEXTURE_MAG_FILTER].forEach(k=>gl.texParameteri(gl.TEXTURE_2D,k,gl.LINEAR));
-    gl.texImage2D(gl.TEXTURE_2D,0,gl.RGB,gl.RGB,gl.UNSIGNED_BYTE,im)}
-  const ok=im=>im.complete&&im.naturalWidth?Promise.resolve():new Promise((r,j)=>{im.addEventListener('load',r,{once:true});im.addEventListener('error',j,{once:true})});
-  let mx=0,my=0,tmx=0,tmy=0,t0=0;
-  if(matchMedia('(hover:hover) and (pointer:fine)').matches)sec.addEventListener('pointermove',e=>{tmx=(e.clientX/innerWidth-.5)*2;tmy=(e.clientY/innerHeight-.5)*2});
-  sec.addEventListener('pointerleave',()=>{tmx=tmy=0});
-  Promise.all([ok(img),ok(dep)]).then(()=>{
-    try{tex(0,img);tex(1,dep)}catch(e){return}
-    gl.uniform1i(U('t0'),0);gl.uniform1i(U('td'),1);gl.uniform2f(U('isz'),img.naturalWidth,img.naturalHeight);
-    // pornește din aceeași mărire la care a ajuns animația CSS a imaginii, ca trecerea să nu se vadă
-    const m=(getComputedStyle(img).transform.match(/matrix\(([^,]+)/)||[])[1];const z0=m?parseFloat(m):1.06;
-    t0=performance.now()-Math.max(0,Math.min(1,(z0-1.13)/(1.06-1.13)))*3600;
-    sec.classList.add('gl');looping=true;requestAnimationFrame(draw);
-  }).catch(()=>{});
-  const sm=x=>{x=Math.max(0,Math.min(1,x));return 1-Math.pow(1-x,3)};
-  let heroVis=true,looping=false;
-  new IntersectionObserver(es=>{heroVis=es[es.length-1].isIntersecting;if(heroVis&&!looping&&t0){looping=true;requestAnimationFrame(draw)}}).observe(sec);
-  function draw(now){
-    if(!heroVis||document.hidden){looping=false;if(document.hidden)document.addEventListener('visibilitychange',()=>{if(!looping&&heroVis){looping=true;requestAnimationFrame(draw)}},{once:true});return}
-    requestAnimationFrame(draw);
-    const r=sec.getBoundingClientRect();
-    const dpr=Math.min(devicePixelRatio||1,1.75),w=Math.round(cv.clientWidth*dpr),h=Math.round(cv.clientHeight*dpr);
-    if(!w||!h)return;if(cv.width!==w||cv.height!==h){cv.width=w;cv.height=h}gl.viewport(0,0,w,h);
-    const t=(now-t0)/1000,mob=innerWidth<=800,A=mob?.028:.04;
-    mx+=(tmx-mx)*.05;my+=(tmy-my)*.05;
-    const sc=Math.max(0,Math.min(1,-r.top/Math.max(1,r.height)));
-    const ox=A*(.85*Math.sin(t*2*Math.PI/24)+.7*mx), oy=A*(.25*Math.sin(t*2*Math.PI/33)+.3*my+1.1*sc);
-    const op=getComputedStyle(cv).objectPosition.split(' ').map(x=>parseFloat(x)/100);
-    gl.uniform2f(U('res'),w,h);gl.uniform2f(U('pos'),op[0]||.8,op[1]||.55);gl.uniform2f(U('camo'),ox,oy);
-    gl.uniform1f(U('zm'),1.06+.07*(1-sm(t/3.6))+.04*sc);gl.uniform1f(U('dol'),.05+.05*Math.sin(t*2*Math.PI/41)+.08*sc);
-    gl.drawArrays(gl.TRIANGLE_STRIP,0,4);
-  }
-})();
-</script>
-<script>(function(){const h=document.getElementById('top');if(!h)return;const u=()=>document.body.classList.toggle('at-top',scrollY<h.offsetHeight*.55);u();addEventListener('scroll',u,{passive:true});addEventListener('resize',u)})();</script>
+<script>(function(){const h=document.getElementById('top');if(!h)return;const u=()=>document.body.classList.toggle('at-top',scrollY<h.offsetHeight-innerHeight*.6);u();addEventListener('scroll',u,{passive:true});addEventListener('resize',u)})();</script>
 <script id="caps-shared">
 window.CAPS=(function(){const mq=q=>matchMedia(q);return{
  rm:mq('(prefers-reduced-motion: reduce)'),fine:mq('(hover:hover) and (pointer:fine)'),
