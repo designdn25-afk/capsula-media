@@ -79,10 +79,11 @@ export function houseMaterials(M) {
   return M;
 }
 
-// regulă comună pentru geamuri seara: devin transparente și calde
+// regulă comună pentru geamuri (geamul LOW-E din real.js): ziua reflectă cerul și lasă să se vadă puțin interiorul; seara devin străvezii și calde
+const GLASS_WARM = new THREE.Color(0xffe2b8);
 export function glassNight(mat, n, dayColor) {
-  if (dayColor) mat.color.copy(dayColor); if (n > .02) mat.color.lerp(new THREE.Color(0xffe2b8), n * .85);
-  mat.opacity = .96 + (.16 - .96) * n; mat.metalness = .92 * (1 - n); mat.envMapIntensity = 1.25 + (.25 - 1.25) * n; mat.roughness = .05 + .07 * n;
+  if (dayColor) mat.color.copy(dayColor); if (n > .02) mat.color.lerp(GLASS_WARM, n * .3);
+  mat.opacity = .5 + (.1 - .5) * n; mat.envMapIntensity = 1.1 + (.75 - 1.1) * n; mat.roughness = .04 + .04 * n;
 }
 
 // Set propriu de materiale (copii ale celor comune, cu aceleași nume), pentru o parte a casei care trebuie să poată dispărea singură:
@@ -91,7 +92,7 @@ export function fadeSet(M) {
   const own = {}, src = {};
   const S = new Proxy(own, { get(t, k) {
     if (k in t) return t[k]; const m = M[k]; if (!m || !m.isMaterial) return m;
-    const c = m.clone(); c.userData = { k: 0 }; t[k] = c; src[k] = m; (M.clones || (M.clones = [])).push([m, c]); return c; } });
+    const c = m.clone(); c.onBeforeCompile = m.onBeforeCompile; c.customProgramCacheKey = m.customProgramCacheKey; c.userData = { k: 0 }; t[k] = c;   // clone() nu copiază și textura pusă din real.js src[k] = m; (M.clones || (M.clones = [])).push([m, c]); return c; } });
   Object.defineProperty(own, 'fade', { enumerable: false, value: k => { for (const n in src) { const c = own[n], m = src[n], tr = k > .001 || m.transparent;
     c.userData.k = k; if (c.transparent !== tr) { c.transparent = tr; c.needsUpdate = true; } c.opacity = m.opacity * (1 - k); c.depthWrite = k < .5 ? m.depthWrite : false; } } });
   return S;
