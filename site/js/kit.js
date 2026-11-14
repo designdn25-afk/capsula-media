@@ -23,10 +23,11 @@ export function makeRenderer(canvas, { alpha = true, shadows = true } = {}) {
   return r;
 }
 
-// potrivește canvasul la elementul lui; întoarce true dacă s-a schimbat mărimea
-export function fit(renderer, camera, el, maxDpr = 2) {
+// potrivește canvasul la elementul lui; întoarce true dacă s-a schimbat mărimea.
+// maxPx = câți pixeli are voie să aibă desenul: pe ecrane mari și dese (retina) rezoluția scade puțin, ca mișcarea să rămână lină
+export function fit(renderer, camera, el, maxDpr = 2, maxPx = 3.6e6) {
   const w = el.clientWidth, h = el.clientHeight; if (!w || !h) return false;
-  const dpr = Math.min(window.devicePixelRatio || 1, maxDpr);
+  const dpr = Math.max(1, Math.min(window.devicePixelRatio || 1, maxDpr, Math.round(Math.sqrt(maxPx / (w * h)) * 20) / 20));
   const k = w + 'x' + h + '@' + dpr; if (renderer.__k === k) return false; renderer.__k = k;
   renderer.setPixelRatio(dpr); renderer.setSize(w, h, false);
   camera.aspect = w / h; camera.updateProjectionMatrix(); return true;
@@ -154,6 +155,30 @@ export function grow(poly, m) {
 
 export function lineSeg(positions, material) { const g = new THREE.BufferGeometry(); g.setAttribute('position', new THREE.Float32BufferAttribute(positions, 3)); return new THREE.LineSegments(g, material); }
 export function edges(geometry, material, angle = 28) { return new THREE.LineSegments(new THREE.EdgesGeometry(geometry, angle), material); }
+
+// Unește piesele de sub `base` care au același material într-una singură (mai puține desene pe cadru). Forma rămâne aceeași.
+// Liniile, piesele cu mai multe materiale și cele fără normale rămân cum sunt.
+export function mergeMeshes(base) {
+  base.updateMatrixWorld(true); const buckets = new Map();
+  base.traverse(o => {
+    if (!o.isMesh || o === base || o.isInstancedMesh || Array.isArray(o.material) || o.children.length || !o.visible || !o.geometry.attributes.position || !o.geometry.attributes.normal) return;
+    const key = o.material.uuid + '|' + (o.castShadow ? 1 : 0) + (o.receiveShadow ? 1 : 0) + '|' + o.renderOrder + '|' + (o.geometry.attributes.color ? 1 : 0);
+    let b = buckets.get(key); if (!b) buckets.set(key, b = []); b.push(o);
+  });
+  const inv = new THREE.Matrix4().copy(base.matrixWorld).invert(), m4 = new THREE.Matrix4(), n3 = new THREE.Matrix3(), v = new THREE.Vector3(), nn = new THREE.Vector3();
+  buckets.forEach(list => {
+    if (list.length < 2) return; const pos = [], nor = [], col = [], hasCol = !!list[0].geometry.attributes.color, o0 = list[0];
+    list.forEach(o => {
+      const g = o.geometry.index ? o.geometry.toNonIndexed() : o.geometry, P = g.attributes.position, N = g.attributes.normal, C = g.attributes.color;
+      m4.multiplyMatrices(inv, o.matrixWorld); n3.getNormalMatrix(m4); const flip = m4.determinant() < 0;
+      const put = i => { v.fromBufferAttribute(P, i).applyMatrix4(m4); pos.push(v.x, v.y, v.z); nn.fromBufferAttribute(N, i).applyMatrix3(n3).normalize(); nor.push(nn.x, nn.y, nn.z); if (hasCol) col.push(C.getX(i), C.getY(i), C.getZ(i)); };
+      for (let i = 0; i + 2 < P.count; i += 3) { put(i); put(flip ? i + 2 : i + 1); put(flip ? i + 1 : i + 2); }
+      o.parent.remove(o); if (g !== o.geometry) g.dispose();
+    });
+    const geo = new THREE.BufferGeometry(); geo.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); geo.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3)); if (hasCol) geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+    const m = new THREE.Mesh(geo, o0.material); m.castShadow = o0.castShadow; m.receiveShadow = o0.receiveShadow; m.renderOrder = o0.renderOrder; m.userData.cs = o0.castShadow; base.add(m);
+  });
+}
 
 export function box(w, h, d, mat, x = 0, y = 0, z = 0) { const m = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), mat); m.position.set(x, y, z); return m; }
 

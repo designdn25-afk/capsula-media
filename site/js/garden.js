@@ -42,8 +42,9 @@ async function boot() {
   /* ---------- casele ---------- */
   const mods = await Promise.allSettled(CASE.map(c => import('./' + c.mod + '.js')));
   const H = [];
-  mods.forEach((r, i) => {
-    if (r.status !== 'fulfilled') return;
+  for (let i = 0; i < mods.length; i++) {
+    const r = mods[i]; if (r.status !== 'fulfilled') continue;
+    await new Promise(res => setTimeout(res, 0));   // câte o casă pe rând, ca pagina să nu se poticnească
     try {
       const c = CASE[i], api = r.value.build(G.M), inf = r.value.info || {}, s = api.size || { w: inf.w, d: inf.d, h: inf.h, cz: 0 };
       try { mergeHouse(api); } catch (e) { console.warn('gradina: casa ' + c.cod + ' a rămas neunită', e); }
@@ -52,7 +53,7 @@ async function boot() {
       g.updateMatrixWorld(true);
       H.push({ c, cat: catOf(c.cod), api, g, s, hit, k: 0, ring: null, ro: 0, side: -1, sideP: -1, center: g.localToWorld(new THREE.Vector3(0, 0, s.cz || 0)), top: g.localToWorld(new THREE.Vector3(0, s.h + 1.5, s.cz || 0)) });
     } catch (e) { console.warn('gradina: casa ' + CASE[i].cod + ' nu s-a putut construi', e); }
-  });
+  }
   if (!H.length || dead) { toStatic(); return; }
   const env = buildGarden(G, H);
   // din ce parte se uită camera la fiecare casă: de acolo de unde nu stă altă casă în față

@@ -50,10 +50,11 @@ function boot() {
   const LAYERS = [['roof', 'Acoperiș', 'izolație 15 cm', 3.35], ['walls', 'Panouri din aluminiu', 'tratament fluorocarbon · izolație 10 cm', 1.8], ['glazing', 'Geam triplu LOW-E', 'vitraj panoramic', 1.8], ['frame', 'Structură din oțel galvanizat', 'pe șasiu rigid', 1.8], ['chassis', 'Pardoseală', 'izolație 15 cm', .3]]
     .map(l => ({ el: mk('layer', `<b>${l[1]}</b><span>${l[2]}</span>`), part: l[0], y: l[3] }));
   const v = new THREE.Vector3();
-  const place = (o, x, y, z, op, W, H) => { v.set(x, y, z).project(S.camera); o.el.style.opacity = op.toFixed(3); if (op > .01) o.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * H).toFixed(1)}px)`; };
+  const place = (o, x, y, z, op, W, H) => { const s = op.toFixed(2); if (s !== o.op) { o.op = s; o.el.style.opacity = s; } if (op > .01) { v.set(x, y, z).project(S.camera); o.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * H).toFixed(1)}px)`; } };
 
   /* stare */
-  let ps = -1, visible = true, raf = 0, mx = 0, my = 0, tmx = 0, tmy = 0, lastCh = -1, lastDark = null, lastClock = '', W = 0, H = 0, t0 = performance.now();
+  let ps = -1, visible = true, raf = 0, mx = 0, my = 0, tmx = 0, tmy = 0, lastCh = -1, lastDark = null, lastClock = '', W = 0, H = 0, t0 = performance.now(),
+    last = 0, px = 3.6e6, slow = 0, fr = 0, shT = -9, shR = -9, shE = -9, shB = -9, bgA = '', bgB = '', dayV = '', clkO = '', moved = null;
   const fine = matchMedia('(hover:hover) and (pointer:fine)');
   pin.addEventListener('pointermove', e => { if (!fine.matches) return; tmx = (e.clientX / innerWidth - .5) * 2; tmy = (e.clientY / innerHeight - .5) * 2; }, { passive: true });
   pin.addEventListener('pointerleave', () => { tmx = tmy = 0; });
@@ -62,8 +63,12 @@ function boot() {
   function frame(now) {
     raf = 0; if (!live || !visible || document.hidden) return;
     raf = requestAnimationFrame(frame);
-    if (S.fit(pin, innerWidth < 800 ? 1.75 : 2) || !W) { W = pin.clientWidth; H = pin.clientHeight; }
-    const p = progress(); ps = ps < 0 ? p : ps + (p - ps) * .14; if (Math.abs(p - ps) < .0004) ps = p;
+    const dt = Math.min(.05, (now - (last || now)) / 1000); last = now; fr++;
+    // dacă placa video nu ține pasul (cadre rare mai mult timp), desenul se face la o rezoluție ceva mai mică
+    if (dt > .027) { if (++slow > 45 && px > 1.3e6) { px *= .72; slow = 0; } } else if (slow > 0) slow--;
+    if (S.fit(pin, innerWidth < 800 ? 1.75 : 2, px) || !W) { W = pin.clientWidth; H = pin.clientHeight; }
+    // derularea e urmărită lin (la fel de lin la orice număr de cadre pe secundă), ca rotița mouse-ului să nu dea mișcări în trepte
+    const p = progress(); ps = ps < 0 ? p : ps + (p - ps) * (1 - Math.exp(-dt * 5.2)); if (Math.abs(p - ps) < .0003) ps = p;
     const asp = W / H, m = clamp((1.25 - asp) / .5), c = sample(ps, m);
     mx += (tmx - mx) * .05; my += (tmy - my) * .05;
     const idle = (now - t0) / 1000, fov = lerp(30, 42, m), tn = Math.tan(fov * Math.PI / 360);
@@ -71,16 +76,18 @@ function boot() {
     S.camera.fov = fov; S.camera.setViewOffset(W, H, -c.ox * W, -c.oy * H, W, H);
     orbit(S.camera, { az: c.az + Math.sin(idle * .22) * 1.1 + mx * 2.4 + c.bp * Math.sin(idle * .16) * 10, el: clamp(c.el - my * 1.3, 2, 88), dist, tx: c.tx, ty: c.ty, tz: 0 });
     const d = S.setTime(c.t); S.x7.openRoof(c.roof); S.setBlueprint(c.bp); S.x7.explode(c.ex);
+    // umbra: doar când s-a mutat soarele sau s-a mișcat capsula, și cel mult o dată la două cadre
+    if ((fr & 1) && (Math.abs(c.t - shT) > .03 || Math.abs(c.roof - shR) > .01 || Math.abs(c.ex - shE) > .004 || Math.abs(c.bp - shB) > .02)) { shT = c.t; shR = c.roof; shE = c.ex; shB = c.bp; S.shadow(); }
     S.render();
     // fundalul paginii, culoarea textului, bara de sus
-    pin.style.setProperty('--st-top', '#' + d.top.getHexString()); pin.style.setProperty('--st-bot', '#' + d.bot.getHexString());
+    const ca = d.top.getHexString(), cb = d.bot.getHexString(); if (ca !== bgA) { bgA = ca; pin.style.setProperty('--st-top', '#' + ca); } if (cb !== bgB) { bgB = cb; pin.style.setProperty('--st-bot', '#' + cb); }
     const dark = d.n > .5; if (dark !== lastDark) { lastDark = dark; sec.classList.toggle('st--dark', dark); window.__skyDark = dark; if (window.navU) window.navU(); }
     const ck = clock(c.t); if (ck !== lastClock) { lastClock = ck; clkT.textContent = ck; }
-    dayEl.style.setProperty('--day', clamp((c.t - 6.5) / 14.7).toFixed(3)); clk.style.opacity = (1 - c.bp).toFixed(2);
+    const dv = clamp((c.t - 6.5) / 14.7).toFixed(3), co = (1 - c.bp).toFixed(2); if (dv !== dayV) { dayV = dv; dayEl.style.setProperty('--day', dv); } if (co !== clkO) { clkO = co; clk.style.opacity = co; }
     // capitolul activ
     let ci = 0; for (let i = 0; i < CH.length; i++) if (ps >= CH[i][0]) ci = i;
     if (ci !== lastCh) { lastCh = ci; chs.forEach((e, i) => e.classList.toggle('on', i === ci)); rail.forEach((e, i) => e.classList.toggle('on', i === ci)); }
-    sec.classList.toggle('st--moved', ps > .012);
+    const mv = ps > .012; if (mv !== moved) { moved = mv; sec.classList.toggle('st--moved', mv); }
     // etichetele
     const ro = clamp((c.roof - .75) / .25);
     ROOMS.forEach(o => place(o, o.v.x, o.v.y, o.v.z, ro, W, H));

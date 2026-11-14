@@ -1,5 +1,5 @@
 // Scena comună pentru capsula X7: curtea pavată, soarele, lumina cerului, stelele. Ora zilei se dă cu setTime(t).
-import { THREE, makeRenderer, fit, studioEnv, materials, dayAt, pavingTexture, blobTexture, tree, clamp, lerp } from './kit.js';
+import { THREE, makeRenderer, fit, studioEnv, materials, dayAt, pavingTexture, blobTexture, tree, clamp, lerp, mergeMeshes } from './kit.js';
 import { buildX7, x7Materials } from './x7.js';
 
 export function createStage(canvas, { shadows = true, shadowSize = 2048 } = {}) {
@@ -8,6 +8,9 @@ export function createStage(canvas, { shadows = true, shadowSize = 2048 } = {}) 
   const camera = new THREE.PerspectiveCamera(30, 1, .5, 500);
   const M = x7Materials(materials()), x7 = buildX7(M);
   scene.add(x7.root);
+  // fiecare strat al capsulei (șasiu, pardoseală, structură, geamuri, pereți, acoperiș) se desenează din câteva piese mari, nu din sute de piese mici
+  const fv = x7.parts.frame.visible; x7.parts.frame.visible = true; Object.values(x7.parts).forEach(mergeMeshes); x7.parts.frame.visible = fv;
+  renderer.shadowMap.autoUpdate = false; renderer.shadowMap.needsUpdate = true;   // umbra se recalculează doar când se schimbă ceva (vezi story.js)
 
   /* curtea: o placă pavată, cu colțuri rotunjite, care „plutește” pe fundalul paginii */
   const yard = new THREE.Group(); scene.add(yard);
@@ -53,7 +56,7 @@ export function createStage(canvas, { shadows = true, shadowSize = 2048 } = {}) 
   }
   setTime(9);
   return { renderer, scene, camera, x7, M, yard, sun, hemi, stars, setTime, setBlueprint, day: d,
-    setEnv(k) { envBase = k; }, fit: (el, dpr) => fit(renderer, camera, el, dpr), render() { renderer.render(scene, camera); } };
+    setEnv(k) { envBase = k; }, fit: (el, dpr, px) => fit(renderer, camera, el, dpr, px), shadow() { renderer.shadowMap.needsUpdate = true; }, render() { renderer.render(scene, camera); } };
 }
 
 // așază camera pe o sferă în jurul țintei: az = 0 privește fațada cu intrarea, pozitiv spre dreapta; el = înălțimea (grade)
