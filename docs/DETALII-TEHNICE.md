@@ -205,3 +205,25 @@ A cerut ca site-ul să fie „fix așa” și un tur 3D prin case, „mai jos un
 - **Meniul de sus** are un link în plus („Grădina”); „Capsule la comandă” a devenit „La comandă” ca să încapă.
 - **Verificare:** `node tools/test_pagini.js` are și opririle „poveste-mijloc”, „cifre” și „gradina”. Ultima rulare (14 nov 2026):
   toate cele 7 treceri „ok” (5 mărimi + 2 cu mișcare redusă).
+
+## 13. Grădina, a doua trecere: mai real și cu intrat în casă (14 nov 2026, seara)
+Clientul: „arată prea ca un desen animat… vreau să pară mult mai real… aș vrea direct chiar să intre în casă”. Tot atunci a cerut
+scoaterea secțiunii „Ziua și seara”. Copii: `versiuni/gradina-macheta/` (grădina dinainte), `versiuni/inainte-fara-zi-seara/`.
+
+- **X7 era în oglindă**: în realitate, văzută din față, capsula are vitrajul mare al dormitorului în stânga ușii și livingul în
+  dreapta (se vede în pozele reale și în datele turului 360). `x7.js` oglindește acum modelul o singură dată (`root.scale.x = -1`);
+  etichetele camerelor din `story.js` și `h_x7.js` au fost întoarse la fel.
+- **Intrarea în casă** (`garden.js`): starea „în casă” are două vederi, `inView = 'walk'` (la nivelul ochilor, implicit) și
+  `'plan'` (de sus, cu acoperișul ridicat; la M9 cu Etaj / Parter). `buildWalk(casă)` găsește o singură dată punctele de stat:
+  pentru fiecare cameră caută cu raze podeaua (materialul `M.floor`, sau lemnul terasei), un loc liber de mobilă în jurul
+  etichetei camerei și direcția cea mai deschisă (cu un plus pentru geamuri). Trecerea dintre afară și înăuntru e o amestecare
+  lină a poziției și orientării camerei (`blend`). În casă: tragi ca să te uiți în jur, apeși pe o cameră (din fișă sau pe
+  eticheta din scenă) ca să mergi acolo.
+- **Fotografii reale 360°** (`pano.js`): un strat desenat peste scena 3D cu un shader (panoramă echirectangulară), aliniat cu
+  macheta. Casa X7 are în `gradina-data.js` rândul `pano` (punctele din turul 360: living, masă, blat, baie, dormitor), iar
+  pozițiile și orientările vin din `window.VTN` / `window.VTNIGHT` (datele turului, expuse din `home.base.html`).
+  Legătura plan tur → model: `x_model = x_plan − 5,75`, `z_model = y_plan − 1,7`; unghiul în fotografie = `H + 180 − (privirea −
+  rotirea casei)`. Seara se folosesc variantele de noapte unde există. Cât fotografia e complet vizibilă, scena 3D nu se mai desenează.
+- **Realism** (`real.js`, `gscene.js`, `genv.js`): vezi comentariile din fișiere (cer cu soare și nori, iarbă, copaci din frunze,
+  texturi desenate local și așezate după poziția din lume, geam transparent cu reflexii). `genv.js` = fosta parte de grădină din `garden.js`.
+- Pagina de probă `site/_t_env.html` arată grădina fără meniuri (din afară sau din interiorul unei case) și nu depinde de `garden.js`.

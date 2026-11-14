@@ -1,6 +1,6 @@
 <!--CSS-->
 <style>
-/* ===== 05 Grădina cu case model (scenă 3D: js/garden.js; casele: js/gradina-data.js) ===== */
+/* ===== 04 Grădina cu case model (scenă 3D: js/garden.js; casele: js/gradina-data.js) ===== */
 .gd{padding-bottom:clamp(44px,6vw,84px);overflow:hidden}
 .gd-head{display:flex;justify-content:space-between;align-items:flex-end;gap:20px 48px;flex-wrap:wrap;margin-bottom:clamp(24px,3vw,44px)}
 .gd-head .lead{margin-top:0;max-width:440px}
@@ -57,10 +57,25 @@
 .gd-c-specs dt{padding:6px 0;font:600 10.5px/1.5 var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}
 .gd-c-specs dd{margin:0;padding:5px 0;font:600 14px/1.4 var(--body);color:var(--ink)}
 .gd-c-specs .gd-c-a{font:500 26px/1 var(--serif);padding-top:2px;font-variant-numeric:lining-nums}
-.gd-c-rooms[hidden],.gd-c-lvl[hidden],.gd-c-nota[hidden],.gd-photos[hidden],.gd-tur[hidden],.gd-tour[hidden]{display:none}
-.gd-c-lvl{display:inline-flex;margin-top:14px;padding:4px;border-radius:999px;background:var(--bg2)}
-.gd-c-lvl button{border:0;background:transparent;cursor:pointer;padding:9px 16px;border-radius:999px;font:600 13px/1 var(--body);color:var(--ink)}
-.gd-c-lvl button.on{background:#fff;box-shadow:0 2px 8px rgba(15,20,30,.12)}
+.gd-c-rooms[hidden],.gd-c-lvl[hidden],.gd-look[hidden],.gd-c-nota[hidden],.gd-photos[hidden],.gd-tur[hidden],.gd-tour[hidden]{display:none}
+.gd-c-lvl,.gd-c-view{display:inline-flex;margin:14px 8px 0 0;padding:4px;border-radius:999px;background:var(--bg2)}
+.gd-c-lvl button,.gd-c-view button{border:0;background:transparent;cursor:pointer;padding:9px 16px;border-radius:999px;font:600 13px/1 var(--body);color:var(--ink)}
+.gd-c-lvl button.on,.gd-c-view button.on{background:#fff;box-shadow:0 2px 8px rgba(15,20,30,.12)}
+.gd-c-view[hidden],.gd-c-real[hidden]{display:none}
+.gd[data-mode="in"] .gd-c-desc,.gd[data-mode="in"] .gd-c-nota,.gd[data-mode="in"] .gd-r-l{display:none}
+.gd-c-real{display:flex;align-items:center;gap:8px;margin:14px 0 0;font:600 12px/1.3 var(--body);color:var(--accent-ink)}
+.gd-c-real::before{content:"";flex:none;width:7px;height:7px;border-radius:50%;background:var(--accent)}
+.gd-c-rooms dd{display:flex;flex-wrap:wrap;gap:6px}
+.gd-rm{border:1px solid var(--line);background:#fff;color:var(--ink);cursor:pointer;padding:8px 12px;border-radius:999px;font:600 12.5px/1 var(--body);transition:background .2s,color .2s,border-color .2s}
+.gd-rm:hover{border-color:var(--ink)}
+.gd-rm.on{background:var(--ink);border-color:var(--ink);color:#fff}
+.gd-room.go{border:0;cursor:pointer;padding:9px 14px 9px 12px;background:rgba(14,18,28,.72);color:#fff;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px);transition:opacity .35s,background .2s}
+.gd-room.go::after{content:" →";letter-spacing:0}
+.gd-room.go:hover{background:var(--accent);color:#111}
+.gd[data-view="walk"] .gd-gl{cursor:grab}
+.gd-look{position:absolute;z-index:3;left:50%;top:18px;translate:-50% 0;margin:0;padding:9px 16px;border-radius:999px;background:rgba(14,18,28,.62);color:#fff;font:500 12.5px/1 var(--body);white-space:nowrap;pointer-events:none;opacity:0;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.gd[data-view="walk"] .gd-look{animation:gdLook 6.5s 1.2s both}
+@keyframes gdLook{0%{opacity:0}10%,80%{opacity:1}100%{opacity:0}}
 .gd-c-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .gd-c-btns .btn{padding:13px 20px}
 .gd-enter{flex:1 1 100%;justify-content:center;background:var(--ink);color:#fff}
@@ -94,8 +109,14 @@
   .gd-c-specs .gd-c-a::after{content:" · "}
   .gd-c-specs .gd-c-l,.gd-c-specs .gd-c-p{display:block;margin-top:3px}
   .gd-c-specs .gd-c-l{font-weight:500;color:var(--mute)}
-  .gd-c-rooms dd{display:block;margin-top:3px;font-weight:500;color:var(--mute)}
-  .gd[data-mode="in"] .gd-c-specs .gd-c-l,.gd[data-mode="in"] .gd-c-specs .gd-c-p{display:none}
+  .gd-c-rooms dd{display:flex;margin-top:6px;font-weight:500;color:var(--mute)}
+  .gd-rm{padding:7px 10px;font-size:12px}
+  .gd-c-real{margin-top:6px;font-size:11.5px}
+  .gd-c-lvl,.gd-c-view{margin-top:10px}.gd-c-view button{padding:7px 13px}
+  .gd-look{top:auto;bottom:74px;font-size:11.5px;max-width:calc(100% - 24px);white-space:normal;text-align:center;display:none}
+  .gd[data-mode="in"] .gd-c-specs>div:not(.gd-c-rooms){display:none}
+  .gd[data-mode="in"] .gd-c-real{display:none}
+  .gd[data-view="walk"] .gd-c-rooms dd{margin-top:2px}
   .gd-c-lvl{margin-top:10px}
   .gd-c-btns{margin-top:12px;flex-wrap:nowrap}
   .gd-c-btns .btn{padding:12px 16px;font-size:13.5px}
@@ -122,16 +143,17 @@
 <section id="gradina" class="gd" aria-labelledby="gdTitle" data-mode="all">
   <div class="wrap gd-head">
     <div>
-      <div class="eyebrow reveal" data-n="05">Grădina cu case</div>
+      <div class="eyebrow reveal" data-n="04">Grădina cu case</div>
       <h2 class="title" id="gdTitle">Plimbă-te printre <em>case.</em></h2>
     </div>
-    <p class="lead reveal">Alege o casă din grădină, intră în ea și vezi cum e împărțită, câți metri pătrați are și cât costă.</p>
+    <p class="lead reveal">Alege o casă din grădină și intră în ea: te uiți în jur, treci dintr-o cameră în alta și vezi câți metri pătrați are și cât costă.</p>
   </div>
   <div class="gd-stage" tabindex="-1">
     <canvas class="gd-gl" aria-hidden="true"></canvas>
     <div class="gd-pins"></div>
     <div class="gd-labels" aria-hidden="true"></div>
     <p class="gd-hint">Trage ca să te rotești · apasă pe o casă</p>
+    <p class="gd-look" aria-hidden="true">Trage ca să te uiți în jur · apasă pe o cameră ca să mergi acolo</p>
     <div class="gd-tools">
       <div class="gd-dn" role="group" aria-label="Ora din zi"><button type="button" data-t="zi" class="on" aria-pressed="true">Zi</button><button type="button" data-t="seara" aria-pressed="false">Seară</button></div>
       <button type="button" class="gd-tour" aria-pressed="false" aria-label="Tur ghidat prin toate casele"><svg class="i-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 .8v10.4L11 6z"/></svg><svg class="i-stop" viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 1.5h9v9h-9z"/></svg><span>Tur ghidat</span></button>
@@ -144,10 +166,12 @@
       <dl class="gd-c-specs">
         <div><dt>Suprafață</dt><dd class="gd-c-a"></dd></div>
         <div><dt>Dimensiuni</dt><dd class="gd-c-d"></dd></div>
-        <div><dt>Împărțire</dt><dd class="gd-c-l"></dd></div>
+        <div class="gd-r-l"><dt>Împărțire</dt><dd class="gd-c-l"></dd></div>
         <div><dt>Preț</dt><dd class="gd-c-p"></dd></div>
         <div class="gd-c-rooms" hidden><dt>Camere</dt><dd></dd></div>
       </dl>
+      <p class="gd-c-real" hidden></p>
+      <div class="gd-c-view" role="group" aria-label="Cum vezi casa" hidden><button type="button" data-v="walk" aria-pressed="true">Din interior</button><button type="button" data-v="plan" aria-pressed="false">Plan</button></div>
       <div class="gd-c-lvl" role="group" aria-label="Nivel" hidden><button type="button" data-l="1" aria-pressed="true">Etaj</button><button type="button" data-l="2" aria-pressed="false">Parter</button></div>
       <div class="gd-c-btns">
         <button type="button" class="btn gd-enter">Intră în casă</button>

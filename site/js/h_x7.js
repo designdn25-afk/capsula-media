@@ -12,6 +12,6 @@ export function build(M) {
     root: a.root, levels: 1,
     openRoof(k) { k = clamp(k); a._lift = ease(k) * 2.4; a._lay(); R.fade(clamp(k * 1.3)); roof.visible = k < .77; const s = k < .3; if (s !== sh) { sh = s; roof.children.forEach(c => { if (c.isMesh) c.castShadow = s; }); } },
     size: { w: 11.9, d: 5.2, h: 3.45, cz: .6 },
-    rooms: [{ n: 'Living', x: -4.3, y: 1.0, z: .35, lvl: 1 }, { n: 'Bucătărie', x: -1.6, y: 1.7, z: -1.15, lvl: 1 }, { n: 'Baie', x: .4, y: 2.0, z: -.7, lvl: 1 }, { n: 'Dormitor', x: 3.9, y: 1.0, z: 0, lvl: 1 }],
+    rooms: [{ n: 'Living', x: 4.3, y: 1.0, z: .35, lvl: 1 }, { n: 'Bucătărie', x: 1.6, y: 1.7, z: -1.15, lvl: 1 }, { n: 'Baie', x: -.4, y: 2.0, z: -.7, lvl: 1 }, { n: 'Dormitor', x: -3.9, y: 1.0, z: 0, lvl: 1 }],
   };
 }

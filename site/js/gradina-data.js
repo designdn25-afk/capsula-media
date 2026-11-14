@@ -5,8 +5,12 @@
 //   x, z = locul casei în grădină, în metri (x = stânga/dreapta, z = spre intrare)
 //   rot  = spre ce parte se uită fațada, în grade (0 = spre intrare, plus = spre dreapta)
 //   nota = un rând scurt, afișat sub nume (opțional)
+//   pano = fotografii reale 360° din interior (opțional); fără ele, în casă se vede macheta 3D
 export const CASE = [
-  { cod: 'X7', mod: 'h_x7', x: 15.5, z: 11, rot: -28, nota: 'O vezi în showroom-ul din Ciorogârla' },
+  { cod: 'X7', mod: 'h_x7', x: 15.5, z: 11, rot: -28, nota: 'O vezi în showroom-ul din Ciorogârla',
+    // fotografii reale 360° din showroom (aceleași ca în turul 360): [numele camerei, punctul din tur]. x0, z0 = legătura dintre planul
+    // turului și model (metri); ochi = înălțimea aparatului foto față de sol. Altă casă cu poze 360 primește un rând „pano” la fel.
+    pano: { x0: 5.75, z0: -1.7, ochi: 2.15, pts: [['Living', 'living'], ['Masă', 'masa'], ['Bucătărie', 'blat'], ['Baie', 'baie'], ['Dormitor', 'dorm']] } },
   { cod: 'T7', mod: 'h_t7', x: -15.5, z: 13, rot: 28 },
   { cod: 'E7', mod: 'h_e7', x: -17, z: -9, rot: 34 },
   { cod: 'V3', mod: 'h_v3', x: 15.5, z: -10, rot: -36 },

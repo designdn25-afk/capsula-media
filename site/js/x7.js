@@ -171,6 +171,9 @@ export function buildX7(M, { lamps: withLamps = true } = {}) {
       M.inner.emissive.setHex(0xffc890); M.inner.emissiveIntensity = n * .22; M.ceil.emissive.setHex(0xffc890); M.ceil.emissiveIntensity = n * .35;
     },
   };
+  // Capsula reală (pozele și turul 360 din showroom): văzută din față, dormitorul cu vitrajul mare e în stânga ușii, livingul în dreapta.
+  // Modelul a fost desenat invers pe lungime, așa că se oglindește aici, o singură dată (livingul ajunge la +X).
+  root.scale.x = -1;
   api.explode(0); api.blueprint(0); api.night(0);
   return api;
 }

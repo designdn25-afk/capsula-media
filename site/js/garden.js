@@ -1,9 +1,12 @@
 // Grădina cu case model (#gradina): o scenă 3D în care vizitatorul trece de la o casă la alta și intră în fiecare.
 // Marcajul și stilurile: surse/final/parts/gradina.html. Casele: js/gradina-data.js + js/h_<nume>.js (vezi surse/final/CASE-3D.md).
-// Scena de bază (cer, gazon, soare, seara): js/gscene.js. Datele afișate (m², dimensiuni, preț) vin din window.CAT.
-import { THREE, clamp, lerp, ease, webglOK, tree, blobTexture, pavingTexture, perimeter, sweep, cap, box } from './kit.js';
+// Scena de bază (cer, gazon, soare, seara): js/gscene.js; grădina: js/genv.js. Datele afișate (m², dimensiuni, preț) vin din window.CAT.
+// În casă se intră la nivelul ochilor (te uiți în jur, treci dintr-o cameră în alta); casele cu fotografii reale 360° (js/pano.js)
+// le arată peste machetă, aliniate cu ea. „Plan” = vederea de sus, cu acoperișul ridicat.
+import { THREE, clamp, lerp, ease, webglOK } from './kit.js';
 import { createGScene } from './gscene.js';
-import { lampPost } from './furn.js';
+import { buildGarden } from './genv.js';
+import { createPano } from './pano.js';
 import { CASE, GRADINA } from './gradina-data.js';
 
 window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel pagina arată imaginea de rezervă)
@@ -60,6 +63,7 @@ async function boot() {
   /* ---------- elementele din pagină ---------- */
   const cSer = $('.gd-c-ser'), cName = $('.gd-c-name'), cNota = $('.gd-c-nota'), cDesc = $('.gd-c-desc'), cA = $('.gd-c-a'), cD = $('.gd-c-d'), cL = $('.gd-c-l'), cP = $('.gd-c-p'),
     cRooms = $('.gd-c-rooms'), cRoomsT = $('.gd-c-rooms dt'), cRoomsV = $('.gd-c-rooms dd'), lvlBox = $('.gd-c-lvl'), lvlBtns = [...sec.querySelectorAll('.gd-c-lvl button')],
+    viewBox = $('.gd-c-view'), viewBtns = [...sec.querySelectorAll('.gd-c-view button')], cReal = $('.gd-c-real'),
     enterBtn = $('.gd-enter'), offer = $('.gd-offer'), photos = $('.gd-photos'), tur = $('.gd-tur'), tourBtn = $('.gd-tour'), dnBtns = [...sec.querySelectorAll('.gd-dn button')], hint = $('.gd-hint');
   chipsEl.innerHTML = `<button type="button" class="gd-chip on" data-i="-1" aria-pressed="true">Toată grădina</button>` + H.map((h, i) => `<button type="button" class="gd-chip" data-i="${i}" aria-pressed="false">${esc(h.c.cod)}</button>`).join('');
   const chips = [...chipsEl.children];
@@ -71,6 +75,47 @@ async function boot() {
   let mode = 'all', sel = -1, lvl = 1, W = 0, Hh = 0, mP = 0, tr = 1, dur = 1.7, uaz = 0, uel = 0, tuaz = 0, tuel = 0, offX = 0, offY = 0, tOffX = 0, tOffY = 0,
     time = 10.6, timeGoal = 10.6, hover = -1, visible = false, raf = 0, last = 0, awake = 30, needMeasure = 2, started = false, auto = null, drag = null, lastN = -1, snap = 0, freeW = 1, freeH = 1;
   const wake = () => { awake = 40; kick(); };
+  // în casă: 'walk' = la nivelul ochilor, 'plan' = de sus, cu acoperișul ridicat
+  let inView = 'walk', pOp = 0, pA = null, pH = 0, noPano = false;
+  const W3 = { pos: new THREE.Vector3(), from: new THREE.Vector3(), to: new THREE.Vector3(), k: 1, yaw: 0, tyaw: 0, pitch: -4, tpitch: -4 },
+    blend = { k: 1, dur: 1.6, fov0: 34, p0: new THREE.Vector3(), q0: new THREE.Quaternion() }, tP = new THREE.Vector3(), tQ = new THREE.Quaternion(), pano = createPano(G.renderer);
+  const walking = () => mode === 'in' && inView === 'walk';
+  const startBlend = d => { blend.p0.copy(cam.position); blend.q0.copy(cam.quaternion); blend.fov0 = cam.fov; blend.k = rm || !started ? 1 : 0; blend.dur = d; };
+  const fam = (m, base) => m === base || (G.M.clones || []).some(([a, b]) => b === m && a === base);
+
+  /* punctele din care se vede interiorul unei case (o singură dată pe casă) */
+  function buildWalk(h) {
+    if (h.walk) return h.walk;
+    const pts = [], VT = window.VTN, pn = h.c.pano, M = G.M; h.g.updateMatrixWorld(true);
+    if (pn && VT) pn.pts.forEach(([n, k]) => {   // fotografii reale: chiar locurile din care s-a fotografiat
+      const d = VT[k]; if (!d) return; const kn = (window.VTNIGHT || {})[k], dn = kn && VT[kn];
+      pts.push({ n, p: h.g.localToWorld(new THREE.Vector3(d.p[0] - pn.x0, pn.ochi, d.p[1] + pn.z0)), yaw: h.c.rot + d.H + 180 - d.v[0], pitch: d.v[1], k, H: d.H, kn: dn ? kn : null, Hn: dn ? dn.H : 0 });
+    });
+    if (!pts.length) {   // machetă: se caută în fiecare cameră un loc liber pe podea și direcția cea mai deschisă
+      const ms = []; h.api.root.traverse(o => { if (o.isMesh && o.material && o.material.visible !== false) ms.push(o); });
+      const rc = new THREE.Raycaster(), o3 = new THREE.Vector3(), d3 = new THREE.Vector3();
+      const cast = (x, y, z, dx, dy, dz, far) => { rc.set(o3.set(x, y, z), d3.set(dx, dy, dz)); rc.far = far; return rc.intersectObjects(ms, false); };
+      (h.api.rooms || []).forEach(r => {
+        const P = h.g.localToWorld(new THREE.Vector3(r.x, r.y, r.z)), down = cast(P.x, P.y + .3, P.z, 0, -1, 0, 3.4);
+        let f = down.find(x => fam(x.object.material, M.floor)); if (!f) { const w = down.filter(x => fam(x.object.material, M.wood)); f = w[w.length - 1]; }
+        const fy = f ? f.point.y : Math.max(.3, P.y - 1.1); let best = null;
+        const free = (x, z) => { const d0 = cast(x, fy + 1.5, z, 0, -1, 0, 1.7)[0]; if (!d0 || Math.abs(d0.point.y - fy) > .09) return false;
+          for (let i = 0; i < 8; i++) { const a = i * Math.PI / 4, dx = Math.sin(a), dz = Math.cos(a); if (cast(x, fy + .35, z, dx, 0, dz, .5).length || cast(x, fy + 1.15, z, dx, 0, dz, .5).length) return false; } return true; };
+        search: for (const rad of [0, .4, .8, 1.2, 1.6]) for (let i = 0; i < (rad ? 10 : 1); i++) { const a = i * Math.PI / 5, x = P.x + Math.sin(a) * rad, z = P.z + Math.cos(a) * rad; if (free(x, z)) { best = [x, z]; break search; } }
+        const [x, z] = best || [P.x, P.z]; let yaw = h.c.rot, sc = -1;
+        for (let i = 0; i < 12; i++) { const a = i * Math.PI / 6, hit = cast(x, fy + 1.5, z, Math.sin(a), 0, Math.cos(a), 14)[0], v = (hit ? hit.distance : 14) + (hit && fam(hit.object.material, M.glass) ? 3 : 0); if (v > sc) { sc = v; yaw = a / DEG; } }
+        pts.push({ n: r.n, p: new THREE.Vector3(x, fy + 1.55, z), yaw, pitch: -4, k: null });
+      });
+    }
+    h.walk = { pts, i: 0 }; return h.walk;
+  }
+  function goRoom(i, jump) {
+    const w = H[sel] && H[sel].walk, p = w && w.pts[i]; if (!p) return; w.i = i; jump = jump || rm;
+    W3.from.copy(jump ? p.p : W3.pos); W3.to.copy(p.p); W3.k = jump ? 1 : 0; if (jump) W3.pos.copy(p.p);
+    W3.tyaw = jump ? p.yaw : W3.yaw + ((((p.yaw - W3.yaw) % 360) + 540) % 360 - 180); W3.tpitch = p.pitch; if (jump) { W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; }
+    wake();
+  }
+  const panoUrl = k => 'p360/' + k + '_m.webp';
 
   /* unde stă camera: toată grădina, o casă văzută din față, o casă văzută de sus (în interior). L = ecran lat, P = ecran înalt */
   function station(out) {
@@ -98,18 +143,25 @@ async function boot() {
   }
 
   /* ---------- comenzi ---------- */
-  function select(i, keepAuto) { if (!keepAuto) stopAuto(); lvl = 1; if (i < 0) goTo('all', -1); else goTo('house', i); sync(); }
-  function enter(keepAuto) { if (sel < 0) return; if (!keepAuto) stopAuto(); lvl = 1; goTo('in', sel, 1.5); sync(); }
-  function leave(keepAuto) { if (sel < 0) return; if (!keepAuto) stopAuto(); goTo('house', sel, 1.4); sync(); }
+  function select(i, keepAuto) { if (!keepAuto) stopAuto(); const w = walking(); if (w) startBlend(1.7); lvl = 1; if (i < 0) goTo('all', -1); else goTo('house', i); if (w) tr = 1; sync(); }
+  function enter(keepAuto, view) {
+    if (sel < 0) return; if (!keepAuto) stopAuto(); lvl = 1; inView = view || 'walk';
+    if (inView === 'walk' && !buildWalk(H[sel]).pts.length) inView = 'plan';
+    if (inView === 'walk') { startBlend(1.8); goTo('in', sel, 1.5); tr = 1; goRoom(0, true); } else goTo('in', sel, 1.5);
+    sync();
+  }
+  function leave(keepAuto) { if (sel < 0) return; if (!keepAuto) stopAuto(); const w = walking(); if (w) startBlend(1.5); goTo('house', sel, 1.4); if (w) tr = 1; sync(); }
   function setLvl(l, keepAuto) { if (!keepAuto) stopAuto(); lvl = l; goTo('in', sel, 1.2); sync(); }
+  function setView(v) { if (mode !== 'in' || v === inView || sel < 0) return; stopAuto(); if (v === 'walk' && !buildWalk(H[sel]).pts.length) return; startBlend(1.5); inView = v; lvl = 1; if (v === 'walk') goRoom(H[sel].walk.i, true); tr = 1; needMeasure = 2; sync(); wake(); }
+  function room(i, keepAuto) { if (!walking()) return; if (!keepAuto) stopAuto(); goRoom(i); sync(); }
   function setEvening(on) { timeGoal = on ? 19.9 : 10.6; if (rm) time = timeGoal; dnBtns.forEach(b => { const a = (b.dataset.t === 'seara') === on; b.classList.toggle('on', a); b.setAttribute('aria-pressed', a); }); wake(); }
   function startAuto() { auto = { i: sel, step: 0, at: 0 }; tourBtn.classList.add('on'); tourBtn.setAttribute('aria-pressed', 'true'); tourBtn.querySelector('span').textContent = 'Oprește turul'; wake(); }
   function stopAuto() { if (!auto) return; auto = null; tourBtn.classList.remove('on'); tourBtn.setAttribute('aria-pressed', 'false'); tourBtn.querySelector('span').textContent = 'Tur ghidat'; }
   function stepAuto(now) {
     const a = auto;
     if (a.step === 0) { a.i = (a.i + 1) % H.length; select(a.i, true); a.at = now + 4400; a.step = 1; }
-    else if (a.step === 1) { enter(true); a.at = now + 4800; a.step = H[a.i].api.levels > 1 ? 2 : 3; }
-    else if (a.step === 2) { setLvl(2, true); a.at = now + 4000; a.step = 3; }
+    else if (a.step === 1) { enter(true); a.at = now + 5200; a.step = H[a.i].walk && H[a.i].walk.pts.length > 1 ? 2 : 3; }
+    else if (a.step === 2) { const w = H[a.i].walk; room(w.pts.length - 1, true); a.at = now + 4600; a.step = 3; }
     else { leave(true); a.at = now + 1700; a.step = 0; }
   }
 
@@ -119,17 +171,23 @@ async function boot() {
     pins.forEach((p, i) => { p.classList.toggle('sm', mode === 'house'); p.classList.toggle('hide', mode === 'in' || i === sel); p.tabIndex = (mode === 'in' || i === sel) ? -1 : 0; });
     labBox.innerHTML = ''; rooms = [];
     if (sel < 0) return;
-    const h = H[sel], m = h.cat, two = h.api.levels > 1, inside = mode === 'in';
+    const h = H[sel], m = h.cat, two = h.api.levels > 1, inside = mode === 'in', walk = walking(), w = walk ? h.walk : null;
     cSer.textContent = m ? 'Seria ' + m.s + ' · ' + m.sn : 'Casă model'; cName.textContent = h.c.cod;
     cNota.textContent = h.c.nota || ''; cNota.hidden = !h.c.nota; cDesc.textContent = m ? m.t : '';
     cA.textContent = m ? fmtA(m.a) : '–'; cD.textContent = m ? m.d : '–'; cL.textContent = m ? m.l : '–'; cP.textContent = priceOf(m) || '–';
     const rs = (h.api.rooms || []).filter(r => (r.lvl || 1) === lvl);
-    cRooms.hidden = !inside; if (inside) { cRoomsT.textContent = two ? (lvl === 1 ? 'La etaj' : 'La parter') : 'Camere'; cRoomsV.textContent = [...new Set(rs.map(r => r.n))].join(' · '); }
-    lvlBox.hidden = !(inside && two); lvlBtns.forEach(b => { const on = +b.dataset.l === lvl; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+    cRooms.hidden = !inside;
+    if (walk) { cRoomsT.textContent = 'Mergi în'; cRoomsV.innerHTML = w.pts.map((p, i) => `<button type="button" class="gd-rm${i === w.i ? ' on' : ''}" data-i="${i}" aria-pressed="${i === w.i}">${esc(p.n)}</button>`).join(''); }
+    else if (inside) { cRoomsT.textContent = two ? (lvl === 1 ? 'La etaj' : 'La parter') : 'Camere'; cRoomsV.textContent = [...new Set(rs.map(r => r.n))].join(' · '); }
+    viewBox.hidden = !inside; viewBtns.forEach(b => { const on = b.dataset.v === inView; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
+    cReal.hidden = !walk; if (walk) cReal.textContent = w.pts.some(p => p.k) ? 'Fotografii reale 360°, făcute în showroom' : 'Machetă 3D orientativă';
+    sec.dataset.view = inside ? inView : '';
+    lvlBox.hidden = !(inside && !walk && two); lvlBtns.forEach(b => { const on = +b.dataset.l === lvl; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
     enterBtn.textContent = inside ? 'Ieși din casă' : 'Intră în casă';
     offer.href = 'https://wa.me/40731166070?text=' + encodeURIComponent('Bună! Aș dori o ofertă pentru modelul ' + h.c.cod + (m ? ' (' + fmtA(m.a) + ', ' + m.l + ')' : '') + '. Locația mea: ');
     photos.hidden = !(m && window.CATopen); tur.hidden = h.c.cod !== 'X7';
-    if (inside) rooms = (h.api.rooms || []).map(r => { const e = document.createElement('div'); e.className = 'gd-room'; e.textContent = r.n; labBox.appendChild(e); return { el: e, v: new THREE.Vector3(r.x, r.y, r.z), lvl: r.lvl || 1 }; });
+    if (walk) rooms = w.pts.map((p, i) => { const e = document.createElement('button'); e.type = 'button'; e.className = 'gd-room go'; e.dataset.i = i; e.textContent = p.n; e.tabIndex = -1; labBox.appendChild(e); return { el: e, w: new THREE.Vector3(p.p.x, p.p.y - .45, p.p.z), i }; });
+    else if (inside) rooms = (h.api.rooms || []).map(r => { const e = document.createElement('div'); e.className = 'gd-room'; e.textContent = r.n; labBox.appendChild(e); return { el: e, v: new THREE.Vector3(r.x, r.y, r.z), lvl: r.lvl || 1 }; });
   }
 
   chipsEl.addEventListener('click', e => { const b = e.target.closest('.gd-chip'); if (b) select(+b.dataset.i); });
@@ -139,6 +197,9 @@ async function boot() {
   $('.gd-c-x').onclick = () => (mode === 'in' ? leave() : select(-1));
   enterBtn.onclick = () => (mode === 'in' ? leave() : enter());
   lvlBtns.forEach(b => { b.onclick = () => setLvl(+b.dataset.l); });
+  viewBtns.forEach(b => { b.onclick = () => setView(b.dataset.v); });
+  cRooms.addEventListener('click', e => { const b = e.target.closest('.gd-rm'); if (b) room(+b.dataset.i); });
+  labBox.addEventListener('click', e => { const b = e.target.closest('.gd-room.go'); if (b) room(+b.dataset.i); });
   photos.onclick = () => { if (sel >= 0 && window.CATopen) window.CATopen(H[sel].c.cod); };
   dnBtns.forEach(b => { b.onclick = () => setEvening(b.dataset.t === 'seara'); });
   tourBtn.onclick = () => (auto ? stopAuto() : startAuto());
@@ -152,10 +213,12 @@ async function boot() {
   canvas.addEventListener('pointermove', e => {
     if (drag && e.pointerId === drag.id) {
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy);
-      if (drag.moved > 6) { stopAuto(); tuaz -= dx * .3; if (!drag.touch) tuel += dy * .2; if (mode === 'all') tuaz = clamp(tuaz, -80, 80); tuel = clamp(tuel, 6 - to.el, 82 - to.el); canvas.classList.add('drag'); wake(); }
-    } else if (fine.matches) { const i = pick(e); if (i !== hover) { hover = i; canvas.classList.toggle('can', i >= 0 && !(mode === 'in' && i === sel)); wake(); } }
+      if (drag.moved > 6) { stopAuto(); canvas.classList.add('drag'); wake();
+        if (walking()) { W3.tyaw += dx * .2; if (!drag.touch) W3.tpitch = clamp(W3.tpitch + dy * .16, -40, 40); }
+        else { tuaz -= dx * .3; if (!drag.touch) tuel += dy * .2; if (mode === 'all') tuaz = clamp(tuaz, -80, 80); tuel = clamp(tuel, 6 - to.el, 82 - to.el); } }
+    } else if (fine.matches && !walking()) { const i = pick(e); if (i !== hover) { hover = i; canvas.classList.toggle('can', i >= 0 && !(mode === 'in' && i === sel)); wake(); } }
   });
-  const up = e => { if (!drag || e.pointerId !== drag.id) return; const d = drag; drag = null; canvas.classList.remove('drag'); if (e.type === 'pointerup' && d.moved < 7) { const i = pick(e); if (i >= 0) { if (i === sel && mode === 'house') enter(); else if (i !== sel) select(i); } } };
+  const up = e => { if (!drag || e.pointerId !== drag.id) return; const d = drag; drag = null; canvas.classList.remove('drag'); if (e.type === 'pointerup' && d.moved < 7 && !walking()) { const i = pick(e); if (i >= 0) { if (i === sel && mode === 'house') enter(); else if (i !== sel) select(i); } } };
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
   canvas.addEventListener('pointerleave', () => { if (hover >= 0) { hover = -1; canvas.classList.remove('can'); wake(); } });
 
@@ -186,9 +249,21 @@ async function boot() {
     // ora zilei
     if (time !== timeGoal) { time += clamp(timeGoal - time, -dt * 3.4, dt * 3.4); busy = true; lastN = -2; }
     if (lastN < 0) { const d = G.setTime(time); env.night(d.n); G.renderer.shadowMap.needsUpdate = true; const nn = d.n > .5 ? 1 : 0; if (nn !== lastN) sec.classList.toggle('gd--night', !!nn); lastN = time === timeGoal ? nn : -1; }
+    // în casă: mersul dintr-o cameră în alta și privitul în jur; trecerea lină dintre afară și înăuntru
+    const wk = walking();
+    if (wk) {
+      if (W3.k < 1) { W3.k = Math.min(1, W3.k + dt / 1.2); W3.pos.lerpVectors(W3.from, W3.to, ease(W3.k)); busy = true; }
+      if (Math.abs(W3.tyaw - W3.yaw) + Math.abs(W3.tpitch - W3.pitch) > .03) { W3.yaw += (W3.tyaw - W3.yaw) * .16; W3.pitch += (W3.tpitch - W3.pitch) * .16; busy = true; }
+    }
+    if (blend.k < 1) { blend.k = Math.min(1, blend.k + dt / blend.dur); busy = true; }
+    // fotografia reală a camerei (dacă există): apare după ce camera a ajuns; la mers și la schimbarea zi/seară se vede macheta
+    let pt = null;
+    if (wk && W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k) { const night = timeGoal > 15 && p.kn, k = night ? p.kn : p.k, u = panoUrl(k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); else if (pt !== pA && pOp < .02) { pA = pt; pH = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; } } }
+    const pg = pt && pt === pA && blend.k > .82 && time === timeGoal && !noPano ? 1 : 0;
+    if (pOp !== pg) { pOp += clamp(pg - pOp, -dt * 2.4, dt * 2.4); busy = true; }
     // acoperișurile și inelul auriu
     H.forEach((h, i) => {
-      const kg = i === sel && mode === 'in' ? lvl : 0;
+      const kg = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0;
       if (h.k !== kg) { h.k = rm ? kg : h.k + clamp(kg - h.k, -dt * 1.05, dt * 1.05); h.api.openRoof(h.k); G.renderer.shadowMap.needsUpdate = true; busy = true; }
       const rg = i === sel ? (mode === 'in' ? .0 : .85) : i === hover ? .6 : 0;
       if (Math.abs(rg - h.ro) > .004) { h.ro += (rg - h.ro) * .14; busy = true; } else h.ro = rg;
@@ -197,15 +272,25 @@ async function boot() {
     const sway = mode === 'all' && !rm && !drag;
     if (busy || sway) awake = Math.max(awake, 12);
     if (awake <= 0) return; awake--;
-    const asp = W / Hh, fov = cur.fov, tn = Math.tan(fov * DEG / 2), dist = Math.max((cur.fh / 2) / tn * (Hh / freeH), (cur.fw / 2) / (tn * asp) * (W / freeW));
-    cam.fov = fov; cam.setViewOffset(W, Hh, -offX * W, -offY * Hh, W, Hh);
-    const az = (cur.az + uaz + (sway ? Math.sin(now / 1000 * .17) * 4 : 0)) * DEG, el = clamp(cur.el + uel, 5, 86) * DEG;
-    cam.position.set(cur.tx + Math.sin(az) * Math.cos(el) * dist, cur.ty + Math.sin(el) * dist, cur.tz + Math.cos(az) * Math.cos(el) * dist); cam.lookAt(cur.tx, cur.ty, cur.tz);
-    G.scene.fog.near = dist * 1.25; G.scene.fog.far = dist * 1.25 + 430;
-    G.render();
+    const asp = W / Hh; let fov;
+    if (wk) {
+      fov = lerp(70, 88, mP); const a = W3.yaw * DEG, e = W3.pitch * DEG; cam.position.copy(W3.pos);
+      cam.lookAt(W3.pos.x + Math.sin(a) * Math.cos(e), W3.pos.y + Math.sin(e), W3.pos.z + Math.cos(a) * Math.cos(e));
+      G.scene.fog.near = 70; G.scene.fog.far = 520;
+    } else {
+      fov = cur.fov; const tn = Math.tan(fov * DEG / 2), dist = Math.max((cur.fh / 2) / tn * (Hh / freeH), (cur.fw / 2) / (tn * asp) * (W / freeW));
+      const az = (cur.az + uaz + (sway ? Math.sin(now / 1000 * .17) * 4 : 0)) * DEG, el = clamp(cur.el + uel, 5, 86) * DEG;
+      cam.position.set(cur.tx + Math.sin(az) * Math.cos(el) * dist, cur.ty + Math.sin(el) * dist, cur.tz + Math.cos(az) * Math.cos(el) * dist); cam.lookAt(cur.tx, cur.ty, cur.tz);
+      G.scene.fog.near = dist * 1.25; G.scene.fog.far = dist * 1.25 + 430;
+    }
+    if (blend.k < 1) { const e = ease(blend.k); tP.copy(cam.position); tQ.copy(cam.quaternion); cam.position.lerpVectors(blend.p0, tP, e); cam.quaternion.slerpQuaternions(blend.q0, tQ, e); fov = lerp(blend.fov0, fov, e); }
+    cam.fov = fov; cam.near = wk || blend.k < 1 ? .08 : .5; cam.setViewOffset(W, Hh, -offX * W, -offY * Hh, W, Hh);
+    if (pOp < .995) G.render();
+    if (pOp > .004 && pA) pano.render(pA, null, 0, pOp, pH - W3.yaw, W3.pitch, fov, asp, offX, offY);
     // etichetele caselor și ale camerelor
     pins.forEach((p, i) => { v.copy(H[i].top).project(cam); const ok = v.z < 1 && Math.abs(v.x) < 1.05 && v.y < 1.1 && v.y > -1; p.style.visibility = ok ? 'visible' : 'hidden'; if (ok) p.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; p.classList.toggle('hov', i === hover); });
-    if (rooms.length) { const h = H[sel]; rooms.forEach(r => { const o = mode === 'in' ? 1 - clamp(Math.abs(h.k - r.lvl) / .3) : 0; r.el.style.opacity = o.toFixed(2); if (o > .01) { h.g.localToWorld(v.copy(r.v)).project(cam); r.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; } }); }
+    if (rooms.length && wk) { const cw = H[sel].walk.i, sh = W3.k >= 1 && blend.k >= 1; rooms.forEach(r => { v.copy(r.w).project(cam); const ok = sh && r.i !== cw && v.z < 1 && Math.abs(v.x) < .96 && Math.abs(v.y) < .9; r.el.style.opacity = ok ? '1' : '0'; r.el.style.pointerEvents = ok ? 'auto' : 'none'; if (ok) r.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; }); }
+    else if (rooms.length) { const h = H[sel]; rooms.forEach(r => { const o = mode === 'in' ? 1 - clamp(Math.abs(h.k - r.lvl) / .3) : 0; r.el.style.opacity = o.toFixed(2); if (o > .01) { h.g.localToWorld(v.copy(r.v)).project(cam); r.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; } }); }
     if (!sec.classList.contains('gd--live')) sec.classList.add('gd--live');
   }
   const kick = () => { if (!raf && visible && !dead && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } };
@@ -214,86 +299,5 @@ async function boot() {
   document.addEventListener('visibilitychange', () => { awake = 40; kick(); });
   addEventListener('resize', () => { needMeasure = 1; wake(); });
   sync();
-  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, get state() { return { mode, sel, lvl, time, tr, awake }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; H.forEach((h, i) => { h.k = i === sel && mode === 'in' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
-}
-
-/* ---------- grădina: gard viu, alei cu dale, flori, copaci, lămpi ---------- */
-function buildGarden(G, H) {
-  const { scene, M } = G, S = o => new THREE.MeshStandardMaterial(o), g = new THREE.Group(); scene.add(g);
-  let seed = 11; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647, rr = (a, b) => a + (b - a) * rnd();
-  const { latime: GW, adancime: GD, centruZ: GZ, intrareZ: EZ } = GRADINA;
-  const m = {
-    hedge: S({ color: 0x3f6b3a, roughness: 1, side: THREE.DoubleSide }), stone: S({ color: 0xd9d3c7, roughness: .95 }), soil: S({ color: 0x4f3e31, roughness: 1 }),
-    pave: S({ color: 0xffffff, roughness: .95, map: pavingTexture('#e6e1d6', 'rgba(70,60,45,.13)') }), trunk: S({ color: 0x6d5846, roughness: 1 }),
-    leaf: [0x4d8a44, 0x6aa353, 0x35683a, 0x7fae5c].map(c => S({ color: c, roughness: 1, flatShading: true })),
-    bush: S({ color: 0x4a7f42, roughness: 1, flatShading: true }), tuft: S({ color: 0x5c9150, roughness: 1 }), flower: S({ color: 0xffffff, roughness: .8 }),
-    gold: () => new THREE.MeshBasicMaterial({ color: 0xd4a24c, transparent: true, opacity: 0, depthWrite: false, side: THREE.DoubleSide }),
-    glow: new THREE.MeshBasicMaterial({ map: blobTexture('rgba(255,196,120,.55)', 'rgba(255,196,120,0)'), transparent: true, opacity: 0, depthWrite: false, blending: THREE.AdditiveBlending, fog: false }),
-  };
-  m.pave.map.repeat.set(.42, .42);
-  const sh = (o, cast = true, recv = true) => { o.castShadow = cast; o.receiveShadow = recv; return o; };
-  const flat = (geo, mat, y) => { const o = new THREE.Mesh(geo, mat); o.rotation.x = -Math.PI / 2; o.position.y = y; o.receiveShadow = true; return o; };
-  const lamps = [];
-
-  // gardul viu, cu poartă în față
-  const hp = perimeter(GW, GD, 9), prof = [{ d: 0, y: 0 }, { d: 0, y: 1.2 }, { d: .18, y: 1.38 }, { d: .95, y: 1.38 }, { d: 1.13, y: 1.2 }, { d: 1.13, y: 0 }];
-  const hedge = sh(new THREE.Mesh(sweep(hp, prof, { ds: .9, s0: hp.a + 3.7, s1: hp.total + hp.a - 3.7 }), m.hedge)); hedge.position.z = GZ; g.add(hedge);
-  [-1, 1].forEach(sg => { g.add(sh(box(.8, 2, .8, m.stone, sg * 4.2, 1, EZ - .5)), sh(box(.95, .08, .95, m.stone, sg * 4.2, 2.42, EZ - .5))); const l = box(.5, .36, .5, M.lamp, sg * 4.2, 2.2, EZ - .5); g.add(l); lamps.push([sg * 4.2, EZ - 1.6, 5]); });
-
-  // locul fiecărei case: platformă pavată, inel auriu (la alegere), lumină caldă pe iarbă seara
-  H.forEach(h => {
-    const s = h.s, cz = s.cz || 0;
-    const pad = new THREE.Mesh(cap(perimeter(s.w + 2.6, s.d + 2.6, 1.4), .03), m.pave); pad.position.z = cz; pad.receiveShadow = true; h.g.add(pad);
-    h.ring = new THREE.Mesh(sweep(perimeter(s.w + 3.5, s.d + 3.5, 1.85), [{ d: 0, y: .05 }, { d: .17, y: .05 }], { ds: .45 }), m.gold()); h.ring.position.z = cz; h.ring.visible = false; h.ring.renderOrder = 3; h.g.add(h.ring);
-    const gl = flat(new THREE.PlaneGeometry(s.w + 9, s.d + 11), m.glow, .045); gl.receiveShadow = false; gl.position.z = cz + 1.5; gl.renderOrder = 2; h.g.add(gl);
-  });
-
-  // aleile: dale pe iarbă, de la poartă la rondul din mijloc și de acolo la fiecare casă
-  const stones = [];
-  const path = (pts, step = .98) => { const cv = new THREE.CatmullRomCurve3(pts.map(p => new THREE.Vector3(p[0], 0, p[1]))), n = Math.max(2, Math.floor(cv.getLength() / step));
-    for (let i = 0; i <= n; i++) { const p = cv.getPointAt(i / n), t = cv.getTangentAt(i / n); if (Math.hypot(p.x, p.z) < 4.1) continue; stones.push([p.x + rr(-.05, .05), p.z + rr(-.05, .05), Math.atan2(t.x, t.z) + rr(-.1, .1), rr(.92, 1.08)]); } };
-  path([[0, EZ + 6], [.5, EZ - 3], [-1.3, 19], [1.1, 10], [0, 4]]);
-  let backEnd = [0, GZ - 8];
-  H.forEach(h => { const dp = h.g.localToWorld(new THREE.Vector3(0, 0, (h.s.cz || 0) + h.s.d / 2 + 1.5)); h.door = dp; if (Math.abs(dp.x) < 3) backEnd = [dp.x, dp.z]; });
-  path([[0, -4], [-1.1, backEnd[1] * .4], [.9, backEnd[1] * .75], backEnd]);
-  H.forEach(h => { const d = h.door; if (Math.abs(d.x) < 3) return; const z0 = clamp(d.z + 3, backEnd[1] + 4, EZ - 6), sx = Math.sign(d.x); path([[sx * 1.2, z0], [d.x * .5, (z0 + d.z) / 2 + 1.2], [d.x, d.z]]); lamps.push([d.x - sx * 2.2, d.z + 1.2, 4.5]); });
-  const sm = new THREE.InstancedMesh(new THREE.BoxGeometry(1.08, .06, .5), m.stone, stones.length), dm = new THREE.Object3D(); sm.receiveShadow = true;
-  stones.forEach((s, i) => { dm.position.set(s[0], .03, s[1]); dm.rotation.set(0, s[2], 0); dm.scale.set(s[3], 1, s[3]); dm.updateMatrix(); sm.setMatrixAt(i, dm.matrix); }); g.add(sm);
-
-  // rondul din mijloc, cu un copac
-  g.add(flat(new THREE.ShapeGeometry(new THREE.Shape().absarc(0, 0, 3.9, 0, Math.PI * 2), 40), m.pave, .035));
-  const pot = sh(new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.62, .5, 36), m.stone)); pot.position.y = .25; g.add(pot);
-  const so = new THREE.Mesh(new THREE.CylinderGeometry(1.34, 1.34, .06, 36), m.soil); so.position.y = .5; g.add(so);
-  const t0 = tree(0, 1.5, { trunk: m.trunk, leaf: m.leaf[1] }); t0.position.y = .45; g.add(t0);
-  [[-3.1, 1.9, .5], [3.1, -1.9, .5 + Math.PI]].forEach(([x, z, a]) => { const b = new THREE.Group(); b.add(sh(box(1.7, .07, .46, M.wood, 0, .45, 0)), sh(box(.08, .45, .4, m.stone, -.7, .225, 0)), sh(box(.08, .45, .4, m.stone, .7, .225, 0))); b.position.set(x, 0, z); b.rotation.y = a; g.add(b); });
-  lamps.push([-3.3, 9, 4.5], [3.2, 18, 4.5], [-2.6, GZ - 6, 4.5]);
-
-  // straturi cu flori
-  const beds = [[-27.6, 19, 2.2, 6, 0], [-28.2, 1, 2, 6.5, 1], [-27.6, -24, 2.2, 8, 2], [27.6, 20, 2.2, 6, 1], [28.2, 0, 2, 6.5, 3], [27.6, -25, 2.2, 8, 0],
-    [-14, GZ - GD / 2 + 3.4, 8, 1.9, 3], [14, GZ - GD / 2 + 3.4, 8, 1.9, 1], [-14.5, EZ - 3.2, 7, 1.8, 2], [14.5, EZ - 3.2, 7, 1.8, 0], [-4.6, 20, 1.3, 4.4, 1], [4.7, 15, 1.3, 4.4, 2], [-6.6, -1.2, 1.4, 3, 0], [6.6, 1.2, 1.4, 3, 3]];
-  const pal = [[0x9a7fe0, 0xf4f1ff], [0xee8fb0, 0xffffff], [0xf3c64e, 0xf59a4a], [0x8f6fd6, 0xe98ab3]];
-  const fl = [], tu = [];
-  beds.forEach(([x, z, rx, rz, pi]) => {
-    const b = new THREE.Mesh(new THREE.CylinderGeometry(1, 1, .14, 28), m.soil); b.scale.set(rx, 1, rz); b.position.set(x, .07, z); b.receiveShadow = true; g.add(b);
-    const ar = rx * rz * Math.PI, pt = () => { const a = rnd() * 6.283, r = Math.sqrt(rnd()) * .93; return [x + Math.cos(a) * r * rx, z + Math.sin(a) * r * rz]; };
-    for (let i = 0; i < ar * 3; i++) { const p = pt(); fl.push([p[0], rr(.3, .52), p[1], rr(.75, 1.25), pal[pi][rnd() < .68 ? 0 : 1]]); }
-    for (let i = 0; i < ar * 1.7; i++) { const p = pt(); tu.push([p[0], p[1], rr(.8, 1.3)]); }
-  });
-  const fm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(.13, 0), m.flower, fl.length), col = new THREE.Color();
-  fl.forEach((f, i) => { dm.position.set(f[0], f[1], f[2]); dm.rotation.set(0, 0, 0); dm.scale.setScalar(f[3]); dm.updateMatrix(); fm.setMatrixAt(i, dm.matrix); fm.setColorAt(i, col.setHex(f[4])); }); fm.receiveShadow = true; g.add(fm);
-  const tm = new THREE.InstancedMesh(new THREE.ConeGeometry(.2, .42, 5), m.tuft, tu.length);
-  tu.forEach((t, i) => { dm.position.set(t[0], .14 + .2 * t[2], t[1]); dm.rotation.set(0, rnd() * 3, 0); dm.scale.setScalar(t[2]); dm.updateMatrix(); tm.setMatrixAt(i, dm.matrix); }); tm.receiveShadow = true; g.add(tm);
-
-  // tufe rotunde și copaci
-  const bs = []; beds.forEach(([x, z, rx, rz]) => { const long = rz > rx; bs.push([x + (long ? 0 : -rx * .92), z + (long ? -rz * .92 : 0), rr(.6, .95)], [x + (long ? 0 : rx * .92), z + (long ? rz * .92 : 0), rr(.6, .95)]); });
-  for (let i = 0; i < 10; i++) bs.push([rr(-1, 1) * (GW / 2 - 4), GZ - GD / 2 + rr(2.2, 3.4), rr(.7, 1.15)]);
-  const bm = new THREE.InstancedMesh(new THREE.IcosahedronGeometry(1, 1), m.bush, bs.length);
-  bs.forEach((b, i) => { dm.position.set(b[0], b[2] * .62, b[1]); dm.rotation.set(0, rnd() * 3, 0); dm.scale.set(b[2], b[2] * .78, b[2]); dm.updateMatrix(); bm.setMatrixAt(i, dm.matrix); }); sh(bm); g.add(bm);
-  const trees = [[-26.5, 24.5, 0, 1.25], [26.8, 25, 1, 1.3], [-28, -9.5, 1, 1.5], [28, -12, 0, 1.4], [27.5, -37, 0, 1.6], [-26.5, -38, 0, 1.7], [9.5, GZ - GD / 2 + 4, 1, 1.5], [-10.5, GZ - GD / 2 + 4, 1, 1.45], [28, 10, 1, 1.2], [-28.5, 10.5, 0, 1.25]];
-  for (let i = 0; i < 30; i++) { const a = (-125 + 250 * (i + rr(-.3, .3)) / 29) * DEG, R = rr(50, 70); trees.push([Math.sin(a) * R, GZ - Math.cos(a) * R, rnd() < .45 ? 1 : 0, rr(1.7, 2.9)]); }
-  trees.forEach(([x, z, kind, s], i) => { const t = tree(kind, s, { trunk: m.trunk, leaf: m.leaf[(i * 7 + kind) % m.leaf.length] }); t.position.set(x, 0, z); t.rotation.y = rnd() * 6; g.add(t); });
-
-  // lămpile de grădină și lumina lor pe iarbă (seara)
-  lamps.forEach(([x, z, r], i) => { if (i > 1) { const l = lampPost(M, 2.5); l.position.set(x, 0, z); g.add(l); } const gl = flat(new THREE.PlaneGeometry(r * 2, r * 2), m.glow, .05); gl.position.x = x; gl.position.z = z; gl.receiveShadow = false; gl.renderOrder = 2; g.add(gl); });
-  return { night(n) { m.glow.opacity = n * .85; } };
+  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
 }

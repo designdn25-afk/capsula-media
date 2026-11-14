@@ -954,12 +954,12 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 
 <!--PART:exterior-->
 
-<!--PART:zi-noapte-->
+<!-- Secțiunea „Zi și seară” (parts/zi-noapte.html) a fost scoasă la cererea clientului, 14 nov 2026. -->
 
 <!-- 02 MODEL -->
 <section class="alt" id="model">
   <div class="wrap">
-    <div class="eyebrow reveal" data-n="04">Casele noastre</div>
+    <div class="eyebrow reveal" data-n="03">Casele noastre</div>
     <h2 class="title reveal">Descoperă următoarea<br>ta <em>casă.</em></h2>
     <div class="model-grid">
       <div class="model-img ph reveal" data-bg="img/n_hero.jpg" style="background-image:linear-gradient(135deg,#e9ebef,#dfe3e8)"><span class="tag">X7 / 01</span></div>
@@ -994,7 +994,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <div class="wrap">
     <div class="head-row">
       <div>
-        <div class="eyebrow reveal" data-n="06">Tur virtual 360°</div>
+        <div class="eyebrow reveal" data-n="05">Tur virtual 360°</div>
         <h2 class="title">Intră în capsula <em>X7.</em></h2>
       </div>
       <p class="note reveal" style="max-width:400px">Fotografii 360° reale, făcute în showroom-ul din Ciorogârla. Trage ca să te uiți în jur și apasă cercurile aurii de pe podea ca să mergi prin capsulă. Vezi capsula și seara, cu lumina aprinsă.</p>
@@ -1050,7 +1050,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <div class="wrap">
     <div class="head-row">
       <div>
-        <div class="eyebrow reveal" data-n="07">Capsule la comandă</div>
+        <div class="eyebrow reveal" data-n="06">Capsule la comandă</div>
         <h2 class="title reveal">Sau alege<br>un model <em>la comandă.</em></h2>
       </div>
       <p class="note reveal" style="max-width:380px">Pe lângă X7 din showroom, aducem la comandă orice model din gama producătorului. Alege modelul și primești oferta cu preț, termen și transport.</p>
@@ -1097,7 +1097,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <div class="wrap">
     <div class="head-row">
       <div>
-        <div class="eyebrow reveal" data-n="08">De ce noi</div>
+        <div class="eyebrow reveal" data-n="07">De ce noi</div>
         <h2 class="title">Capsule reale,<br>pe care le <em>vezi azi.</em></h2>
       </div>
       <a href="complet.html#galerie" class="btn btn-ghost reveal">Toată galeria →</a>
@@ -1118,7 +1118,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 <!-- HUB -->
 <section id="mai-mult" class="alt">
   <div class="wrap">
-    <div class="eyebrow reveal" data-n="09">Tot ce mai vrei să știi</div>
+    <div class="eyebrow reveal" data-n="08">Tot ce mai vrei să știi</div>
     <div class="hub">
       <a href="complet.html#configurator" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 6h9M17 6h3M4 12h3M11 12h9M4 18h11M19 18h1"/><circle cx="15" cy="6" r="2"/><circle cx="9" cy="12" r="2"/><circle cx="17" cy="18" r="2"/></svg></i><b>Preț și configurator</b><span>Alege dotările, vezi totalul</span></a>
       <a href="complet.html#finantare" class="reveal"><i aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M3 9.5 12 4l9 5.5M5.5 10.5v7M10 10.5v7M14 10.5v7M18.5 10.5v7M3 20h18"/></svg></i><b>Rate TBI Bank</b><span>Calculează rata lunară</span></a>
@@ -1134,7 +1134,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 <section class="visit" id="contact">
   <div class="wrap visit-grid" id="vizita">
     <div>
-      <div class="eyebrow reveal" data-n="10">Ciorogârla</div>
+      <div class="eyebrow reveal" data-n="09">Ciorogârla</div>
       <h2 class="title reveal">Vino să o vezi<br>înainte să <em>alegi.</em></h2>
       <p class="lead reveal">Vezi capsule finalizate și capsule în asamblare.</p>
       <div class="addr reveal"><i class="addr-i" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 21s-7-6.2-7-11.5a7 7 0 0 1 14 0C19 14.8 12 21 12 21z"/><circle cx="12" cy="9.5" r="2.5"/></svg></i><div><b>Calea București nr. 41</b><small>077055 Ciorogârla, Ilfov</small></div></div>
@@ -1475,6 +1475,7 @@ const N={
 };
 const NIGHT={living:'living_n',masa:'masa_n',baie:'baie_n',dorm:'dorm_n'};
 Object.keys(N).forEach(k=>{const d=N[k];if(d.night){const b=N[d.day];d.H=b.H+d.off;d.p=b.p;d.links=b.links.map(([t,y,pt])=>[t,y==null?null:y+d.off,pt]);}});
+window.VTN=N;window.VTNIGHT=NIGHT;   // folosite și de grădina 3D (js/garden.js): fotografiile reale din X7
 const norm=a=>((a%360)+540)%360-180;
 const dayOf=k=>N[k].night?N[k].day:k;
 function dist(a,b){const p=N[a].p,q=N[b].p;return Math.hypot(q[0]-p[0],q[1]-p[1])}
