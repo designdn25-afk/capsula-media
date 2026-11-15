@@ -67,9 +67,12 @@ async function run(browser, w, h, name, reduced) {
   fs.mkdirSync('screenshots', { recursive: true });
   const browser = await chromium.launch({ args: ['--use-angle=swiftshader', '--enable-unsafe-swiftshader', '--ignore-gpu-blocklist'] });
   let problems = 0;
-  for (const [w, h, name] of SIZES) problems += await run(browser, w, h, name, false);
-  problems += await run(browser, 1440, 900, 'laptop', true);
-  problems += await run(browser, 390, 844, 'telefon', true);
+  const doar = process.env.DOAR;   // DOAR=rm: doar cele două treceri „fără animații”; DOAR=marimi: doar cele cinci mărimi
+  if (doar !== 'rm') for (const [w, h, name] of SIZES) problems += await run(browser, w, h, name, false);
+  if (doar !== 'marimi') {
+    problems += await run(browser, 1440, 900, 'laptop', true);
+    problems += await run(browser, 390, 844, 'telefon', true);
+  }
   await browser.close();
   process.exitCode = problems ? 1 : 0;
 })();
