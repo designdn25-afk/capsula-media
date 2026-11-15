@@ -55,7 +55,7 @@ site/                    tot ce se publică
   home_v1.html           veche (varianta V1), nefolosită și nelegată; nu se publică
   js/                    scenele 3D (module): kit.js (unelte comune), x7.js (modelul capsulei), stage.js + story.js (deschiderea),
                          gscene.js + genv.js + real.js + garden.js + gradina-data.js (grădina), pano.js (fotografii reale 360°
-                         în interiorul caselor), furn.js (mobilier, terase), h_<casă>.js (câte o casă)
+                         în interiorul caselor și imaginile realiste ale vederilor din afară), furn.js (mobilier, terase), h_<casă>.js (câte o casă)
   vendor/                three.js 0.170 ținut local (nu se încarcă nimic de pe alte site-uri)
   img/                   imaginile; img/ext (exterior), img/int (interior), img/vid (clipuri .mp4 + postere .webp),
                          img/st și img/gd (imaginile de rezervă pentru deschidere și grădină, când 3D-ul nu poate porni)
@@ -129,6 +129,15 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   orientativă” — **nu scoate mențiunea** (generatorul schimbă detalii de mobilier și finisaje). Cum se refac: `surse/ai360/CITESTE.md`.
   Dacă se schimbă forma sau mobila unei case, imaginile ei trebuie refăcute (altfel nu se mai potrivesc cu macheta). X7 rămâne cu
   fotografiile reale. Un film de prezentare făcut la fel (animație → video cu AI) nu s-a făcut încă; cere din nou acordul pentru credite.
+- **Vederile din afară, „reale” cu AI** (cerut pe 14–15 nov 2026: grădina de sus și fiecare casă din afară să arate real, cu hale în
+  jur, „să vadă că suntem în România, în Ciorogârla”; „folosește ambele, și Higgsfield, și ElevenLabs”): în jurul grădinii sunt hale și
+  o curte de asfalt, iar fiecare vedere din afară poate primi o imagine realistă făcută din același loc (`VEDERI` în
+  `site/js/gradina-data.js`), care apare peste macheta 3D ziua, cu mențiunea „Vizualizare realizată cu AI, orientativă” (**nu o scoate**).
+  **Gata doar X7 pe ecran lat** (calculator, tabletă, panoul îngust). Celelalte 11 (grădina de sus, X7 pe telefon, T7, E7, V3, M9) sunt
+  pregătite în ElevenLabs, dar **s-au terminat creditele** (au rămas 270): fie clientul mai pune ~25.000 de credite și se pornesc
+  dintr-o comandă, fie le generează el în Higgsfield (conectorul Higgsfield din Claude **nu poate genera**, doar citește contul).
+  Pașii, nodurile pregătite și cifrele: `surse/ai360/CITESTE.md`, partea a doua. Dacă se mută o casă, se schimbă grădina sau locul
+  camerei, imaginile trebuie refăcute.
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle
   camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare.
 - **Interior real în fiecare casă**: singurul mod ca interiorul să arate „pe bune” e cu fotografii 360° făcute în casa

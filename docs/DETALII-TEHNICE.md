@@ -248,3 +248,24 @@ pentru toate casele. Pentru T7, E7, V3 și M9, fiecare cameră are acum o panora
 din X7 (`pano.js`), cu trei diferențe: cheia începe cu `ai:`, orientarea e `H = −rotirea casei` (imaginile sunt aliniate cu lumea)
 și seara nu se afișează (rămâne macheta). Fișa casei arată „Vizualizare realizată cu AI, orientativă”. La intrarea într-o cameră,
 privirea e îndreptată spre interior (cea mai lungă direcție care nu dă în geam). Pașii de refacere: `surse/ai360/CITESTE.md`.
+
+## 15. Vederi „reale” din afară în grădină (15 nov 2026)
+
+Cereri: „hai să facem și aici mai realistic” (grădina de sus), „și pe exterior, din afară, dacă te uiți pe geam tot arată totul
+pătrățos”, „în afară să fie așa hale… să vadă că suntem în România, în Ciorogârla”, „folosește ambele, și Higgsfield, și ElevenLabs”.
+
+- **Hale** în jurul grădinii și o curte de asfalt în față (`js/genv.js`), mai puțini copaci în afara gardului viu.
+- **Camera stă în locuri fixe** (`view()` în `js/garden.js`): pentru fiecare vedere (toată grădina, fiecare casă) există un loc pentru
+  ecran lat și unul pentru ecran înalt; pe ecran se schimbă doar unghiul de vedere. Dintre cele două locuri se alege cel din care
+  subiectul se vede mai mare în spațiul liber (`pvOf`; pe ecran mare rămâne vederea lată dacă diferența e mică). Înainte se alegea
+  după proporția spațiului liber și, pe unele telefoane, ieșea o vedere foarte deformată (unghi de 84°).
+- **Imaginea realistă** a unei vederi (`VEDERI` în `js/gradina-data.js`) e o imagine obișnuită, făcută din același loc; `js/pano.js`
+  (`renderFlat`) o desenează peste scena 3D, potrivită cu unghiul de vedere și cu decalajul camerei, deci etichetele caselor și
+  apăsatul pe ele rămân corecte. Unde imaginea nu ajunge până la marginea ecranului se stinge lin în macheta 3D. Apare după ce
+  camera a ajuns la loc; la zbor, la rotire cu degetul/mouse-ul și seara se vede macheta. După o rotire, camera revine singură
+  (2,6 s) și imaginea reapare.
+- Pe scenă apare mențiunea „Vizualizare realizată cu AI, orientativă” (`.gd-ai`) cât timp se vede o imagine făcută cu AI (și în
+  interior, și afară); pe ecran mic stă deasupra fișei casei. Textul de sub scenă spune același lucru.
+- Cum se fac imaginile, ce e gata și ce a rămas: `surse/ai360/CITESTE.md` (partea a doua). Pe scurt: gata X7 pe ecran lat; restul
+  de 11 așteaptă credite ElevenLabs sau generarea de către client în Higgsfield.
+

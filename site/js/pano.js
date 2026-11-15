@@ -1,5 +1,5 @@
-// Fotografii reale 360° (panorame echirectangulare) desenate peste scena 3D, pentru interiorul caselor care au așa ceva.
-// Se folosește din js/garden.js: când vizitatorul intră în casă, fotografia apare lin peste macheta 3D, aliniată cu ea.
+// Fotografii reale 360° (panorame echirectangulare) desenate peste scena 3D, pentru interiorul caselor care au așa ceva, și
+// imagini obișnuite pentru vederile din afară. Se folosește din js/garden.js: imaginea apare lin peste macheta 3D, aliniată cu ea.
 import { THREE } from './kit.js';
 
 export function createPano(renderer) {
@@ -19,10 +19,14 @@ void main(){vec3 d=look((vUv*2.-1.)-off*2.);vec2 uv=vec2(.5+atan(d.x,-d.z)/6.283
   const touch = url => { const i = order.indexOf(url); if (i >= 0) order.splice(i, 1); order.push(url); };
   const trim = () => { while (order.length > 3) { const u = order.shift(), e = cache.get(u); if (e && e.tex && e.tex !== U.tA.value) { e.tex.dispose(); cache.delete(u); } else if (e && e.tex) { order.push(u); break; } } };
   // încarcă o panoramă (o singură dată); întoarce o promisiune cu textura sau null
-  function load(url) {
+  // flat = imagine obișnuită (nu 360°): se arată de obicei micșorată, deci primește și variantele mici (mipmap)
+  function load(url, flat) {
     let e = cache.get(url); if (e) return e.p;
     e = { tex: null }; cache.set(url, e);
-    e.p = new Promise(res => loader.load(url, t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; e.tex = t; touch(url); trim(); res(t); }, undefined, () => { cache.delete(url); res(null); }));
+    e.p = new Promise(res => loader.load(url, t => { t.colorSpace = THREE.SRGBColorSpace; t.magFilter = THREE.LinearFilter;
+      if (flat) { t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); }
+      else { t.wrapS = THREE.RepeatWrapping; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; }
+      e.tex = t; touch(url); trim(); res(t); }, undefined, () => { cache.delete(url); res(null); }));
     return e.p;
   }
   const ready = url => { const e = cache.get(url); if (e && e.tex) { touch(url); return e.tex; } return null; };
@@ -32,5 +36,25 @@ void main(){vec3 d=look((vUv*2.-1.)-off*2.);vec2 uv=vec2(.5+atan(d.x,-d.z)/6.283
     U.th.value = Math.tan(fov * Math.PI / 360); U.asp.value = asp; U.off.value.set(offX, -offY);
     const ac = renderer.autoClear; renderer.autoClear = false; renderer.render(scene, cam); renderer.autoClear = ac;
   }
-  return { load, ready, render };
+  /* Imagine obișnuită (o „fotografie” făcută din locul în care stă camera, privind în aceeași direcție), așezată exact peste scena 3D:
+     r = [stânga, dreapta, jos, sus] = cât cuprinde ea, în tangente față de direcția privirii. fov, asp, offX, offY = camera de acum.
+     Unde imaginea nu ajunge (ecran mai lat sau mai înalt decât ea), se stinge lin și rămâne scena 3D de dedesubt. */
+  const UF = { tA: { value: null }, op: { value: 0 }, th: { value: 1 }, asp: { value: 1 }, off: { value: new THREE.Vector2() }, c: { value: new THREE.Vector2() }, hf: { value: new THREE.Vector2(1, 1) } };
+  const matF = new THREE.ShaderMaterial({ uniforms: UF, transparent: true, depthTest: false, depthWrite: false, toneMapped: false,
+    vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
+    fragmentShader: `uniform sampler2D tA;uniform float op,th,asp;uniform vec2 off,c,hf;varying vec2 vUv;
+void main(){vec2 nd=(vUv*2.-1.)-off*2.;vec2 q=(vec2(nd.x*th*asp,nd.y*th)-c)/hf;vec2 e=smoothstep(vec2(1.),vec2(.94),abs(q));
+ gl_FragColor=vec4(texture2D(tA,q*.5+.5).rgb,op*e.x*e.y);
+ #include <colorspace_fragment>
+}` });
+  const quadF = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), matF); quadF.frustumCulled = false; const sceneF = new THREE.Scene(); sceneF.add(quadF);
+  function renderFlat(tex, opacity, r, fov, asp, offX, offY) {
+    UF.tA.value = tex; UF.op.value = opacity; UF.th.value = Math.tan(fov * Math.PI / 360); UF.asp.value = asp; UF.off.value.set(offX, -offY);
+    UF.c.value.set((r[0] + r[1]) / 2, (r[2] + r[3]) / 2); UF.hf.value.set((r[1] - r[0]) / 2, (r[3] - r[2]) / 2);
+    const ac = renderer.autoClear; renderer.autoClear = false; renderer.render(sceneF, cam); renderer.autoClear = ac;
+  }
+  // imaginea acoperă tot ecranul? (atunci scena 3D de dedesubt nu mai trebuie desenată)
+  const covers = (r, fov, asp, offX, offY) => { const th = Math.tan(fov * Math.PI / 360), cx = (r[0] + r[1]) / 2, cy = (r[2] + r[3]) / 2, hx = (r[1] - r[0]) / 2 * .94, hy = (r[3] - r[2]) / 2 * .94;
+    return (-1 - 2 * offX) * th * asp >= cx - hx && (1 - 2 * offX) * th * asp <= cx + hx && (-1 + 2 * offY) * th >= cy - hy && (1 + 2 * offY) * th <= cy + hy; };
+  return { load, ready, render, renderFlat, covers };
 }

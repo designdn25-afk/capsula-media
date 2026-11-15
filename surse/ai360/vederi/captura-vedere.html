@@ -1,0 +1,28 @@
+<!doctype html><meta charset="utf-8"><title>captură vedere</title>
+<style>html,body{margin:0;background:#000;overflow:hidden}canvas{display:block}</style>
+<canvas id="c"></canvas>
+<script type="module">
+// Imagine obișnuită a grădinii, făcută din locul unei vederi de pe site (vezi __gradina.views() în pagină):
+//   ?tx=&ty=&tz=&az=&el=&dist=   locul camerei (ca în js/garden.js)
+//   &x0=&x1=&y0=&y1=             cât cuprinde imaginea, în tangente față de direcția privirii (stânga, dreapta, jos, sus)
+//   &w=2752                      lățimea imaginii în pixeli (înălțimea iese din proporție) · &t= ora
+// Folosită ca sursă pentru imaginile realiste ale vederilor din afară (surse/ai360/CITESTE.md).
+import { THREE } from './js/kit.js';
+import { createGScene } from './js/gscene.js';
+import { buildGarden } from './js/genv.js';
+import { CASE } from './js/gradina-data.js';
+const q = new URLSearchParams(location.search), n = (k, d) => (q.has(k) ? +q.get(k) : d);
+const cv = document.getElementById('c'), G = createGScene(cv, { half: 48 }), R = G.renderer;
+const H = [];
+for (const c of CASE) { const mod = await import('./js/' + c.mod + '.js'), api = mod.build(G.M), s = api.size, g = new THREE.Group(); g.position.set(c.x, 0, c.z); g.rotation.y = c.rot * Math.PI / 180; g.add(api.root); G.scene.add(g); g.updateMatrixWorld(true); H.push({ c, api, g, s, center: g.localToWorld(new THREE.Vector3(0, 0, s.cz || 0)) }); }
+const env = buildGarden(G, H), d = G.setTime(n('t', 10.6)); env.night(d.n);
+const x0 = n('x0', -.6), x1 = n('x1', .6), y0 = n('y0', -.34), y1 = n('y1', .34), W = n('w', 2752), Hh = Math.round(W * (y1 - y0) / (x1 - x0));
+const a = n('az', 0) * Math.PI / 180, e = n('el', 31) * Math.PI / 180, dist = n('dist', 90), tx = n('tx', 0), ty = n('ty', 1), tz = n('tz', -5), cam = G.camera, near = .5, far = cam.far;
+R.setPixelRatio(1); R.setSize(W, Hh, false); cv.style.width = W + 'px'; cv.style.height = Hh + 'px';
+cam.position.set(tx + Math.sin(a) * Math.cos(e) * dist, ty + Math.sin(e) * dist, tz + Math.cos(a) * Math.cos(e) * dist); cam.lookAt(tx, ty, tz); cam.near = near;
+cam.updateProjectionMatrix = () => {};   // proiecția se pune de mână (poate fi descentrată)
+cam.projectionMatrix.makePerspective(x0 * near, x1 * near, y1 * near, y0 * near, near, far); cam.projectionMatrixInverse.copy(cam.projectionMatrix).invert();
+G.scene.fog.near = dist * 1.25; G.scene.fog.far = dist * 1.25 + 430;
+R.shadowMap.needsUpdate = true; G.render(); R.shadowMap.needsUpdate = true; G.render();
+window.__ready = true;
+</script>

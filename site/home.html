@@ -1343,6 +1343,8 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .gd[data-view="walk"] .gd-gl{cursor:grab}
 .gd-look{position:absolute;z-index:3;left:50%;top:18px;translate:-50% 0;margin:0;padding:9px 16px;border-radius:999px;background:rgba(14,18,28,.62);color:#fff;font:500 12.5px/1 var(--body);white-space:nowrap;pointer-events:none;opacity:0;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .gd[data-view="walk"] .gd-look{animation:gdLook 6.5s 1.2s both}
+.gd-ai{position:absolute;z-index:3;right:16px;bottom:78px;margin:0;padding:7px 12px;border-radius:999px;background:rgba(14,18,28,.5);color:#fff;font:500 11.5px/1 var(--body);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
+.gd--ai .gd-ai{opacity:1}
 @keyframes gdLook{0%{opacity:0}10%,80%{opacity:1}100%{opacity:0}}
 .gd-c-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .gd-c-btns .btn{padding:13px 20px}
@@ -1382,6 +1384,7 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
   .gd-c-real{margin-top:6px;font-size:11.5px}
   .gd-c-lvl,.gd-c-view{margin-top:10px}.gd-c-view button{padding:7px 13px}
   .gd-look{top:auto;bottom:74px;font-size:11.5px;max-width:calc(100% - 24px);white-space:normal;text-align:center;display:none}
+  .gd-ai{right:auto;left:12px;bottom:calc(var(--gd-ch,0px) + 76px);padding:6px 10px;font-size:10.5px}
   .gd[data-mode="in"] .gd-c-specs>div:not(.gd-c-rooms){display:none}
   .gd[data-mode="in"] .gd-c-real{display:none}
   .gd[data-view="walk"] .gd-c-rooms dd{margin-top:2px}
@@ -1398,7 +1401,7 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 @media (max-width:899px) and (max-height:640px){.gd-c-ser{display:none}.gd-c-top{justify-content:flex-end;height:0}.gd-c-x{position:relative;top:12px;width:30px;height:30px}.gd-c-links{right:54px;top:20px}.gd-c-name{font-size:36px}.gd-card{padding:10px 14px 12px}.gd-c-btns{margin-top:9px}.gd-c-btns .btn{padding:10px 14px}.gd-c-specs{margin-top:5px}.gd-c-lvl{margin-top:7px}.gd-c-lvl button{padding:7px 14px}}
 @media (max-width:420px){.gd-c-ser{display:none}.gd-c-top{justify-content:flex-end;height:0}.gd-c-x{position:relative;top:14px}.gd-c-links{right:62px;top:22px}.gd-dn button{padding:9px 11px}}
 /* fără WebGL: imaginea grădinii și lista caselor */
-.gd--static .gd-gl,.gd--static .gd-pins,.gd--static .gd-labels,.gd--static .gd-hint,.gd--static .gd-tools,.gd--static .gd-bar,.gd--static .gd-card{display:none}
+.gd--static .gd-gl,.gd--static .gd-ai,.gd--static .gd-pins,.gd--static .gd-labels,.gd--static .gd-hint,.gd--static .gd-tools,.gd--static .gd-bar,.gd--static .gd-card{display:none}
 .gd--static .gd-stage{height:auto;aspect-ratio:16/9}
 .gd--static .gd-still{display:block;width:100%;height:100%;object-fit:cover}
 .gd--static .gd-list{display:grid;grid-template-columns:repeat(auto-fit,minmax(170px,1fr));gap:12px;margin-top:18px}
@@ -1653,6 +1656,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
     <div class="gd-labels" aria-hidden="true"></div>
     <p class="gd-hint">Trage ca să te rotești · apasă pe o casă</p>
     <p class="gd-look" aria-hidden="true">Trage ca să te uiți în jur · apasă pe o cameră ca să mergi acolo</p>
+    <p class="gd-ai" aria-hidden="true">Vizualizare realizată cu AI, orientativă</p>
     <div class="gd-tools">
       <div class="gd-dn" role="group" aria-label="Ora din zi"><button type="button" data-t="zi" class="on" aria-pressed="true">Zi</button><button type="button" data-t="seara" aria-pressed="false">Seară</button></div>
       <button type="button" class="gd-tour" aria-pressed="false" aria-label="Tur ghidat prin toate casele"><svg class="i-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 .8v10.4L11 6z"/></svg><svg class="i-stop" viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 1.5h9v9h-9z"/></svg><span>Tur ghidat</span></button>
@@ -1684,7 +1688,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   </div>
   <div class="wrap">
     <div class="gd-list"></div>
-    <p class="gd-note">În X7, interiorul este fotografiat în showroom. La celelalte case, exteriorul este o machetă 3D, iar interiorul o vizualizare realizată cu inteligență artificială pornind de la machetă; amândouă sunt orientative. Pentru detalii exacte, cere oferta modelului care îți place.</p>
+    <p class="gd-note">Grădina este o prezentare 3D. În X7, interiorul este fotografiat în showroom. Vederile de zi din afară și interiorul celorlalte case sunt vizualizări realizate cu inteligență artificială pornind de la macheta 3D: sunt orientative și pot diferi în detalii de casele reale. Pentru detalii exacte, cere oferta modelului care îți place.</p>
   </div>
 </section>
 
