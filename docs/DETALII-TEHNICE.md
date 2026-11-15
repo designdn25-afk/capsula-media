@@ -269,3 +269,19 @@ pătrățos”, „în afară să fie așa hale… să vadă că suntem în Rom�
 - Cum se fac imaginile, ce e gata și ce a rămas: `surse/ai360/CITESTE.md` (partea a doua). Pe scurt: gata X7 pe ecran lat; restul
   de 11 așteaptă credite ElevenLabs sau generarea de către client în Higgsfield.
 
+## 16. Rotire „reală” și seară „reală” în grădină: pregătite, așteaptă credite (15 nov 2026, ziua)
+
+Clientul a văzut vederea reală a lui X7 („îmi place cum arată”), dar a reclamat, cu un filmuleț, că la rotire și seara apare tot
+macheta: „când miști capsula 360 tot așa apare pătrățos… și pe zi și pe noapte”.
+
+- **În pagină e gata** (`js/garden.js`, `ROTIRI` și `VEDERI` în `js/gradina-data.js`): o casă poate avea cadrele unei filmări care o
+  ocolește (rotire) și fiecare vedere poate avea și imagine de seară. Cât timp nu există cadre/imagini, totul se poartă ca înainte.
+  La rotire se arată cadrul cel mai apropiat de unghi (camera 3D sare la unghiul cadrului, etichetele rămân potrivite); cadre mici
+  în mișcare, cadrul mare la oprire; pe telefon se încarcă întâi un sfert din cadre.
+- **Sursele sunt gata**: cele 12 vederi de seară ale machetei (`surse/ai360/vederi/gr_*_n_src.jpg`) și filmările 3D ale rotirii pentru
+  cele cinci case (192 de cadre, 8 s; se refac cu `capspin.js`, nu sunt în git fiindcă sunt mari).
+- **În ElevenLabs sunt pregătite, nepornite**: 11 imagini de zi, 12 de seară și proba de rotire pentru X7. Contul avea 0 credite.
+  Cifre, noduri și pași: `surse/ai360/CITESTE.md`, părțile a doua și a treia.
+- Ordinea când apar creditele: (1) cele 11 imagini de zi, (2) cele 12 de seară, (3) o singură rotire de probă (X7) și, dacă arată
+  bine, restul caselor; apoi rotirile pentru telefon și de seară, dacă clientul le vrea (dublează costul).
+

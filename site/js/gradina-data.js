@@ -25,9 +25,18 @@ export const GRADINA = { latime: 64, adancime: 72, centruZ: -8, intrareZ: 28 };
 // Imagini realiste (făcute cu AI pornind de la machetă) pentru vederile de zi din afară: toată grădina și fiecare casă.
 // Pentru fiecare vedere (all = toată grădina, apoi codul casei): [imaginea pentru ecran lat, imaginea pentru ecran înalt]; unde lipsește
 // una (null), se vede macheta 3D. O imagine = [fișierul din img/gd/ai/ (fără .webp),
-// stânga, dreapta, jos, sus] = cât cuprinde ea în jurul direcției în care privește camera (în tangente). Fiecare imagine e făcută
+// stânga, dreapta, jos, sus, (opțional) fișierul imaginii de seară] = cât cuprinde ea în jurul direcției în care privește camera (în
+// tangente). Fiecare imagine e făcută
 // exact din locul în care stă camera în acea vedere (locurile se citesc din pagină cu __gradina.views()), deci, dacă muți o casă,
 // schimbi grădina sau locul camerei, imaginile trebuie refăcute (surse/ai360/CITESTE.md). Seara se vede macheta 3D.
 export const VEDERI = {
   X7: [['gr_x7', -1.068, 0.686, -0.514, 0.473], null],
 };
+
+// Rotirea realistă a unei case: cadrele unei filmări (făcute cu AI pornind de la rotirea machetei) care ocolește casa complet, pe
+// cercul vederii ei din afară. Pentru fiecare casă (sau all): [pentru ecran lat, pentru ecran înalt]; unde lipsește (null), la rotire se vede
+// macheta 3D. zi / seara = folderul cadrelor din img/gd/rot/ (s_000.webp … mici, pentru mișcare; l_000.webp … mari, pentru oprire);
+// n = câte cadre are o rotire completă; az0 = unghiul primului cadru (grade); r = ce cuprinde un cadru: [stânga, dreapta, jos, sus].
+// La „all” (toată grădina) filmarea acoperă doar un arc: arc = câte grade (de la az0), iar n = câte cadre are arcul.
+// Cum se fac: surse/ai360/CITESTE.md, partea a treia.
+export const ROTIRI = {};

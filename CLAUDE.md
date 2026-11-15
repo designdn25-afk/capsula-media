@@ -139,6 +139,14 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   Pagina făcută pentru el, cu pozele și textele de lipit în Higgsfield: https://claude.ai/artifact/5DRE5A9xasjCnU9aXFuMQR
   Pașii, nodurile pregătite și cifrele: `surse/ai360/CITESTE.md`, partea a doua. Dacă se mută o casă, se schimbă grădina sau locul
   camerei, imaginile trebuie refăcute.
+- **Rotire reală și seară reală** (cerut pe 15 nov 2026, cu filmuleț: „când miști capsula 360 tot așa apare pătrățos… și pe zi și pe
+  noapte”; poza reală pe loc îi place): pagina **știe deja** să arate, la rotire, cadrele unei filmări reale în locul machetei
+  (`ROTIRI` în `site/js/gradina-data.js`) și imagini de seară (al șaselea element din `VEDERI`), dar **nu există încă nici cadre, nici
+  imagini de seară**: contul ElevenLabs avea 0 credite. Sunt pregătite acolo, nepornite: 11 imagini de zi (~25.000 credite), 12 de
+  seară (~27.000) și proba de rotire pentru X7 (~6.500–11.000 pe rotire, cu Kling O3 / Kling 4). Clientul a întrebat cum cumpără
+  credite (ElevenLabs → Subscription → Pay As You Go sau abonament mai mare, pe **același cont** legat în Claude). Când apar: întâi
+  imaginile de zi, apoi seara, apoi **o singură rotire de probă** și abia după aceea restul. Pași, noduri, prețuri:
+  `surse/ai360/CITESTE.md`, părțile a doua și a treia.
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle
   camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare.
 - **Interior real în fiecare casă**: singurul mod ca interiorul să arate „pe bune” e cu fotografii 360° făcute în casa

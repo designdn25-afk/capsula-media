@@ -79,3 +79,67 @@ cu sursele și cererile de mai sus, imaginile se pot lua cu `show_generations` �
 Pagina pregătită pentru el, cu cele 11 poze, formatul fiecăreia și textul de lipit: https://claude.ai/artifact/5DRE5A9xasjCnU9aXFuMQR
 (privată; butonul „Deschide poza mare” duce la sursele urcate temporar pe `gh-pages`, în `img/gd/src/fl-*.jpg`: după fiecare
 publicare cu `tools/publica_pages.sh` trebuie urcate din nou acolo, cât timp mai e nevoie de ele).
+
+# Rotirea „reală” în jurul caselor și vederile de seară (15 nov 2026, ziua)
+
+Clientul a văzut vederea reală a lui X7 și i-a plăcut, dar: „când miști capsula 360 tot așa apare pătrățos… și pe zi și pe noapte”
+(a trimis și un filmuleț: cât stă pe loc e poza reală, la rotire apare macheta 3D). Deci și rotirea, și seara trebuie să arate real.
+
+## Cum funcționează pe site (gata, în `js/garden.js`)
+- **Rotirea** (`ROTIRI` în `js/gradina-data.js`): pentru o casă există cadrele unei filmări care o ocolește complet pe cercul vederii
+  ei (același centru, aceeași înălțime și distanță ca vederea din afară). Când vizitatorul trage de scenă, în locul machetei se arată
+  cadrul cel mai apropiat de unghiul la care a ajuns (camera 3D sare la unghiul cadrului, deci totul rămâne potrivit). Cadrele mici
+  (`s_000.webp…`, 1280 px) se încarcă din timp, de la rare la dese; când rotirea se oprește se cere cadrul mare (`l_…`, 1920 px).
+  Cu rotire realistă camera nu mai revine singură la loc și nu se mai ridică/coboară. Fără cadre (`null`), se vede macheta, ca înainte.
+  Pentru toată grădina (`all`) se poate pune doar un arc (`arc: 160`, cât se poate roti acolo).
+- **Seara**: o vedere poate avea și imagine de seară (al șaselea element din rândul ei din `VEDERI`), iar o rotire poate avea și
+  cadre de seară (`seara: 'folder'`). Fără ele, seara se vede macheta.
+
+## Cum se fac cadrele unei rotiri
+1. `node capspin.js x7 192 1920` (în `vederi/`; are nevoie de `captura-rotire.html` copiat în `site/_t_spin.html` și de serverul local):
+   192 de cadre 1920×1080 ale machetei, pornind din spatele casei (unghiul vederii + 180°). Durează ~9 minute pe casă. Scrie și
+   `info.json` (az0, cadrul). Pentru seară: al cincilea argument = ora (`node capspin.js x7 192 1920 0 19.9`). Pentru ecran înalt:
+   al patrulea argument `1`. Cadrele sunt mari și multe: se țin în afara proiectului (`IESIRE=<folder>`).
+2. `ffmpeg -framerate 24 -i rot_x7/f_%04d.jpg -c:v libx264 -pix_fmt yuv420p -crf 21 -movflags +faststart rot8-x7.mp4` (8 secunde).
+   ElevenLabs taxează după numărul de cadre (24 pe secundă), deci mai multe cadre = mai scump; 192 e un compromis bun.
+3. Filmarea se urcă la o adresă publică (temporar pe `gh-pages`, `img/gd/src/`) și se atașează în ElevenLabs; un nod „video-generation”
+   cu un model de editare video primește **filmarea** și, ca referință, **imaginea reală a vederii** (ca aspectul să fie același).
+   Cererea: „fă din această filmare 3D o filmare reală cu drona; păstrează exact traseul camerei, cadrul și viteza; fiecare clădire,
+   alee, lampă, copac în același loc în fiecare cadru; potrivește aspectul cu fotografia de referință; fără neclaritate de mișcare”
+   (textul întreg e în nodurile „ROTIRE X7 zi” din flux).
+4. `python3 fixspin.py filmare-reala.mp4 ../../../site/img/gd/rot/x7 72` → 72 de cadre (din 5 în 5 grade), mici și mari.
+5. Rândul din `ROTIRI`: `X7: [{ zi: 'x7', n: 72, az0: <az0 din info.json>, r: [cadrul din cadre.json] }, null]`.
+   Mecanismul a fost probat cu cadrele machetei (X7, az0 122): merge, etichetele celorlalte case rămân la locul lor.
+
+## Prețuri (estimări date de ElevenLabs pe 15 nov 2026, fără să se fi rulat nimic)
+- Kling O3 Video Edit: ~815 credite pe secundă de filmare → **~6.500 pe rotire** (8 s), ~1,3 $.
+- Kling 4.0 Video Edit, 1080p: ~1.370 credite pe secundă → **~10.900 pe rotire**, ~2,2 $.
+- Seedance 2.5 Video Edit, 1080p: ~30.000 de credite pentru o probă de 4 secunde (prea scump).
+- O imagine (zi sau seară), 4K: ~2.270 de credite.
+Nimic din toate acestea nu s-a putut proba: contul ElevenLabs legat în Claude avea 0 credite (din 50.254). Întâi se probează o
+singură rotire (X7) cu Kling O3 și, dacă nu e destul de bună, cu Kling 4; abia apoi restul caselor.
+
+## Ce e pregătit în fluxul ElevenLabs „Gradina cu case - vizualizare reala” (`yUzMp1srSOsKx9pUwTk2`), nepornit
+- **11 imagini de zi**: tabelul de mai sus (partea a doua).
+- **12 imagini de seară** (fiecare primește sursa de seară + imaginea de zi a aceleiași vederi, ca locul să arate la fel; deci se
+  pornesc **după** imaginile de zi). Sursele: `vederi/gr_*_n_src.jpg`; cererile: `vederi/cereri.json`.
+
+| imagine | nod |
+|---|---|
+| gr_all_n | NmvwjBkHWH2fDoOBZ4eC |
+| gr_all_p_n | 1AFMquotMUZSjCjfC72M |
+| gr_x7_n | GlNIWsOQIlzFdZRwrTJw |
+| gr_x7_p_n | Eu9vflQmZTGZzydXQH0B |
+| gr_t7_n | Se3BI8QD3Oi94tNMvARq |
+| gr_t7_p_n | xYCFDFTRKjsBgsG3SGCz |
+| gr_e7_n | oyGpp9JsI6YZ3FlDau1e |
+| gr_e7_p_n | FhWuyeB2u4kzDxXL5d1U |
+| gr_v3_n | u9960Siolrehn8SFep7A |
+| gr_v3_p_n | MH3QW58IkukoKLkWjhEx |
+| gr_m9_n | eQGUcX04PKEwFhFsWIgW |
+| gr_m9_p_n | g0rxya8dqrhE49mJOewI |
+
+  După descărcare: `fixflat.py` cu sursa de seară, apoi numele fișierului se adaugă ca al șaselea element în rândul vederii din `VEDERI`.
+- **Rotirea X7, probă** (filmarea de 288 de cadre, ~12 s la tarif): `SXKUxyH0ToSUpJWzhanm` (Kling O3, ~9.800 credite) și
+  `qs0UMH65RSJ9RXQcVPPb` (Kling 4, ~16.400). Mai bine se folosesc filmările de 8 secunde (192 de cadre): se atașează
+  `rot8-<casă>.mp4` și se face câte un nod nou la fel. Nodurile „proba 4s” sunt doar pentru estimarea prețului: nu se pornesc.
