@@ -112,8 +112,8 @@ Clientul a văzut vederea reală a lui X7 și i-a plăcut, dar: „când miști 
    Mecanismul a fost probat cu cadrele machetei (X7, az0 122): merge, etichetele celorlalte case rămân la locul lor.
 
 ## Prețuri (estimări date de ElevenLabs pe 15 nov 2026, fără să se fi rulat nimic)
-- Kling O3 Video Edit: ~815 credite pe secundă de filmare → **~6.500 pe rotire** (8 s), ~1,3 $.
-- Kling 4.0 Video Edit, 1080p: ~1.370 credite pe secundă → **~10.900 pe rotire**, ~2,2 $.
+- Kling O3 Video Edit: ~815 credite pe secundă de filmare; filmarea de 8 s se taxează ca 10 s → **~8.150 pe rotire**, ~1,6 $.
+- Kling 4.0 Video Edit, 1080p: ~1.370 credite pe secundă → **~13.700 pe rotire**, ~2,7 $.
 - Seedance 2.5 Video Edit, 1080p: ~30.000 de credite pentru o probă de 4 secunde (prea scump).
 - O imagine (zi sau seară), 4K: ~2.270 de credite.
 Nimic din toate acestea nu s-a putut proba: contul ElevenLabs legat în Claude avea 0 credite (din 50.254). Întâi se probează o
@@ -140,6 +140,10 @@ singură rotire (X7) cu Kling O3 și, dacă nu e destul de bună, cu Kling 4; ab
 | gr_m9_p_n | g0rxya8dqrhE49mJOewI |
 
   După descărcare: `fixflat.py` cu sursa de seară, apoi numele fișierului se adaugă ca al șaselea element în rândul vederii din `VEDERI`.
-- **Rotirea X7, probă** (filmarea de 288 de cadre, ~12 s la tarif): `SXKUxyH0ToSUpJWzhanm` (Kling O3, ~9.800 credite) și
-  `qs0UMH65RSJ9RXQcVPPb` (Kling 4, ~16.400). Mai bine se folosesc filmările de 8 secunde (192 de cadre): se atașează
-  `rot8-<casă>.mp4` și se face câte un nod nou la fel. Nodurile „proba 4s” sunt doar pentru estimarea prețului: nu se pornesc.
+- **Rotirea X7, proba** (filmarea de 8 s, cu imaginea reală a lui X7 ca referință): **`uI69SqM6B14cKERVIcod`** (Kling O3, ~8.150
+  credite) și, doar dacă prima nu e destul de bună, **`TvODuvG3eff1v3crrz9n`** (Kling 4, ~13.700). Nodurile mai vechi „ROTIRE X7 zi”
+  (filmarea de 288 de cadre) și „proba 4s” au fost doar pentru estimarea prețului: **nu se pornesc**.
+- **Filmările 3D ale celorlalte case** sunt deja atașate în flux (nu mai trebuie urcate): T7 `OScVVLsjG0YoZVJylusI`, E7
+  `CAFUSu5rQaEmOL9s8q5O`, V3 `0EdU80lAjiT2nO27ISmY`, M9 `CJRhjOHLkgQZCo9JK1GB` (X7: `8XUP7obXZHWDERwtIbiU`). După probă se face pentru
+  fiecare un nod ca al lui X7, cu modelul care a ieșit mai bine, legat la filmare și la imaginea de zi a casei (nodul ei din tabelul
+  cu imaginile de zi; deci după ce imaginile de zi există). Unghiul de pornire și cadrul fiecărei rotiri: `vederi/rotiri.json`.

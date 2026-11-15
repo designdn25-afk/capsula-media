@@ -279,7 +279,7 @@ macheta: „când miști capsula 360 tot așa apare pătrățos… și pe zi și
   La rotire se arată cadrul cel mai apropiat de unghi (camera 3D sare la unghiul cadrului, etichetele rămân potrivite); cadre mici
   în mișcare, cadrul mare la oprire; pe telefon se încarcă întâi un sfert din cadre.
 - **Sursele sunt gata**: cele 12 vederi de seară ale machetei (`surse/ai360/vederi/gr_*_n_src.jpg`) și filmările 3D ale rotirii pentru
-  cele cinci case (192 de cadre, 8 s; se refac cu `capspin.js`, nu sunt în git fiindcă sunt mari).
+  cele cinci case (192 de cadre, 8 s; se refac cu `capspin.js`, nu sunt în git fiindcă sunt mari; sunt deja atașate în ElevenLabs).
 - **În ElevenLabs sunt pregătite, nepornite**: 11 imagini de zi, 12 de seară și proba de rotire pentru X7. Contul avea 0 credite.
   Cifre, noduri și pași: `surse/ai360/CITESTE.md`, părțile a doua și a treia.
 - Ordinea când apar creditele: (1) cele 11 imagini de zi, (2) cele 12 de seară, (3) o singură rotire de probă (X7) și, dacă arată
