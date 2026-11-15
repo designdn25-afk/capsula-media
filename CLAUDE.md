@@ -136,6 +136,7 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   **Gata doar X7 pe ecran lat** (calculator, tabletă, panoul îngust). Celelalte 11 (grădina de sus, X7 pe telefon, T7, E7, V3, M9) sunt
   pregătite în ElevenLabs, dar **s-au terminat creditele** (au rămas 270): fie clientul mai pune ~25.000 de credite și se pornesc
   dintr-o comandă, fie le generează el în Higgsfield (conectorul Higgsfield din Claude **nu poate genera**, doar citește contul).
+  Pagina făcută pentru el, cu pozele și textele de lipit în Higgsfield: https://claude.ai/artifact/5DRE5A9xasjCnU9aXFuMQR
   Pașii, nodurile pregătite și cifrele: `surse/ai360/CITESTE.md`, partea a doua. Dacă se mută o casă, se schimbă grădina sau locul
   camerei, imaginile trebuie refăcute.
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle

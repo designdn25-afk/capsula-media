@@ -76,3 +76,6 @@ rulate ca probă și nu s-au folosit).
 **Higgsfield** (cerut de client): conectorul din Claude poate doar să citească din cont (modele, imaginile făcute, credite), nu poate
 genera și nu poate urca imagini. Clientul are abonament Ultra, cu „Nano Banana Pro” (același model) nelimitat: dacă generează el acolo
 cu sursele și cererile de mai sus, imaginile se pot lua cu `show_generations` și se pun pe site cu `fixflat.py`.
+Pagina pregătită pentru el, cu cele 11 poze, formatul fiecăreia și textul de lipit: https://claude.ai/artifact/5DRE5A9xasjCnU9aXFuMQR
+(privată; butonul „Deschide poza mare” duce la sursele urcate temporar pe `gh-pages`, în `img/gd/src/fl-*.jpg`: după fiecare
+publicare cu `tools/publica_pages.sh` trebuie urcate din nou acolo, cât timp mai e nevoie de ele).
