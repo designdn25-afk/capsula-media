@@ -7,7 +7,7 @@ import { THREE, clamp, lerp, ease, webglOK, fit } from './kit.js';
 import { createGScene } from './gscene.js';
 import { buildGarden } from './genv.js';
 import { createPano } from './pano.js';
-import { CASE, GRADINA, VEDERI, ROTIRI } from './gradina-data.js';
+import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js';
 
 window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel pagina arată imaginea de rezervă)
 const DEG = Math.PI / 180;
@@ -151,7 +151,8 @@ async function boot() {
   function station(out) { const o = view(mode, sel, lvl, pvOf(mode, sel, lvl)); CAMK.forEach(k => { out[k] = o[k]; }); return out; }
   // imaginea realistă a vederii de acum (doar ziua, doar din afară), dacă există: [fișier, stânga, dreapta, jos, sus]
   const extOf = (i, pv) => { const e = VEDERI[i < 0 ? 'all' : H[i].c.cod]; return (e && e[pv]) || null; };
-  const extKey = () => { if (mode === 'in') return null; const e = extOf(mode === 'all' ? -1 : sel, pvOf(mode, sel, 1)); if (!e || timeGoal <= 15) return e; return e[5] ? [e[5], e[1], e[2], e[3], e[4]] : null; };   // seara: imaginea de seară, dacă există
+  const planKey = () => { if (inView !== 'plan' || sel < 0 || timeGoal > 15 || pvOf('in', sel, lvl)) return null; const e = PLANURI[H[sel].c.cod]; return (e && e[lvl - 1]) || null; };   // planul casei (acoperișul ridicat), ecran lat, ziua
+  const extKey = () => { if (mode === 'in') return planKey(); const e = extOf(mode === 'all' ? -1 : sel, pvOf(mode, sel, 1)); if (!e || timeGoal <= 15) return e; return e[5] ? [e[5], e[1], e[2], e[3], e[4]] : null; };   // seara: imaginea de seară, dacă există
   const extLoad = () => { const e = extKey(); if (e) pano.load(panoUrl('ai:' + e[0]), true); };
 
   /* Rotirea realistă a unei case (ROTIRI din gradina-data.js): cadrele unei filmări care ocolește casa pe cercul vederii ei. Când
@@ -159,7 +160,7 @@ async function boot() {
      încarcă din timp, de la rare la dese; când rotirea se oprește, se cere și cadrul mare al acelui unghi. */
   /* Trecerea „reală” dintre două vederi din afară: imaginea de pe ecran rămâne pe loc, camera sare direct la vederea nouă, iar
      imaginea ei apare peste cea veche (fără drumul prin macheta 3D). xf = imaginea veche, așa cum era desenată. */
-  let xf = null, lastFov = 40, preK = '';
+  let xf = null, lastFov = 40, roofSnap = false;
   const spin = { key: '', cfg: null, im: [], texS: null, texL: null, cur: -1, at: 0, lReq: -1, lOk: false, on: false, op: 0, more: null };
   const frameTex = () => { const t = new THREE.Texture(); t.colorSpace = THREE.SRGBColorSpace; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; return t; };
   const setFrame = (t, img) => { if (t.image && (t.image.width !== img.width || t.image.height !== img.height)) t.dispose(); t.image = img; t.needsUpdate = true; };
@@ -169,14 +170,14 @@ async function boot() {
   function spinPrep() {   // cere cadrele mici ale casei alese (o singură dată pe casă și pe zi/seară)
     const c = spinCfg(); if (!c || spin.key === c.dir) return;
     spin.key = c.dir; spin.cfg = c; spin.im = new Array(c.n).fill(null); spin.cur = -1; spin.lReq = -1; spin.lOk = false; spin.on = false;
-    if (!spin.texS) { spin.texS = frameTex(); spin.texL = frameTex(); }
+    spin.curB = -1; if (!spin.texS) { spin.texS = frameTex(); spin.texL = frameTex(); spin.texB = frameTex(); }
     // întâi câteva cadre rare de jur împrejur, apoi mereu cadrul cel mai apropiat de unghiul la care se uită vizitatorul
     // (pe telefon restul se cer abia la prima rotire)
     const req = new Uint8Array(c.n), rare = []; for (let i = 0; i < c.n; i += Math.max(1, Math.round(c.n / 24))) rare.push(i);
     let act = 0, full = fine.matches; spin.want = 0;
     const take = () => { if (rare.length) return rare.shift(); if (!full) return -1; for (let d = 0; d <= c.n / 2; d++) { const a = (spin.want + d) % c.n, b = (spin.want - d + c.n * 2) % c.n; if (!req[a]) return a; if (!req[b]) return b; } return -1; };
     const next = () => { while (spin.key === c.dir && act < 8) { const i = take(); if (i < 0) return; if (req[i]) continue; req[i] = 1; act++; const im = new Image(); im.decoding = 'async';
-      im.onload = () => { act--; if (spin.key === c.dir) { spin.im[i] = im; if (spin.on) wake(); } next(); }; im.onerror = () => { act--; next(); }; im.src = spinUrl(c, 0, i); } };
+      im.onload = () => { const ok = () => { act--; if (spin.key === c.dir) { spin.im[i] = im; if (spin.on) wake(); } next(); }; if (im.decode) im.decode().then(ok, ok); else ok(); }; im.onerror = () => { act--; next(); }; im.src = spinUrl(c, 0, i); } };
     spin.more = () => { if (spin.key === c.dir && !full) { full = true; next(); } };
     next();
   }
@@ -186,12 +187,12 @@ async function boot() {
     const i0 = Math.round((((az - c.az0) % 360) + 360) % 360 / 360 * c.n) % c.n; spin.want = i0; for (let d = 0; d <= c.n / 2; d++) { const a = (i0 + d) % c.n, b = (i0 - d + c.n) % c.n; if (spin.im[a]) return a; if (spin.im[b]) return b; } return -1; }
   function goTo(m, i, d = 1.7) {
     CAMK.forEach(k => { from[k] = cur[k]; }); from.az += uaz; from.el = clamp(from.el + uel, 5, 86); uaz = uel = tuaz = tuel = 0;
-    const was = mode !== 'in' && m !== 'in' && started && tr >= 1 && time === timeGoal && !noPano ? (spin.op > .9 && spin.cur >= 0 && spin.cfg ? { tex: spin.lOk ? spin.texL : spin.texS, r: spin.cfg.r, own: 1 } : pOp > .9 && pA && pR ? { tex: pA, r: pR } : null) : null;
+    const was = !walking() && !(m === 'in' && inView === 'walk') && started && tr >= 1 && time === timeGoal && !noPano ? (spin.op > .9 && spin.cur >= 0 && spin.cfg ? { tex: spin.lOk ? spin.texL : spin.texS, r: spin.cfg.r, own: 1 } : pOp > .9 && pA && pR ? { tex: pA, r: pR } : null) : null;
     mode = m; sel = i; tr = rm ? 1 : 0; dur = d; needMeasure = 2; clearTimeout(backT); spin.on = false; wake();
     if (was && extKey()) {   // de la o imagine reală la alta: fără zbor prin machetă
       if (was.own) { const t = frameTex(); t.image = was.tex.image; t.needsUpdate = true; was.tex = t; }   // cadrul rotirii se păstrează separat (texturile rotirii se refolosesc)
       if (xf && xf.own) xf.tex.dispose();
-      xf = { tex: was.tex, r: was.r, own: was.own, fov: lastFov, offX, offY, op: 1, t0: performance.now() }; tr = 1; pOp = 0; spin.op = 0; spin.cur = -1;
+      xf = { tex: was.tex, r: was.r, own: was.own, fov: lastFov, offX, offY, op: 1, t0: performance.now() }; tr = 1; pOp = 0; spin.op = 0; spin.cur = -1; roofSnap = true;
     }
   }
 
@@ -278,7 +279,7 @@ async function boot() {
   });
   const up = e => { if (!drag || e.pointerId !== drag.id) return; const d = drag; drag = null; canvas.classList.remove('drag');
     { const c = d.moved > 6 && !walking() ? spinCfg() : null; if (c && c.arc >= 360) {   // rotirea mai alunecă puțin după ce dai drumul și se oprește pe un cadru care are și varianta mare
-        if (d.v && performance.now() - d.vt < 90) tuaz -= clamp(d.v, -60, 60) * .42 * 5;
+        if (d.v && performance.now() - d.vt < 90) tuaz -= clamp(d.v, -60, 60) * .42 * 9;
         const st = 360 / c.nl; tuaz = Math.round((to.az + tuaz - c.az0) / st) * st + c.az0 - to.az; wake(); } }
     if (d.moved > 6 && !walking() && extKey() && !noPano && !spinCfg()) backT = setTimeout(() => { if (!drag && !walking()) { tuaz = tuel = 0; wake(); } }, 2600);   // după ce te-ai rotit, vederea revine la imaginea realistă
     if (e.type === 'pointerup' && d.moved < 7 && !walking()) { const i = pick(e); if (i >= 0) { if (i === sel && mode === 'house') enter(); else if (i !== sel) select(i); } } };
@@ -310,7 +311,7 @@ async function boot() {
     let busy = false;
     if (tr < 1) { tr = Math.min(1, tr + dt / dur); const k = ease(tr); CAMK.forEach(n => { cur[n] = lerp(from[n], to[n], k); }); cur.az = from.az + ((((to.az - from.az) % 360) + 540) % 360 - 180) * k; busy = true; }
     else CAMK.forEach(n => { cur[n] = to[n]; });
-    if (Math.abs(tuaz - uaz) + Math.abs(tuel - uel) > .02) { const q = spin.on ? .34 : .16; uaz += (tuaz - uaz) * q; uel += (tuel - uel) * q; busy = true; }
+    if (Math.abs(tuaz - uaz) + Math.abs(tuel - uel) > .02) { const q = spin.on ? .24 : .16; uaz += (tuaz - uaz) * q; uel += (tuel - uel) * q; busy = true; }
     if (Math.abs(tOffX - offX) + Math.abs(tOffY - offY) > .0008) { offX += (tOffX - offX) * .09; offY += (tOffY - offY) * .09; busy = true; }
     // ora zilei
     if (time !== timeGoal) { time += clamp(timeGoal - time, -dt * 3.4, dt * 3.4); busy = true; lastN = -2; }
@@ -325,13 +326,17 @@ async function boot() {
     // fotografia reală a camerei (dacă există): apare după ce camera a ajuns; la mers și la schimbarea zi/seară se vede macheta
     let pt = null, ph = 180, pr = null, pai = false;
     if (wk) { if (W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k && !(p.ai && timeGoal > 15)) { const night = timeGoal > 15 && p.kn, u = panoUrl(night ? p.kn : p.k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); ph = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; pai = !!p.ai; } } }
-    else if (tr >= 1 && blend.k >= 1 && Math.abs(uaz) + Math.abs(uel) < .05) { const e = extKey(); if (e) { const u = panoUrl('ai:' + e[0]); pt = pano.ready(u); if (!pt) pano.load(u, true).then(wake); pr = e.slice(1); pai = true; } }   // din afară: imaginea realistă a vederii
+    else if (tr >= 1 && blend.k >= 1 && Math.abs(uaz) + Math.abs(uel) < .05) { const e = extKey(); if (e && (mode !== 'in' || H[sel].k === lvl)) { const u = panoUrl('ai:' + e[0]); pt = pano.ready(u); if (!pt) pano.load(u, true).then(wake); pr = e.slice(1); pai = true; } }   // din afară: imaginea realistă a vederii
     if (pt && pt !== pA && pOp < .02) { pA = pt; pH = ph; pR = pr; pAI = pai; }
     // rotirea realistă a casei: cadrul cel mai apropiat de unghiul la care s-a ajuns
     const sc = !wk && tr >= 1 && blend.k >= 1 && time === timeGoal ? spinCfg() : null; let sk = -1;
-    if (sc && sc.dir === spin.key && (spin.on || Math.abs(uaz) > .05)) { sk = spinNear(sc, cur.az + uaz); if (sk >= 0) spin.on = true; }
+    let sb = -1, sm = 0;   // al doilea cadru (vecinul) și cât se vede din el: mișcarea curge între cadre, nu sare din cadru în cadru
+    if (sc && sc.dir === spin.key && (spin.on || Math.abs(uaz) > .05)) { sk = spinNear(sc, cur.az + uaz); if (sk >= 0) spin.on = true;
+      if (sk >= 0 && sc.arc >= 360) { const f = Math.round((((cur.az + uaz - sc.az0) % 360) + 360) % 360 / 360 * sc.n * 500) / 500, a = Math.floor(f) % sc.n, b = (a + 1) % sc.n; if (spin.im[a] && spin.im[b]) { sk = a; sb = b; sm = f - Math.floor(f); } } }
+    if (sk >= 0 && sk !== spin.cur && sk === spin.curB) { const t = spin.texS; spin.texS = spin.texB; spin.texB = t; spin.curB = spin.cur; spin.cur = sk; spin.at = now; spin.lOk = false; spin.lReq = -1; }
+    if (sb >= 0 && sb !== spin.curB && sm > .02) { spin.curB = sb; setFrame(spin.texB, spin.im[sb]); }
     if (sk >= 0 && sk !== spin.cur) { spin.cur = sk; setFrame(spin.texS, spin.im[sk]); spin.at = now; spin.lOk = false; spin.lReq = -1; }
-    else if (sk >= 0 && !drag && !spin.lOk && spin.lReq !== sk && now - spin.at > 380 && Math.abs(tuaz - uaz) < .3 && Number.isInteger(sk * sc.nl / sc.n)) {   // rotirea s-a oprit: cadrul mare
+    else if (sk >= 0 && !drag && !spin.lOk && spin.lReq !== sk && now - spin.at > 380 && Math.abs(tuaz - uaz) < .3 && sm < .02 && Number.isInteger(sk * sc.nl / sc.n)) {   // rotirea s-a oprit: cadrul mare
       spin.lReq = sk; const im = new Image(), key = spin.key; im.onload = () => { if (spin.key === key && spin.cur === sk && spin.lReq === sk) { setFrame(spin.texL, im); spin.lOk = true; wake(); } }; im.src = spinUrl(sc, 1, sk * sc.nl / sc.n); }
     if (sk >= 0 && now - spin.at < 500) busy = true;
     const sg = sk >= 0 ? 1 : 0; if (spin.op !== sg) { spin.op += clamp(sg - spin.op, -dt * 5, dt * 7); busy = true; }
@@ -343,11 +348,12 @@ async function boot() {
     // acoperișurile și inelul auriu
     H.forEach((h, i) => {
       const kg = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0;
-      if (h.k !== kg) { h.k = rm ? kg : h.k + clamp(kg - h.k, -dt * 1.05, dt * 1.05); h.api.openRoof(h.k); G.renderer.shadowMap.needsUpdate = true; busy = true; }
+      if (h.k !== kg) { h.k = rm || roofSnap ? kg : h.k + clamp(kg - h.k, -dt * 1.05, dt * 1.05); h.api.openRoof(h.k); G.renderer.shadowMap.needsUpdate = true; busy = true; }
       const rg = i === sel ? (mode === 'in' ? .0 : .85) : i === hover ? .6 : 0;
       if (Math.abs(rg - h.ro) > .004) { h.ro += (rg - h.ro) * .14; busy = true; } else h.ro = rg;
       h.ring.material.opacity = h.ro; h.ring.visible = h.ro > .004;
     });
+    roofSnap = false;
     const sway = mode === 'all' && !rm && !drag && !extKey();
     if (busy || sway) awake = Math.max(awake, 12);
     if (awake <= 0) return; awake--;
@@ -358,7 +364,7 @@ async function boot() {
       G.scene.fog.near = 70; G.scene.fog.far = 520;
     } else {
       const dist = cur.dist; fov = clamp(2 * Math.atan(Math.max((cur.fh / 2) / dist * (Hh / freeH), (cur.fw / 2) / (dist * asp) * (W / freeW))) / DEG, 14, 84);
-      const az = (sk >= 0 ? spinAz(sc, sk) : cur.az + uaz + (sway ? Math.sin(now / 1000 * .17) * 4 : 0)) * DEG, el = clamp(cur.el + (sk >= 0 ? 0 : uel), 5, 86) * DEG;
+      const az = (sk >= 0 && sb < 0 ? spinAz(sc, sk) : cur.az + uaz + (sway ? Math.sin(now / 1000 * .17) * 4 : 0)) * DEG, el = clamp(cur.el + (sk >= 0 ? 0 : uel), 5, 86) * DEG;
       cam.position.set(cur.tx + Math.sin(az) * Math.cos(el) * dist, cur.ty + Math.sin(el) * dist, cur.tz + Math.cos(az) * Math.cos(el) * dist); cam.lookAt(cur.tx, cur.ty, cur.tz);
       G.scene.fog.near = dist * 1.25; G.scene.fog.far = dist * 1.25 + 430;
     }
@@ -372,6 +378,7 @@ async function boot() {
     if (show && pR) pano.renderFlat(pA, pOp, pR, fov, asp, offX, offY);
     else if (show) { cam.getWorldDirection(v); pano.render(pA, null, 0, pOp, pH - Math.atan2(v.x, v.z) / DEG, Math.asin(clamp(v.y, -1, 1)) / DEG, fov, asp, offX, offY); }
     if (spin.op > .004 && spin.cur >= 0 && spin.cfg) pano.renderFlat(spin.lOk ? spin.texL : spin.texS, spin.op, spin.cfg.r, fov, asp, offX, offY);
+    if (spin.op > .004 && sb >= 0 && sb === spin.curB && sm > .02 && spin.cfg) pano.renderFlat(spin.texB, spin.op * sm, spin.cfg.r, fov, asp, offX, offY);
     // etichetele caselor și ale camerelor
     pins.forEach((p, i) => { v.copy(H[i].top).project(cam); const ok = v.z < 1 && Math.abs(v.x) < 1.05 && v.y < 1.1 && v.y > -1; p.style.visibility = ok ? 'visible' : 'hidden'; if (ok) p.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; p.classList.toggle('hov', i === hover); });
     if (rooms.length && wk) { const cw = H[sel].walk.i, sh = W3.k >= 1 && blend.k >= 1; rooms.forEach(r => { v.copy(r.w).project(cam); const ok = sh && r.i !== cw && v.z < 1 && Math.abs(v.x) < .96 && Math.abs(v.y) < .9; r.el.style.opacity = ok ? '1' : '0'; r.el.style.pointerEvents = ok ? 'auto' : 'none'; if (ok) r.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; }); }
@@ -384,7 +391,7 @@ async function boot() {
   document.addEventListener('visibilitychange', () => { awake = 40; kick(); });
   addEventListener('resize', () => { needMeasure = 1; wake(); });
   sync();
-  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, views() { const o = []; [['all', -1], ...H.map((h, i) => [h.c.cod, i])].forEach(([k, i]) => [0, 1].forEach(pv => { const q = view(i < 0 ? 'all' : 'house', i, 1, pv); o.push({ k, pv, tx: +q.tx.toFixed(3), ty: +q.ty.toFixed(3), tz: +q.tz.toFixed(3), az: +q.az.toFixed(3), el: +q.el.toFixed(3), dist: +q.dist.toFixed(3), fw: +q.fw.toFixed(3), fh: +q.fh.toFixed(3) }); })); return o; }, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, mP, uaz: +uaz.toFixed(1), spin: { on: spin.on, cur: spin.cur, op: +spin.op.toFixed(2), n: spin.im.filter(Boolean).length, xf: !!xf, big: spin.lOk }, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
+  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, views() { const o = []; [['all', -1], ...H.map((h, i) => [h.c.cod, i])].forEach(([k, i]) => [0, 1].forEach(pv => { const add = (k, q) => o.push({ k, pv, tx: +q.tx.toFixed(3), ty: +q.ty.toFixed(3), tz: +q.tz.toFixed(3), az: +q.az.toFixed(3), el: +q.el.toFixed(3), dist: +q.dist.toFixed(3), fw: +q.fw.toFixed(3), fh: +q.fh.toFixed(3) }); add(k, view(i < 0 ? 'all' : 'house', i, 1, pv)); if (i >= 0) for (let l = 1; l <= (H[i].api.levels || 1); l++) add(k + '#' + l, view('in', i, l, pv)); })); return o; }, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, mP, uaz: +uaz.toFixed(1), spin: { on: spin.on, cur: spin.cur, op: +spin.op.toFixed(2), n: spin.im.filter(Boolean).length, xf: !!xf, big: spin.lOk }, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
 }
 
 /* Mai puține desene pe cadru (contează pe telefoane): piesele unei case care au același material și se mișcă împreună

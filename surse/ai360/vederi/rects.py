@@ -29,7 +29,10 @@ def need(st, vw, vh, house, cardH):
 out = {}
 for st in V:
     house = st['k'] != 'all'; U = None; rows = []
+    plan = '#' in st['k']   # vederea „Plan” (acoperișul ridicat): doar ecran lat
+    if plan and st['pv']: continue
     for (vw, vh, cards) in TARGETS:
+        if plan and vw < 900: continue
         for cardH in (cards if vw < 900 and house else [0]):
             fit, r, fov, sz = need(st, vw, vh, house, cardH)
             other = [o for o in V if o['k'] == st['k'] and o['pv'] != st['pv']][0]; fo = need(other, vw, vh, house, cardH)[0]

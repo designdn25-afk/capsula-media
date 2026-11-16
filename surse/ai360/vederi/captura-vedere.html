@@ -5,6 +5,7 @@
 // Imagine obișnuită a grădinii, făcută din locul unei vederi de pe site (vezi __gradina.views() în pagină):
 //   ?tx=&ty=&tz=&az=&el=&dist=   locul camerei (ca în js/garden.js)
 //   &x0=&x1=&y0=&y1=             cât cuprinde imaginea, în tangente față de direcția privirii (stânga, dreapta, jos, sus)
+//   &open=1:1                   (opțional) casa a doua cu acoperișul ridicat, pentru vederea „Plan”
 //   &w=2752                      lățimea imaginii în pixeli (înălțimea iese din proporție) · &t= ora
 // Folosită ca sursă pentru imaginile realiste ale vederilor din afară (surse/ai360/CITESTE.md).
 import { THREE } from './js/kit.js';
@@ -16,6 +17,7 @@ const cv = document.getElementById('c'), G = createGScene(cv, { half: 48 }), R =
 const H = [];
 for (const c of CASE) { const mod = await import('./js/' + c.mod + '.js'), api = mod.build(G.M), s = api.size, g = new THREE.Group(); g.position.set(c.x, 0, c.z); g.rotation.y = c.rot * Math.PI / 180; g.add(api.root); G.scene.add(g); g.updateMatrixWorld(true); H.push({ c, api, g, s, center: g.localToWorld(new THREE.Vector3(0, 0, s.cz || 0)) }); }
 const env = buildGarden(G, H), d = G.setTime(n('t', 10.6)); env.night(d.n);
+if (q.has('open')) { const [i, k] = q.get('open').split(':').map(Number); H[i].api.openRoof(k); }   // &open=<casa>:<nivel> ridică acoperișul (vederea „Plan”)
 const x0 = n('x0', -.6), x1 = n('x1', .6), y0 = n('y0', -.34), y1 = n('y1', .34), W = n('w', 2752), Hh = Math.round(W * (y1 - y0) / (x1 - x0));
 const a = n('az', 0) * Math.PI / 180, e = n('el', 31) * Math.PI / 180, dist = n('dist', 90), tx = n('tx', 0), ty = n('ty', 1), tz = n('tz', -5), cam = G.camera, near = .5, far = cam.far;
 R.setPixelRatio(1); R.setSize(W, Hh, false); cv.style.width = W + 'px'; cv.style.height = Hh + 'px';
