@@ -85,7 +85,7 @@ pentru cele slabe („v4”, ~2.730 de credite, la 1K costă aproape la fel, dec
 - `fixflat.py` arată câte puncte s-au potrivit cu sursa: sute = cadrul e păstrat; sub ~30 = generatorul a recompus (de verificat cu ochii).
 Refăcute așa și puse pe site: `gr_v3` (`2FFRoHGN59veEtifcMOy`), `gr_e7` (`TyBdwCZ5UTmb9HrNlYm3`), `gr_v3_p` (`y4IwjXaXIpufWuyG6NTM`; a
 schimbat terasa de lemn în piatră cu mobilier, de refăcut dacă deranjează), `gr_m9_p` (`dyOuHfp3VWI1HaifoxEv`), `gr_m9`
-(`kr7IWeN4aOjFR1osdC8y`). Au rămas doar „aproape reale”: `gr_x7_p` și `gr_t7_p` (telefon).
+(`zGGUmewWf5busm3HHgPj`, rețeta „v4”, pusă în locul variantei „v2” ca să aibă aceeași așezare ca macheta și ca rotirea ei). Au rămas doar „aproape reale”: `gr_x7_p` și `gr_t7_p` (telefon).
 
 În același flux au rămas 12 noduri mai vechi („… afara - real”, cu surse 360°): **nu se pornesc** (metoda abandonată; două au fost
 rulate ca probă și nu s-au folosit).
@@ -136,6 +136,9 @@ Clientul a văzut vederea reală a lui X7 și i-a plăcut, dar: „când miști 
   ieșit greșite (casa văzută din față, trecând treptat la traseu) și pe peretele din spate a apărut o ușă. Pe site aceste cadre sunt
   ocolite (`EVITA=0-25` la `fixspin.py`: rotirea „stă” puțin în spatele casei). **De acum rotirea pornește din locul vederii**
   (`capspin.js` face asta implicit), ca primul cadru să fie chiar imaginea de referință.
+- Clientul a văzut rotirea și a trimis alt filmuleț, de la T7 (care nu avea încă rotire reală): „când se mișcă imaginea, devine
+  înapoi pătrățos, nu rămâne la fel de 3D și real”. Am vrut să scot din filmare copacii prin care trece camera; a spus clar:
+  **„Lasă copacii.”** Deci copacii rămân în filmările rotirii, chiar dacă acoperă casa câteva grade.
 - Pe site: **X7 are rotire reală** (ecran lat): `ROTIRI.X7 = [{ zi: 'x7', n: 72, az0: 122, r: [...] }, null]`, cadrele în
   `site/img/gd/rot/x7/` (3,9 MB cele mici, 9,2 MB cele mari).
 
