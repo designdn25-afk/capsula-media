@@ -149,7 +149,8 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   fiecare mutare”, „nu se mișcă lin frumos”):** între două vederi cu imagine reală pagina trece direct de la o imagine la alta
   (fără zborul prin machetă; nici la pornire); rotirea are 192 de cadre mici (din ~2 în 2 grade) + 96 mari, se încarcă întâi
   cadrele de lângă unghiul la care te uiți și alunecă puțin după ce dai drumul. Nu readuce zborul 3D între vederi. Copia dinainte:
-  `versiuni/gradina-inainte-treceri-reale/`. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
+  `versiuni/gradina-inainte-treceri-reale/`. Al treilea filmuleț (16 nov, 14:12, „tot parcă sunt blocaje”): după ce dădea
+  drumul, rotirea sărea până la ~200° într-o clipă (alunecarea era pusă ca salt); acum alunecă cu viteza mâinii și se oprește lin. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
 - **„Plan” real (16 nov, „când apăs pe plan arată pătrățos”):** vederea „Plan” (acoperișul ridicat) are imagine reală făcută cu AI la
   **T7, E7 și M9 (etajul)**, pe ecran lat, ziua (`PLANURI` în `site/js/gradina-data.js`, fișiere `img/gd/ai/pl_*.webp`, cu mențiunea AI).
   **X7 și V3 au ieșit „machetă lustruită” și nu s-au pus** (de refăcut cu rețeta cu două referințe, ~2.730 credite fiecare); **M9

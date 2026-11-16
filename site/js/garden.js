@@ -188,7 +188,7 @@ async function boot() {
   function goTo(m, i, d = 1.7) {
     CAMK.forEach(k => { from[k] = cur[k]; }); from.az += uaz; from.el = clamp(from.el + uel, 5, 86); uaz = uel = tuaz = tuel = 0;
     const was = !walking() && !(m === 'in' && inView === 'walk') && started && tr >= 1 && time === timeGoal && !noPano ? (spin.op > .9 && spin.cur >= 0 && spin.cfg ? { tex: spin.lOk ? spin.texL : spin.texS, r: spin.cfg.r, own: 1 } : pOp > .9 && pA && pR ? { tex: pA, r: pR } : null) : null;
-    mode = m; sel = i; tr = rm ? 1 : 0; dur = d; needMeasure = 2; clearTimeout(backT); spin.on = false; wake();
+    mode = m; sel = i; tr = rm ? 1 : 0; dur = d; needMeasure = 2; clearTimeout(backT); spin.on = false; spin.vel = 0; spin.snap = null; wake();
     if (was && extKey()) {   // de la o imagine reală la alta: fără zbor prin machetă
       if (was.own) { const t = frameTex(); t.image = was.tex.image; t.needsUpdate = true; was.tex = t; }   // cadrul rotirii se păstrează separat (texturile rotirii se refolosesc)
       if (xf && xf.own) xf.tex.dispose();
@@ -273,14 +273,13 @@ async function boot() {
       const dx = e.clientX - drag.x, dy = e.clientY - drag.y; drag.x = e.clientX; drag.y = e.clientY; drag.moved += Math.abs(dx) + Math.abs(dy);
       if (drag.moved > 6) { stopAuto(); canvas.classList.add('drag'); wake();
         if (walking()) { W3.tyaw += dx * .2; if (!drag.touch) W3.tpitch = clamp(W3.tpitch + dy * .16, -40, 40); }
-        else if (spinCfg()) { tuaz -= dx * .42; tuel = 0; drag.v = (drag.v || 0) * .5 + dx * .5; drag.vt = performance.now(); if (mode === 'all') tuaz = clamp(tuaz, -80, 80); if (spin.more) spin.more(); }   // rotire realistă: doar în jur, la aceeași înălțime
+        else if (spinCfg()) { tuaz -= dx * .42; tuel = 0; { const tn = performance.now(), el = Math.max(4, tn - (drag.vt || tn - 16)); drag.v = (drag.v || 0) * .6 + (dx / el) * .4; drag.vt = tn; } spin.vel = 0; if (mode === 'all') tuaz = clamp(tuaz, -80, 80); if (spin.more) spin.more(); }   // rotire realistă: doar în jur, la aceeași înălțime
         else { tuaz -= dx * .3; if (!drag.touch) tuel += dy * .2; if (mode === 'all') tuaz = clamp(tuaz, -80, 80); tuel = clamp(tuel, 6 - to.el, 82 - to.el); } }
     } else if (fine.matches && !walking()) { const i = pick(e); if (i !== hover) { hover = i; canvas.classList.toggle('can', i >= 0 && !(mode === 'in' && i === sel)); wake(); } }
   });
   const up = e => { if (!drag || e.pointerId !== drag.id) return; const d = drag; drag = null; canvas.classList.remove('drag');
-    { const c = d.moved > 6 && !walking() ? spinCfg() : null; if (c && c.arc >= 360) {   // rotirea mai alunecă puțin după ce dai drumul și se oprește pe un cadru care are și varianta mare
-        if (d.v && performance.now() - d.vt < 90) tuaz -= clamp(d.v, -60, 60) * .42 * 9;
-        const st = 360 / c.nl; tuaz = Math.round((to.az + tuaz - c.az0) / st) * st + c.az0 - to.az; wake(); } }
+    { const c = d.moved > 6 && !walking() ? spinCfg() : null; if (c && c.arc >= 360) {   // după ce dai drumul, rotirea mai alunecă lin, din ce în ce mai încet (nu sare)
+        spin.vel = d.v && performance.now() - d.vt < 80 ? clamp(-d.v * 16.7 * .42, -9, 9) : 0; spin.snap = c; wake(); } }
     if (d.moved > 6 && !walking() && extKey() && !noPano && !spinCfg()) backT = setTimeout(() => { if (!drag && !walking()) { tuaz = tuel = 0; wake(); } }, 2600);   // după ce te-ai rotit, vederea revine la imaginea realistă
     if (e.type === 'pointerup' && d.moved < 7 && !walking()) { const i = pick(e); if (i >= 0) { if (i === sel && mode === 'house') enter(); else if (i !== sel) select(i); } } };
   canvas.addEventListener('pointerup', up); canvas.addEventListener('pointercancel', up);
@@ -311,7 +310,10 @@ async function boot() {
     let busy = false;
     if (tr < 1) { tr = Math.min(1, tr + dt / dur); const k = ease(tr); CAMK.forEach(n => { cur[n] = lerp(from[n], to[n], k); }); cur.az = from.az + ((((to.az - from.az) % 360) + 540) % 360 - 180) * k; busy = true; }
     else CAMK.forEach(n => { cur[n] = to[n]; });
-    if (Math.abs(tuaz - uaz) + Math.abs(tuel - uel) > .02) { const q = spin.on ? .24 : .16; uaz += (tuaz - uaz) * q; uel += (tuel - uel) * q; busy = true; }
+    if (!drag && spin.snap) {   // alunecarea de după tragere; la sfârșit se așază pe un cadru care are și varianta mare
+      if (Math.abs(spin.vel) > .12) { tuaz += spin.vel * dt * 60; spin.vel *= Math.pow(.93, dt * 60); busy = true; }
+      else { const c = spin.snap, st = 360 / c.nl; spin.vel = 0; spin.snap = null; tuaz = Math.round((to.az + tuaz - c.az0) / st) * st + c.az0 - to.az; busy = true; } }
+    if (Math.abs(tuaz - uaz) + Math.abs(tuel - uel) > .02) { const q = spin.on ? (drag ? .5 : .3) : .16; uaz += (tuaz - uaz) * q; uel += (tuel - uel) * q; busy = true; }
     if (Math.abs(tOffX - offX) + Math.abs(tOffY - offY) > .0008) { offX += (tOffX - offX) * .09; offY += (tOffY - offY) * .09; busy = true; }
     // ora zilei
     if (time !== timeGoal) { time += clamp(timeGoal - time, -dt * 3.4, dt * 3.4); busy = true; lastN = -2; }
