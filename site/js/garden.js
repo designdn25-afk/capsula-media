@@ -157,7 +157,7 @@ async function boot() {
 
   /* Trecerea „reală” dintre două vederi din afară: imaginea de pe ecran rămâne pe loc, camera sare direct la vederea nouă, iar
      imaginea ei apare peste cea veche (fără drumul prin macheta 3D). xf = imaginea veche, așa cum era desenată. */
-  let xf = null, lastFov = 40, roofSnap = false, glide = 0;
+  let xf = null, lastFov = 40, roofSnap = false, glide = 0, fixCls = false, spun = false;
   const GLIDE = .3;   // cât mai alunecă rotirea după ce dai drumul (constanta de timp, în secunde)
   /* Rotirea reală a unei case (ROTIRI din gradina-data.js): cadrele unei filmări care ocolește casa pe cercul vederii ei.
      Ca mișcarea să fie lină pe orice calculator și la orice viteză a netului:
@@ -203,7 +203,7 @@ async function boot() {
   function spinFeed(p) {
     const n = spin.cfg.n, ctr = Math.round(p); spin.want = wrap(ctr, n); if (spin.next) spin.next();
     if (!hasBitmap) return;
-    const big = fine.matches, fwd = big ? 30 : 16, back = big ? 12 : 8, keep = fwd + 8;
+    const big = fine.matches, fwd = big ? 24 : 12, back = big ? 10 : 5, keep = fwd + 6;   // (pe telefoane și tablete mai puține: țin mai puțină memorie)
     for (let d = 0; d <= fwd && spin.nb < 6; d++) for (let k = 0; k < 2 && spin.nb < 6; k++) {
       if (k && (!d || d > back)) continue; const i = wrap(ctr + (k ? -d : d) * spin.dir, n), im = spin.im[i];
       if (!im || spin.bm[i] || spin.busy[i]) continue;
@@ -274,7 +274,9 @@ async function boot() {
   }
 
   function sync() {
-    sec.dataset.mode = mode; if (started) hint.classList.add('off');
+    sec.dataset.mode = mode;
+    { const cue = mode === 'house' && !spun && !!spinCfg();   // prima dată când e aleasă o casă care se poate roti, i se spune vizitatorului
+      hint.textContent = cue ? 'Trage ca să rotești casa' : 'Apasă pe o casă ca să o vezi de aproape'; if (started) hint.classList.toggle('off', !cue); }
     chips.forEach(b => { const on = +b.dataset.i === sel; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); if (on && b.scrollIntoView && chipsEl.scrollWidth > chipsEl.clientWidth) chipsEl.scrollTo({ left: b.offsetLeft - chipsEl.clientWidth / 2 + b.offsetWidth / 2, behavior: rm ? 'auto' : 'smooth' }); });
     pins.forEach((p, i) => { p.classList.toggle('sm', mode === 'house'); p.classList.toggle('hide', mode === 'in' || i === sel); p.tabIndex = (mode === 'in' || i === sel) ? -1 : 0; });
     labBox.innerHTML = ''; rooms = [];
@@ -288,7 +290,7 @@ async function boot() {
     if (walk) { cRoomsT.textContent = 'Mergi în'; cRoomsV.innerHTML = w.pts.map((p, i) => `<button type="button" class="gd-rm${i === w.i ? ' on' : ''}" data-i="${i}" aria-pressed="${i === w.i}">${esc(p.n)}</button>`).join(''); }
     else if (inside) { cRoomsT.textContent = two ? (lvl === 1 ? 'La etaj' : 'La parter') : 'Camere'; cRoomsV.textContent = [...new Set(rs.map(r => r.n))].join(' · '); }
     viewBox.hidden = !inside; viewBtns.forEach(b => { const on = b.dataset.v === inView; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
-    cReal.hidden = !walk; if (walk) cReal.textContent = w.pts.some(p => p.ai) ? 'Vizualizare realizată cu AI, orientativă' : w.pts.some(p => p.k) ? 'Fotografii reale 360°, făcute în showroom' : 'Machetă 3D orientativă';
+    cReal.hidden = !walk; if (walk) cReal.textContent = w.pts.some(p => p.ai) ? 'Imagini realizate cu AI · orientative' : w.pts.some(p => p.k) ? 'Fotografii reale 360°, făcute în showroom' : 'Machetă 3D orientativă';
     sec.dataset.view = inside ? inView : '';
     lvlBox.hidden = !(inside && !walk && two); lvlBtns.forEach(b => { const on = +b.dataset.l === lvl; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
     enterBtn.textContent = inside ? 'Ieși din casă' : 'Intră în casă';
@@ -327,7 +329,7 @@ async function boot() {
       if (drag.moved > 6) { stopAuto(); wake();
         if (walking()) { canvas.classList.add('drag'); W3.tyaw += dx * .2; if (!drag.touch) W3.tpitch = clamp(W3.tpitch + dy * .16, -40, 40); }
         else if (!rotLocked()) { canvas.classList.add('drag'); const sp = spinCfg(); tuaz -= dx * (sp ? .5 : .32); glide = 0;
-          if (sp) { tuel = 0; if (dx) spin.dir = dx < 0 ? 1 : -1; if (spin.more) spin.more(); }   // rotire reală: doar în jur, la aceeași înălțime
+          if (sp) { tuel = 0; spun = true; if (dx) spin.dir = dx < 0 ? 1 : -1; if (spin.more) spin.more(); }   // rotire reală: doar în jur, la aceeași înălțime
           else { if (!drag.touch) tuel += dy * .2; if (mode === 'all') tuaz = clamp(tuaz, -80, 80); tuel = clamp(tuel, 6 - to.el, 82 - to.el); }
           const h = drag.h; h.push(performance.now(), tuaz); if (h.length > 24) h.splice(0, 2); } }
     } else if (fine.matches && !walking()) { const i = pick(e); if (i !== hover) { hover = i; canvas.classList.toggle('can', i >= 0 && !(mode === 'in' && i === sel)); wake(); } }
@@ -370,8 +372,9 @@ async function boot() {
     if (tr < 1) { tr = Math.min(1, tr + dt / dur); const k = ease(tr); CAMK.forEach(n => { cur[n] = lerp(from[n], to[n], k); }); cur.az = from.az + ((((to.az - from.az) % 360) + 540) % 360 - 180) * k; busy = true; }
     else CAMK.forEach(n => { cur[n] = to[n]; });
     // rotirea urmează mâna strâns; după ce dai drumul mai alunecă și se oprește lin (socotit în timp, nu în cadre desenate)
+    // (spre sfârșitul alunecării constanta de timp scade treptat: se așază ceva mai repede, fără să tresară)
     if (!drag && (tuaz || tuel) && rotLocked()) tuaz = tuel = 0;   // o vedere fără rotire nu rămâne întoarsă
-    { const dA = tuaz - uaz, dE = tuel - uel; if (Math.abs(dA) + Math.abs(dE) > .01) { const k = 1 - Math.exp(-dt / (drag ? .045 : glide ? GLIDE : .11)); uaz += dA * k; uel += dE * k; if (Math.abs(tuaz - uaz) < .02) uaz = tuaz; busy = true; } else if (!drag) glide = 0; }
+    { const dA = tuaz - uaz, dE = tuel - uel; if (Math.abs(dA) + Math.abs(dE) > .01) { const k = 1 - Math.exp(-dt / (drag ? .045 : glide ? clamp(.1 + .08 * Math.abs(dA), .1, GLIDE) : .11)); uaz += dA * k; uel += dE * k; if (Math.abs(tuaz - uaz) < .02) uaz = tuaz; busy = true; } else if (!drag) glide = 0; }
     if (Math.abs(tOffX - offX) + Math.abs(tOffY - offY) > .0008) { offX += (tOffX - offX) * .09; offY += (tOffY - offY) * .09; busy = true; }
     // ora zilei
     if (time !== timeGoal) { time += clamp(timeGoal - time, -dt * 3.4, dt * 3.4); busy = true; lastN = -2; }
@@ -416,6 +419,7 @@ async function boot() {
     const pg = hold ? pOp : pt && pt === pA && blend.k > .82 && time === timeGoal && !noPano ? 1 : 0;
     if (pOp !== pg) { pOp += clamp(pg - pOp, -dt * (pR && pg < pOp ? 5 : 2.4), dt * 2.4); busy = true; }
     if (xf) { busy = true; if (pOp >= 1 || now - xf.t0 > 7000 || wk) { xf.op -= dt * (pOp >= 1 ? 1e3 : 2); if (xf.op <= 0) { if (xf.own) xf.tex.dispose(); xf = null; } } }
+    { const fx = !wk && !drag && rotLocked(); if (fx !== fixCls) { fixCls = fx; canvas.classList.toggle('fix', fx); } }
     if (!warmed && pOp >= 1 && !wk) { warmed = -1; setTimeout(() => { warmed = 0; warm(); }, 1800); }
     if (aiOn !== ((pAI && pOp > .5) || spin.op > .5 || !!xf)) { aiOn = !aiOn; sec.classList.toggle('gd--ai', aiOn); }
     // acoperișurile și inelul auriu

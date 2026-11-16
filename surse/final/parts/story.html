@@ -16,6 +16,10 @@
 .st--dark .st-fveil{background:linear-gradient(90deg,rgba(7,10,20,.86) 0%,rgba(7,10,20,.64) 30%,rgba(7,10,20,0) 58%),linear-gradient(0deg,rgba(7,10,20,.5),rgba(7,10,20,0) 22%)}
 .st--film .st-gl{transition:none}
 .st--static .st-film,.st--static .st-fveil{display:none}
+/* mențiunea de pe filmarea reală (imaginile sunt făcute cu AI din macheta 3D) */
+.st-ai{position:absolute;z-index:3;left:max(16px,calc((100% - 1240px)/2));bottom:24px;margin:0;color:#fff;font:500 10px/1 var(--body);letter-spacing:.02em;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.st--ai .st-ai{opacity:.72}
+.st--static .st-ai{display:none}
 .st-veil{display:none}
 .st-copy{position:absolute;top:0;bottom:0;left:50%;width:min(1240px,100% - 32px);transform:translateX(-50%);pointer-events:none;z-index:3}
 .st-ch{position:absolute;left:0;top:50%;width:min(560px,45vw);transform:translateY(calc(-50% + 22px));opacity:0;visibility:hidden;color:var(--st-ink);transition:opacity .4s ease,transform .6s var(--ease),visibility 0s .4s,color .5s}
@@ -99,6 +103,7 @@
   <canvas class="st-film" aria-hidden="true"></canvas>
   <canvas class="st-gl" id="stGL" aria-hidden="true"></canvas>
   <div class="st-fveil" aria-hidden="true"></div>
+  <p class="st-ai" aria-hidden="true">Imagine realizată cu AI · orientativă</p>
   <div class="st-veil" aria-hidden="true"></div>
   <div class="st-labels" aria-hidden="true"></div>
   <div class="st-copy">

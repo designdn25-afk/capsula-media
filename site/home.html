@@ -21,6 +21,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Casă capsulă X7","brand":{"@type":"Brand","name":"Capsula România"},"description":"Casă capsulă 36,5 m² utili, 39 m² construiți, dormitor separat, baie completă, smart home.","image":"https://casecapsula.ro/images/real/exterior-evening.webp","offers":{"@type":"Offer","price":"39500","priceCurrency":"EUR","url":"https://casecapsula.ro/model-x7"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Capsula România","url":"https://casecapsula.ro/","telephone":"+40731166070","address":{"@type":"PostalAddress","streetAddress":"Calea București nr. 41","postalCode":"077055","addressLocality":"Ciorogârla","addressRegion":"Ilfov","addressCountry":"RO"}}</script>
 <link rel="modulepreload" href="vendor/three.module.min.js">
+<link rel="preload" as="image" href="img/st/film/f_0000.webp" media="(min-width:900px) and (min-aspect-ratio:3/2)">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -910,6 +911,10 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .st--dark .st-fveil{background:linear-gradient(90deg,rgba(7,10,20,.86) 0%,rgba(7,10,20,.64) 30%,rgba(7,10,20,0) 58%),linear-gradient(0deg,rgba(7,10,20,.5),rgba(7,10,20,0) 22%)}
 .st--film .st-gl{transition:none}
 .st--static .st-film,.st--static .st-fveil{display:none}
+/* mențiunea de pe filmarea reală (imaginile sunt făcute cu AI din macheta 3D) */
+.st-ai{position:absolute;z-index:3;left:max(16px,calc((100% - 1240px)/2));bottom:24px;margin:0;color:#fff;font:500 10px/1 var(--body);letter-spacing:.02em;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.st--ai .st-ai{opacity:.72}
+.st--static .st-ai{display:none}
 .st-veil{display:none}
 .st-copy{position:absolute;top:0;bottom:0;left:50%;width:min(1240px,100% - 32px);transform:translateX(-50%);pointer-events:none;z-index:3}
 .st-ch{position:absolute;left:0;top:50%;width:min(560px,45vw);transform:translateY(calc(-50% + 22px));opacity:0;visibility:hidden;color:var(--st-ink);transition:opacity .4s ease,transform .6s var(--ease),visibility 0s .4s,color .5s}
@@ -1282,7 +1287,7 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .gd-stage{position:relative;width:min(1640px,100% - 32px);margin-inline:auto;height:clamp(480px,84svh,880px);border-radius:28px;overflow:hidden;background:linear-gradient(#dfe8ee,#d5e4c4 46%,#b9d39a);isolation:isolate;box-shadow:var(--shadow);outline:0}
 .gd-gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab;opacity:0;transition:opacity .9s}
 .gd--live .gd-gl{opacity:1}
-.gd-gl.can{cursor:pointer}.gd-gl.drag{cursor:grabbing}
+.gd-gl.fix{cursor:default}.gd-gl.can{cursor:pointer}.gd-gl.drag{cursor:grabbing}
 .gd-pins,.gd-labels{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
 .gd-pin{position:absolute;left:0;top:0;translate:-50% calc(-100% - 14px);display:flex;align-items:baseline;gap:7px;padding:8px 14px;border:0;border-radius:999px;background:rgba(255,255,255,.95);color:var(--ink);font:600 11.5px/1 var(--body);letter-spacing:.03em;white-space:nowrap;cursor:pointer;pointer-events:auto;box-shadow:0 10px 26px rgba(15,20,30,.2);opacity:0;transition:opacity .4s,background .25s,color .25s,scale .25s;will-change:transform}
 .gd--live .gd-pin{opacity:1}
@@ -1350,8 +1355,9 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .gd[data-view="walk"] .gd-gl{cursor:grab}
 .gd-look{position:absolute;z-index:3;left:50%;top:18px;translate:-50% 0;margin:0;padding:9px 16px;border-radius:999px;background:rgba(14,18,28,.62);color:#fff;font:500 12.5px/1 var(--body);white-space:nowrap;pointer-events:none;opacity:0;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
 .gd[data-view="walk"] .gd-look{animation:gdLook 6.5s 1.2s both}
-.gd-ai{position:absolute;z-index:3;right:16px;bottom:78px;margin:0;padding:7px 12px;border-radius:999px;background:rgba(14,18,28,.5);color:#fff;font:500 11.5px/1 var(--body);white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s;-webkit-backdrop-filter:blur(8px);backdrop-filter:blur(8px)}
-.gd--ai .gd-ai{opacity:1}
+/* mențiunea de pe imaginile făcute cu AI: mică și discretă (cerința clientului, 16 nov 2026), dar rămâne pe imagine */
+.gd-ai{position:absolute;z-index:3;right:16px;bottom:74px;margin:0;color:#fff;font:500 10px/1 var(--body);letter-spacing:.02em;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s;text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.gd--ai .gd-ai{opacity:.72}
 @keyframes gdLook{0%{opacity:0}10%,80%{opacity:1}100%{opacity:0}}
 .gd-c-btns{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
 .gd-c-btns .btn{padding:13px 20px}
@@ -1391,7 +1397,7 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
   .gd-c-real{margin-top:6px;font-size:11.5px}
   .gd-c-lvl,.gd-c-view{margin-top:10px}.gd-c-view button{padding:7px 13px}
   .gd-look{top:auto;bottom:74px;font-size:11.5px;max-width:calc(100% - 24px);white-space:normal;text-align:center;display:none}
-  .gd-ai{right:auto;left:12px;bottom:calc(var(--gd-ch,0px) + 76px);padding:6px 10px;font-size:10.5px}
+  .gd-ai{right:auto;left:12px;bottom:calc(var(--gd-ch,0px) + 74px);font-size:9.5px}
   .gd[data-mode="in"] .gd-c-specs>div:not(.gd-c-rooms){display:none}
   .gd[data-mode="in"] .gd-c-real{display:none}
   .gd[data-view="walk"] .gd-c-rooms dd{margin-top:2px}
@@ -1456,6 +1462,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <canvas class="st-film" aria-hidden="true"></canvas>
   <canvas class="st-gl" id="stGL" aria-hidden="true"></canvas>
   <div class="st-fveil" aria-hidden="true"></div>
+  <p class="st-ai" aria-hidden="true">Imagine realizată cu AI · orientativă</p>
   <div class="st-veil" aria-hidden="true"></div>
   <div class="st-labels" aria-hidden="true"></div>
   <div class="st-copy">
@@ -1663,9 +1670,9 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
     <canvas class="gd-gl" aria-hidden="true"></canvas>
     <div class="gd-pins"></div>
     <div class="gd-labels" aria-hidden="true"></div>
-    <p class="gd-hint">Apasă pe o casă · apoi trage ca să o rotești</p>
+    <p class="gd-hint">Apasă pe o casă ca să o vezi de aproape</p>
     <p class="gd-look" aria-hidden="true">Trage ca să te uiți în jur · apasă pe o cameră ca să mergi acolo</p>
-    <p class="gd-ai" aria-hidden="true">Vizualizare realizată cu AI, orientativă</p>
+    <p class="gd-ai" aria-hidden="true">Imagine realizată cu AI · orientativă</p>
     <div class="gd-tools">
       <div class="gd-dn" role="group" aria-label="Ora din zi"><button type="button" data-t="zi" class="on" aria-pressed="true">Zi</button><button type="button" data-t="seara" aria-pressed="false">Seară</button></div>
       <button type="button" class="gd-tour" aria-pressed="false" aria-label="Tur ghidat prin toate casele"><svg class="i-play" viewBox="0 0 12 12" aria-hidden="true"><path d="M2 .8v10.4L11 6z"/></svg><svg class="i-stop" viewBox="0 0 12 12" aria-hidden="true"><path d="M1.5 1.5h9v9h-9z"/></svg><span>Tur ghidat</span></button>

@@ -1,26 +1,51 @@
-# python3 fixpoveste.py <filmare.mp4> <bucata k> [invers] [--prim <imagine mare a primului cadru>]
-# Scoate din filmarea „reală” a unei bucăți din povestea de la deschidere cadrele pentru site: câte unul din două (96 din 192),
-# 1280 px lățime, în site/img/st/film/f_<k*96 + j>.webp (numerotare continuă, ca în js/story.js).
-#   invers        filmarea a fost făcută de la coadă la cap (ultima bucată: pornește de la imaginea de noapte) și se întoarce aici
-#   --prim x.png  primul cadru al bucății se ia dintr-o imagine mare (imaginea de referință, mai clară decât filmarea), 2560 px;
-#                 imaginea e potrivită întâi peste primul cadru al filmării (vezi fixflat.py), ca trecerea să nu tresară
+# Cadrele pentru site ale filmării „reale” a poveștii de la deschidere (site/img/st/film/f_0000.webp …), din filmările
+# transformate cu Runway Aleph (vezi CITESTE.md, partea a patra). Numerotarea e continuă și trebuie să se potrivească cu
+# FILM.T din site/js/story.js:
+#
+#   python3 fixpoveste.py 0 <aleph-0.mp4> --prim <imaginea reală a primului cadru>        → f_0000 … f_0095  (dimineața)
+#   python3 fixpoveste.py 1 <aleph-1.mp4> --prim <imaginea reală a capătului vitrat>      → f_0096 … f_0191  (acoperișul se ridică)
+#   python3 fixpoveste.py 2 <aleph-2.mp4> --prim <imaginea reală de sus> --seara <aleph-3r.mp4> --ultim <imaginea reală de seară>
+#                                                                                          → f_0192 … f_0384  (de sus → seara)
+#
+# Bucățile 0 și 1: câte un cadru din două (96 din 192), 1280 px. Primul cadru al fiecărei bucăți se ia din imaginea mare de
+# referință (mai clară decât filmarea), potrivită peste primul cadru al filmării (fixflat.py), la 1920 px.
+# Bucata 2 e făcută din două filmări: din aleph-2 (coborârea de sus) se folosesc doar primele 36 de cadre (până la cadrul 72 al
+# filmării; după aceea generatorul n-a mai pus acoperișul la loc), apoi imaginea se topește, pe 25 de cadre, în filmarea de seară.
+# Filmarea de seară (aleph-3r) a fost făcută de la coadă la cap (pornește de la imaginea de noapte, ca generatorul să aibă
+# referința bună) și se întoarce aici; toate cele 192 de cadre ale ei se întind pe 156 de locuri, iar ultimul loc (f_0384) e
+# imaginea mare de seară.
 import sys, os, glob, subprocess, tempfile, shutil
 from PIL import Image
-a = sys.argv[1:]; src = a[0]; k = int(a[1]); inv = 'invers' in a; prim = a[a.index('--prim') + 1] if '--prim' in a else None
-out = os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..', '..', 'site', 'img', 'st', 'film'); os.makedirs(out, exist_ok=True)
-tmp = tempfile.mkdtemp(); subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', src, '-qscale:v', '2', os.path.join(tmp, 'f_%05d.jpg')], check=True)
-fr = sorted(glob.glob(os.path.join(tmp, 'f_*.jpg'))); F = len(fr); assert F >= 190, F
-if inv: fr.reverse()
-tot = 0
-for j in range(96):
-    im = Image.open(fr[min(F - 1, j * 2)]).convert('RGB'); f = os.path.join(out, 'f_%04d.webp' % (k * 96 + j))
-    if j == 0 and prim:
-        ref = os.path.join(tmp, 'ref0.jpg'); im.save(ref, quality=95); al = os.path.join(tmp, 'prim.webp')
-        subprocess.run([sys.executable, os.path.join(os.path.dirname(os.path.abspath(__file__)), 'fixflat.py'), ref, prim, al, '2560'], check=True)
-        im = Image.open(al).convert('RGB'); im.save(f, 'WEBP', quality=84, method=5)
-    else:
-        if im.size[0] > 1280: im = im.resize((1280, round(im.size[1] * 1280 / im.size[0])), Image.LANCZOS)
-        im.save(f, 'WEBP', quality=74, method=5)
-    tot += os.path.getsize(f)
-print('bucata %d: 96 cadre din %d%s · %.1f MB · %s' % (k, F, ' (întoarse)' if inv else '', tot / 1e6, os.path.normpath(out)))
+a = sys.argv[1:]; k = int(a[0]); src = a[1]
+opt = lambda n: a[a.index(n) + 1] if n in a else None
+prim, seara, ultim = opt('--prim'), opt('--seara'), opt('--ultim')
+here = os.path.dirname(os.path.abspath(__file__)); out = os.path.normpath(os.path.join(here, '..', '..', '..', 'site', 'img', 'st', 'film')); os.makedirs(out, exist_ok=True)
+tmp = tempfile.mkdtemp(); tot = [0, 0]
+def cadre(video, nume):
+    d = os.path.join(tmp, nume); os.makedirs(d); subprocess.run(['ffmpeg', '-v', 'error', '-y', '-i', video, '-qscale:v', '2', os.path.join(d, 'f_%05d.jpg')], check=True)
+    fr = sorted(glob.glob(os.path.join(d, 'f_*.jpg'))); assert len(fr) >= 190, len(fr); return fr
+def mic(im): return im if im.size[0] <= 1280 else im.resize((1280, round(im.size[1] * 1280 / im.size[0])), Image.LANCZOS)
+def scrie(i, im, q=74): f = os.path.join(out, 'f_%04d.webp' % i); im.save(f, 'WEBP', quality=q, method=5); tot[0] += 1; tot[1] += os.path.getsize(f)
+def mare(i, cadru, imagine):   # imaginea mare, potrivită peste cadrul filmării, la 1920 px
+    ref = os.path.join(tmp, 'ref.jpg'); Image.open(cadru).convert('RGB').save(ref, quality=95); al = os.path.join(tmp, 'mare.webp')
+    subprocess.run([sys.executable, os.path.join(here, 'fixflat.py'), ref, imagine, al, '1920'], check=True); scrie(i, Image.open(al).convert('RGB'), 84)
+fr = cadre(src, 'a'); F = len(fr); desc = lambda j: mic(Image.open(fr[min(F - 1, j * 2)]).convert('RGB'))
+if k < 2:
+    for j in range(96):
+        if j == 0 and prim: mare(k * 96, fr[0], prim)
+        else: scrie(k * 96 + j, desc(j))
+else:
+    assert seara, 'bucata 2 are nevoie de --seara <filmarea de seară, făcută de la coadă la cap>'
+    ev = cadre(seara, 'b'); ev.reverse(); E = len(ev)   # în ordinea poveștii: de la apus spre noapte
+    N0, NB, NS = 36, 25, 156                             # cadre din coborâre · cadre de topire · locuri pentru seară
+    for j in range(N0):
+        if j == 0 and prim: mare(192, fr[0], prim)
+        else: scrie(192 + j, desc(j))
+    for s in range(NS):
+        im = mic(Image.open(ev[min(E - 1, round(s * (E - 1) / (NS - 1)))]).convert('RGB'))
+        if s < NB: t = (s + 1) / (NB + 1); t = t * t * (3 - 2 * t); d = desc(N0 + s); im = Image.blend(d if d.size == im.size else d.resize(im.size, Image.LANCZOS), im, t)
+        scrie(192 + N0 + s, im)
+    if ultim: mare(192 + N0 + NS, ev[E - 1], ultim)
+    else: scrie(192 + N0 + NS, mic(Image.open(ev[E - 1]).convert('RGB')))
+print('bucata %d: %d cadre · %.1f MB · %s' % (k, tot[0], tot[1] / 1e6, out))
 shutil.rmtree(tmp)
