@@ -198,3 +198,6 @@ a real-life architectural cutaway model at full scale… do not put the roof bac
 Reușite: T7 `Xjy2htRyjjQ4ON447P3N`, E7 `K3gqnB6xn4njOTnkffQO`, M9 etaj `Zz5SUguBVAxxLrx5th2q` (casa a rămas puțin „desenată”).
 Nereușite (aproape neschimbate, nefolosite): X7 `fa4nSEYMFzgqegjZnMpJ`, V3 `QL2dAnC7yskQhKt0hWg9` — de refăcut cu a doua referință
 (planul reușit al lui T7, nodul de mai sus) ca țintă de calitate. M9 parter: sursa e atașată (`9ql03ssygXQf8zohvVjG`), fără nod.
+Pregătite, nepornite (lipsă credite, 16 nov; ~2.730 fiecare, cu planul lui T7 ca a doua referință): X7 `kg8PiQbTdcwBLXHcvLOV`,
+V3 `7MuJ0gpikxOq36BXpWuL`, M9 parter `39EutmhAJq0eaWONwb3k`. Rotirea V3: `50qiw4TNoMphOWRT69Ck` (13.573). Clientul a spus apoi
+„vreau să faci totul real și lin” (inclusiv deschiderea site-ului): se pornesc cum apar credite.
