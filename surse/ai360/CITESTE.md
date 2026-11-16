@@ -201,3 +201,53 @@ Nereușite (aproape neschimbate, nefolosite): X7 `fa4nSEYMFzgqegjZnMpJ`, V3 `QL2
 Pregătite, nepornite (lipsă credite, 16 nov; ~2.730 fiecare, cu planul lui T7 ca a doua referință): X7 `kg8PiQbTdcwBLXHcvLOV`,
 V3 `7MuJ0gpikxOq36BXpWuL`, M9 parter `39EutmhAJq0eaWONwb3k`. Rotirea V3: `50qiw4TNoMphOWRT69Ck` (13.573). Clientul a spus apoi
 „vreau să faci totul real și lin” (inclusiv deschiderea site-ului): se pornesc cum apar credite.
+
+# Partea a patra: deschiderea site-ului ca filmare reală (16 nov 2026)
+
+Clientul: „și la început aici tot așa arată pătrățos și pe exterior și pe interior… vreau să faci totul real și lin”. Povestea 3D de
+la deschidere (drumul camerei din `site/js/story.js`) a fost filmată în grădina realistă, în jurul capsulei X7 de acolo, apoi
+transformată în filmare reală. Pe site se arată cadru cu cadru, după derulare (`FILM` în `story.js`).
+
+## Unelte (în `vederi/`)
+- `captura-poveste.html` (se copiază în `site/_t_story.html`) — desenează cadrul pentru derularea `p`, cu aceeași cameră ca povestea pe
+  ecran lat 16:9. **Cheile camerei sunt copiate din `story.js`**: dacă se schimbă acolo, se schimbă și aici (și filmările se refac).
+- `cappoveste.js <bucată 0…3> [cadre=192]` — filmează o bucată (de la o cheie la următoarea: derularea .03 → .205 → .38 → .55 → .715);
+  `FROM=<cadru>` reia o filmare întreruptă; `proba` scoate câte un cadru din fiecare cheie. ~5–13 s pe cadru pe mașina de lucru
+  (două deodată merg de două ori mai încet; un job în fundal e oprit după limita lui de timp: se reia cu `FROM`).
+- `fixpoveste.py` — scrie cadrele pentru site (`site/img/st/film/f_0000…f_0384.webp`, 1280 px; primul cadru al fiecărei bucăți e
+  imaginea-cheie mare, la 1920 px). Comenzile sunt în capul fișierului.
+
+## Rețeta care a mers
+1. **Imaginea-cheie reală a primului cadru** al fiecărei bucăți (Nano Banana Pro, 4K, 16:9, două referințe: cadrul 3D + o imagine
+   reală ca țintă de calitate; ~2.730 de credite). Fără ea, Aleph nu are de la ce porni.
+2. **Runway Aleph 2** pe filmarea 3D a bucății (8 s, 192 de cadre, 13.573 de credite), cu imaginea-cheie ca `image`.
+   **Cererea are cel mult 1000 de caractere** (una mai lungă eșuează imediat). Cererile folosite sunt în nodurile din flux.
+3. Aleph pornește mereu de la imaginea de referință, deci **primul cadru al filmării trebuie să fie chiar imaginea-cheie**. Pentru
+   bucata de seară, imaginea bună era la sfârșit (noaptea), așa că filmarea 3D a fost **întoarsă** (`ffmpeg -vf reverse`), dată lui
+   Aleph cu imaginea de noapte, iar rezultatul se întoarce la loc în `fixpoveste.py`.
+4. Ce face bine Aleph: ridicarea acoperișului (bucata 1), lumina, grădina. Ce nu face: **nu pune acoperișul la loc** (bucata 2: l-a
+   lăsat ridicat, cu un „bazin” pe casă). De aceea din bucata 2 se folosesc doar primele 72 de cadre, apoi imaginea se topește în
+   filmarea de seară. Dacă se reface: filmarea 3D a bucății 2 întoarsă (`pov-2r.mp4`, urcată deja o dată) + o imagine-cheie reală a
+   cadrului de la apus (`pov_key3`, sursa atașată: `LFb21IJwy2LQ6iLtxDcd`), adică încă ~16.300 de credite.
+5. Imaginea de sus (cheia 2): generatorul **schimbă camerele între ele** (a pus un pat în living). A mers abia cu cererea în care
+   prima imagine „stabilește camera, casa, camerele și mobila”, iar a doua (varianta reală, dar greșită) e „doar pentru calitate”,
+   plus lista camerelor: dreapta = living (canapea verde, masă rotundă, bucătărie verde), mijloc = baie, stânga = birou alb și două
+   fotolii negre, „fără pat”. (Așa e macheta X7: `site/js/x7.js`.)
+
+## Nodurile (fluxul `yUzMp1srSOsKx9pUwTk2`)
+| ce | nod |
+|---|---|
+| imaginea-cheie 0 (dimineața, 06:55) | `FAOofmBXrpEUX7DQqkER` (sursa 3D `vPsa07OvkzQr5dhrIu6j`) |
+| imaginea-cheie 1 (capătul vitrat, 09:10) | `m5zfkLsjaT8pEaUeM7fv` (sursa `tEC66Y9BA9oHckmFiw8u`) |
+| imaginea-cheie 2 (de sus, fără acoperiș, 12:30) | `7x16psjqNMTBArmi4oyc` (sursa `qLW4ZLlKKZRaIGJJyeGR`; variantele nereușite: nodul `AysXncVcI1oeqb0Mxl1t`) |
+| imaginea-cheie 4 (seara, „felinar”, 21:10) | `SdxeLOou3HPGZUvR9XDt` (sursa `5lFWHA6Z31HwZXErumqw`, ținta de calitate: fotografia reală de seară `TCkiNzWLveIef2RwU4bw`) |
+| filmarea 0 (dimineața) | `rh6cuuTclCxBFNRJbQlO` (3D: `oC5Ba8s93Bwyc4CW6OFv`) |
+| filmarea 1 (acoperișul se ridică) | `7O7YzJ73KWXyjn3FRnh7` (3D: `3TJEsDbw919TBeigdvh5`) |
+| filmarea 2 (de sus → jos; bune doar primele 72 de cadre) | `oyFw4hKhZZAZaGXUkpFX` (3D: `1uoUDTV1vWnRvImxXGbr`) |
+| filmarea 3 (seara, făcută întoarsă) | `ezCxdIJSf3XLGNLLYPM9` (3D întors: `XtAsKW58Vbi9gloBpO6k`) |
+
+Filmările descărcate nu sunt în git (sunt mari); se iau din nou din ElevenLabs (istoricul generărilor) dacă trebuie refăcute cadrele.
+
+## Credite pe 16 nov, după a doua încărcare (clientul a pus ~20–30 $)
+Planurile X7, V3, M9 parter 8.181 · rotirea V3 13.573 · deschiderea: 6 imagini-cheie (două refăcute) 16.362 + 4 filmări 54.292.
+În total ≈ 92.400. Soldul nu se poate citi din conector.

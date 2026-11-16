@@ -302,3 +302,32 @@ Clientul: „vreau să-mi faci toată grădina să arate așa” (vederea reală
 - Credite ElevenLabs folosite în ziua aceea: ~65.500 (11 imagini ≈ 25.000; refaceri și probe de imagini ≈ 18.800; filmarea nereușită
   8.144; filmarea reușită 13.573).
 
+
+
+## 18. Fără machetă: filmarea de la deschidere, treceri și rotire (16 noiembrie 2026)
+
+Cerința clientului: „nu mai vreau deloc să mai apară alea pătrățoase”. Macheta 3D rămâne în spate (pentru etichete, apăsat pe case,
+desenul pe straturi), dar pe ecran e mereu o imagine reală.
+
+**Deschiderea (`js/story.js`, `FILM`)**: cadrele `img/st/film/f_0000…f_0384.webp` se arată după derulare. `FILM.T` = bucățile
+(primul cadru, câte cadre, derularea primului cadru, pasul, dacă se topește în următoarea). Primele trei bucăți merg pe drumul
+camerei 3D (de aceea etichetele camerelor cad la locul lor: cât se vede doar filmarea, camera 3D primește proiecția filmării,
+`fcam`); a patra (seara) are pasul ei și se termină la derularea .78; între .80 și .87 filmarea se stinge peste desenul pe straturi.
+Cadrele se cer doar din jurul locului curent, sunt despachetate în afara firului principal (`createImageBitmap`) și pe ecran se
+trece doar prin cadre gata făcute. Ecran lat (raport ≥ 3:2): filmarea umple ecranul, un voal alb / închis în stânga ține textul
+lizibil. Ecran îngust (aceeași regulă ca în CSS: ≤ 800 px sau ≤ 1100 px și mai înalt decât lat): bandă sus, tăiată în jurul
+capsulei (`FILM.cx`), cu marginea de jos stinsă (mască CSS, `--fa` / `--fb`), fundal alb ziua și bleumarin seara. Ceasul arată
+ora filmării (`FILM.time`), textul devine deschis de la `FILM.dark`.
+
+**Grădina (`js/garden.js`)**:
+- `keep()` / `settle()` / `xf`: imaginea de pe ecran (poză, cadru de rotire sau fotografie 360°) rămâne până când imaginea vederii
+  noi e gata, apoi se topește în ea. Folosit la alegerea unei case, intrare, ieșire, „Plan”, nivel, cameră → cameră, zi ↔ seară.
+- `rotLocked()`: vederile cu imagine fixă nu se rotesc la tragere. `spin*`: rotirea prin cadre (vezi comentariul din cod).
+- desen: `G.render()` (macheta) se cheamă doar când nu e o imagine reală întreagă pe ecran; `pano.renderBack` umple marginile.
+- pornire: `gd--live` se pune abia când prima imagine reală e pe pânză (sau după 9 s).
+- „Zi / Seară” (`dnBox`) e ascuns în afară de interiorul caselor cu fotografii de seară (X7).
+- planul folosește mereu locul „lat” al camerei când există imagine (`pvNow`).
+
+**Teste** (în scratchpad-ul sesiunii, de refăcut la nevoie după aceleași idei): `gwalk.js` (drumul casă → înăuntru → cameră → plan →
+afară, numără cadrele în care nu e nicio imagine reală pe ecran: trebuie 0), `gsmooth.js` (rotire pe net încet: fără machetă, fără
+pași înapoi), `glock.js` (vederile fixe rămân pe loc), `story.js` (capturi ale deschiderii la derulări date).

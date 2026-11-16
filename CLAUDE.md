@@ -28,6 +28,22 @@ povestea de la deschidere și grădina cu case model. Detaliile tehnice și isto
   că nu-mi place cum arată, să fie mult mai interactiv, să fie frumos ochiului”. Varianta dinainte (doar capsula seara,
   `img/x7s_night.webp`, cerută pe 22 oct) e salvată în `versiuni/inainte-v3-3d/`. Variantele și mai vechi V1 / V2 sunt în
   `versiuni/inainte-site-final/` și `versiuni/home-inainte-v2-3d/`.
+- **„Nu mai vreau deloc să mai apară alea pătrățoase” (clientul, 16 nov 2026, de mai multe ori, cu filmulețe):** macheta 3D **nu
+  se mai arată niciodată** acolo unde există imagine reală. Reguli care decurg de aici (nu le strica):
+  - Deschiderea se vede ca **filmare reală** (cadre făcute cu AI din drumul camerei 3D, `site/img/st/film/`, arătate cadru cu cadru la
+    derulare): pe ecran lat umple ecranul, pe ecran îngust e o bandă sus cu textul dedesubt. Macheta rămâne doar la ultimul capitol
+    („Fiecare strat, gândit”, desenul pe straturi) și pe ferestrele mici aproape pătrate cu textul în stânga (lățime > 800 px și
+    raport sub 3:2).
+  - În grădină: între două vederi se trece direct de la o imagine la alta (`keep` / `xf` în `js/garden.js`), inclusiv la intrarea
+    în casă, între camere și la „Plan”; vederile care au doar imagine fixă (toată grădina, planul, casele pe ecran îngust) **nu se
+    mai rotesc** la tragere; casele cu filmare de rotire se rotesc doar prin cadre reale; la încărcare, scena apare abia când
+    imaginea reală e gata; unde poza nu ajunge până la marginea ecranului, pe lângă ea e tot ea, ștearsă (nu macheta).
+  - **„Zi / Seară” e ascuns** peste tot, în afară de interiorul lui X7 (acolo există fotografii reale de seară). Revine în grădină
+    când se fac imaginile de seară (12 noduri pregătite, ~2.730 de credite fiecare). Nu-l readuce cu macheta de noapte.
+  - Mențiunea de pe imaginile făcute cu AI e **mică și discretă** („Imagine realizată cu AI · orientativă”, text mic într-un colț):
+    clientul a întrebat dacă se poate scoate („putem scoate vizualizare”); i s-a explicat că imaginile nu sunt fotografii și că
+    trebuie marcate (reclamă înșelătoare / regulile europene despre AI), deci a rămas, dar discretă. **Nu o scoate de tot** și nu
+    scoate nota de sub grădină; dacă insistă, trimite-l la avocatul / contabilul lui.
 - **Titlurile mari sunt cu serife** (Cormorant Garamond, cuvântul auriu în italic), ca în filmulețul de referință. Logo-ul și
   etichetele mici rămân în Unbounded / Manrope.
 - **Grădina cu case model (secțiunea 04, din 14 nov 2026)**: o grădină 3D în care apeși pe o casă, intri în ea (acoperișul se
@@ -109,8 +125,8 @@ cu planul 3D) → caracteristici → 02 Exterior (ocolul capsulei, carusel 3D + 
   (se actualizează din această sesiune Claude Code, cu același fișier `site/home.html`).
   Are limită de 511 fișiere: cadrele rotirilor T7/E7/M9 nu încap, deci acolo doar X7 se rotește „real” (nu urca acolo
   `js/gradina-data.js` cu rotirile noi; acolo X7 a rămas cu 72 de cadre). Linkul public le are pe toate.
-  Din 16 nov (seara) previzualizarea privată a rămas în urmă: nu are „Plan” real și nici rotirea nouă (noul `js/garden.js` cere
-  `PLANURI` din `gradina-data.js`, deci cele două fișiere se urcă doar împreună, cu rotirile scoase din date). Clientul se uită pe linkul public.
+  Din 16 nov previzualizarea privată **a rămas în urmă** (nu are planurile reale, rotirea nouă, filmarea de la deschidere: cadrele
+  nu încap în limita de fișiere). Clientul se uită pe linkul public, într-o fereastră de Chrome, uneori îngustă.
 - Linkurile publice vechi („oricine are linkul”), cu variantele dinainte: V2 https://claude.ai/artifact/XA6dNq77wKbmrcDCdum9Sm ·
   V1 https://claude.ai/artifact/Fj56xUcscpsXGz7k8tMrcV (neschimbate; de actualizat doar după aprobarea clientului).
 
@@ -139,28 +155,34 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   „Vizualizare realizată cu AI, orientativă” (**nu o scoate**). Dacă se mută o casă, se schimbă grădina sau locul camerei, imaginile
   trebuie refăcute. Rețeta care dă fotografie adevărată (nu machetă „lustruită”) și nodurile: `surse/ai360/CITESTE.md`, partea a doua.
 - **Rotire reală** (cerut pe 15 nov cu filmuleț: „când miști capsula 360 tot așa apare pătrățos”): la rotire pagina arată cadrele
-  unei filmări reale în locul machetei (`ROTIRI`). **Gata la X7, T7, E7 și M9** (ecran lat), făcută cu Runway Aleph 2 din rotirea
-  machetei (~13.600 de credite pe casă; proba cu Kling O3 n-a transformat nimic). E mai moale decât imaginea fixă; la X7 „stă” puțin
-  în spatele casei (filmarea ei pornea din spate; celelalte pornesc din locul vederii și sunt bune de la primul cadru).
-  **V3 nu are încă rotire reală**: filmarea 3D și nodul sunt pregătite (`50qiw4TNoMphOWRT69Ck`), dar pe 16 nov au rămas 12.317 credite
-  și trebuie 13.573. **Telefonul (vederea înaltă), toată grădina și seara nu au rotire reală** (se vede macheta). Clientul a cerut
-  „Lasă copacii”: copacii rămân în filmări, nu se ascund.
-  **Mișcare lină și treceri reale (16 nov, după două filmulețe: „la început arată că e pătrățos, după aia devine real… și așa la
-  fiecare mutare”, „nu se mișcă lin frumos”):** între două vederi cu imagine reală pagina trece direct de la o imagine la alta
-  (fără zborul prin machetă; nici la pornire); rotirea are 192 de cadre mici (din ~2 în 2 grade) + 96 mari, se încarcă întâi
-  cadrele de lângă unghiul la care te uiți și alunecă puțin după ce dai drumul. Nu readuce zborul 3D între vederi. Copia dinainte:
-  `versiuni/gradina-inainte-treceri-reale/`. Al treilea filmuleț (16 nov, 14:12, „tot parcă sunt blocaje”): după ce dădea
-  drumul, rotirea sărea până la ~200° într-o clipă (alunecarea era pusă ca salt); acum alunecă cu viteza mâinii și se oprește lin. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
-- **„Plan” real (16 nov, „când apăs pe plan arată pătrățos”):** vederea „Plan” (acoperișul ridicat) are imagine reală făcută cu AI la
-  **T7, E7 și M9 (etajul)**, pe ecran lat, ziua (`PLANURI` în `site/js/gradina-data.js`, fișiere `img/gd/ai/pl_*.webp`, cu mențiunea AI).
-  **X7 și V3 au ieșit „machetă lustruită” și nu s-au pus** (de refăcut cu rețeta cu două referințe, ~2.730 credite fiecare); **M9
-  parterul** nu s-a făcut. Creditele ElevenLabs s-au terminat pe 16 nov (au rămas ~950). Rotirea are acum și amestec între cadre vecine.
-- **Deschiderea site-ului „reală” (cerut pe 16 nov, cu captură: „și la început aici tot așa arată pătrățos și pe exterior și pe
-  interior… trebuie să schimbăm să arate frumos și real”):** NEFĂCUT. Trebuie filmarea 3D a poveștii transformată cu Runway Aleph
-  (câte ~13.600 credite pe 8 secunde; povestea are 5–6 capitole) și arătată cadru cu cadru la derulare, ca rotirile. De stabilit cu
-  clientul câte credite pune și dacă partea „desfăcută pe straturi” rămâne desen (AI-ul nu o redă corect).
-- **Seara** în grădină e încă machetă 3D: sursele și cele 12 noduri sunt pregătite în ElevenLabs (~2.730 de credite fiecare), nepornite.
-  Conectorul Higgsfield din Claude **nu poate genera** (doar citește contul).
+  unei filmări reale (`ROTIRI`). **Gata la toate cele cinci case** (ecran lat), făcută cu Runway Aleph 2 din rotirea machetei
+  (~13.600 de credite pe casă). 192 de cadre mici + 96 mari pe casă. Rotirea a fost rescrisă pe 16 nov (după trei filmulețe: „nu
+  merge lin”, „tot parcă sunt blocaje”): cadrele se cer de lângă unghiul curent, sunt despachetate din timp în afara firului
+  principal, pe ecran se trece doar prin cadre gata făcute (dacă netul nu ține pasul, rotirea așteaptă la ultimul cadru, nu sare
+  și nu arată macheta), mișcarea se socotește în timp, iar după ce dai drumul alunecă puțin. La X7 „stă” puțin în spatele casei
+  (filmarea ei pornea din spate). La V3 apare „V3” scris pe perete în câteva cadre. **Pe ecran îngust (vederea înaltă), la toată
+  grădina și la plan nu există filmare**: acolo imaginea rămâne pe loc. Clientul a cerut „Lasă copacii”: copacii rămân în filmări.
+  Copii: `versiuni/gradina-inainte-treceri-reale/`, `versiuni/gradina-inainte-rotire-noua/`, `versiuni/gradina-inainte-fara-macheta/`.
+  Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
+- **„Plan” real**: toate casele au planul ca imagine reală (`PLANURI`: X7, T7, E7, V3, M9 etaj + parter), folosit pe orice ecran
+  (pe ecran îngust se folosește tot imaginea „lată”). La X7 și la M9 parter casa a rămas puțin „desenată”.
+- **Deschiderea reală** (cerută pe 16 nov: „și la început aici tot așa arată pătrățos… vreau să faci totul real și lin”): **făcută**.
+  Patru filmări Aleph (dimineața, ridicarea acoperișului, de sus → seara, seara) + cinci imagini-cheie. Între prânz și seară imaginea
+  se topește dintr-o filmare în alta (generatorul n-a mai pus acoperișul la loc în a treia filmare). Cum s-a făcut și cum se reface:
+  `surse/ai360/CITESTE.md`, partea a patra. Imaginile de rezervă (`img/st/ch*.webp`, mișcare redusă) sunt încă machetă.
+- **Seara** în grădină: nu există imagini reale de seară, deci butonul „Zi / Seară” e ascuns (vezi „Decizii”). 12 noduri pregătite
+  în ElevenLabs (~2.730 de credite fiecare), nepornite. Conectorul Higgsfield din Claude **nu poate genera** (doar citește contul).
+- **Casa T6 (prima casă comandată de client, 2 bucăți)**: pe 16 nov clientul a trimis proforma furnizorului, un filmuleț și cinci
+  poze de la târg și a cerut: „după aia bagă-ne ca 3D și capsula asta… că ți-am dat tot”. De făcut modelul `site/js/h_t6.js` și de
+  pus în grădină ca a șasea casă (a zis „și”, nu „în loc de”), apoi imaginile reale (2 vederi + plan + rotire + interior ≈ 28.000
+  de credite; se refac și cele două imagini cu toată grădina). Date (din proformă, fără cele sensibile): „Tiny House T6”, casă
+  care se extinde: la transport 5,85 × 2,27 × 2,55 m, desfăcută 5,85 × 4,17 × 2,55 m, ~24 m² (21,4 m² în interior), 5,2 t, 10 kW;
+  o cameră cu living + chicinetă (în modulul din față, cel fix), baie 1,95 × 1,57 m și dormitor (în partea din spate, care se
+  extinde, mai îngustă: 5,45 m); fațada: perete plin 1,4 m (în spatele lui e chicineta), ușă de oțel 0,86 m (se deschide în afară,
+  spre stânga), apoi 3,26 m de sticlă; fereastră pe capătul din dreapta al dormitorului. Structură din oțel galvanizat, pereți din
+  panouri metalice cu spumă PU, **geam triplu** (comandat ca opțiune), ușă cu cheie / cod / cartelă. La târg era **gri**, cu colțuri
+  rotunjite; în poza din proformă e neagră cu lemn: de întrebat clientul ce culoare a comandat. **Prețul de vânzare nu se știe**
+  (în proformă e prețul de achiziție: nu se pune pe site și nu se urcă în git, la fel datele personale și pozele cu oameni de la târg).
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle
   camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare.
 - **Interior real în fiecare casă**: singurul mod ca interiorul să arate „pe bune” e cu fotografii 360° făcute în casa

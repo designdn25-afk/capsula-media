@@ -49,12 +49,15 @@ void main(){vec3 d=look((vUv*2.-1.)-off*2.);vec2 uv=vec2(.5+atan(d.x,-d.z)/6.283
   /* Imagine obișnuită (o „fotografie” făcută din locul în care stă camera, privind în aceeași direcție), așezată exact peste scena 3D:
      r = [stânga, dreapta, jos, sus] = cât cuprinde ea, în tangente față de direcția privirii. fov, asp, offX, offY = camera de acum.
      Unde imaginea nu ajunge (ecran mai lat sau mai înalt decât ea), se stinge lin și rămâne scena 3D de dedesubt. */
-  const UF = { tA: { value: null }, fy: { value: 1 }, op: { value: 0 }, th: { value: 1 }, asp: { value: 1 }, off: { value: new THREE.Vector2() }, c: { value: new THREE.Vector2() }, hf: { value: new THREE.Vector2(1, 1) } };
+  const UF = { tA: { value: null }, fy: { value: 1 }, back: { value: 0 }, op: { value: 0 }, th: { value: 1 }, asp: { value: 1 }, off: { value: new THREE.Vector2() }, c: { value: new THREE.Vector2() }, hf: { value: new THREE.Vector2(1, 1) } };
   const matF = new THREE.ShaderMaterial({ uniforms: UF, transparent: true, depthTest: false, depthWrite: false, toneMapped: false,
     vertexShader: 'varying vec2 vUv;void main(){vUv=uv;gl_Position=vec4(position.xy,0.,1.);}',
-    fragmentShader: `uniform sampler2D tA;uniform float op,th,asp,fy;uniform vec2 off,c,hf;varying vec2 vUv;
+    fragmentShader: `uniform sampler2D tA;uniform float op,th,asp,fy,back;uniform vec2 off,c,hf;varying vec2 vUv;
 void main(){vec2 nd=(vUv*2.-1.)-off*2.;vec2 q=(vec2(nd.x*th*asp,nd.y*th)-c)/hf;vec2 e=smoothstep(vec2(1.),vec2(.94),abs(q));
- gl_FragColor=vec4(texture2D(tA,vec2(q.x*.5+.5,.5+q.y*.5*fy)).rgb,op*e.x*e.y);
+ if(back>.5){if(abs(q.x)<.93&&abs(q.y)<.93)discard;vec2 b=clamp(q,-.86,.86),u0=vec2(b.x*.5+.5,.5+b.y*.5*fy);vec3 s=vec3(0.);
+  for(int i=0;i<24;i++){float a=float(i)*2.399963,r=sqrt((float(i)+.5)/24.)*.085;s+=texture2D(tA,clamp(u0+vec2(cos(a),sin(a))*r,.015,.985),4.).rgb;}
+  gl_FragColor=vec4(s/24.,op);}
+ else gl_FragColor=vec4(texture2D(tA,vec2(q.x*.5+.5,.5+q.y*.5*fy)).rgb,op*e.x*e.y);
  #include <colorspace_fragment>
 }` });
   const quadF = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), matF); quadF.frustumCulled = false; const sceneF = new THREE.Scene(); sceneF.add(quadF);
@@ -63,8 +66,11 @@ void main(){vec2 nd=(vUv*2.-1.)-off*2.;vec2 q=(vec2(nd.x*th*asp,nd.y*th)-c)/hf;v
     UF.c.value.set((r[0] + r[1]) / 2, (r[2] + r[3]) / 2); UF.hf.value.set((r[1] - r[0]) / 2, (r[3] - r[2]) / 2);
     const ac = renderer.autoClear; renderer.autoClear = false; renderer.render(sceneF, cam); renderer.autoClear = ac;
   }
+  // fundal pentru locurile unde poza nu ajunge (ecran mai înalt sau mai lat decât ea): marginea ei, foarte ștearsă (media a 24 de
+  // puncte dintr-un disc larg), continuată lin până la marginea ecranului. Așa nu se vede niciodată macheta 3D pe lângă poză.
+  function renderBack(tex, opacity, r, fov, asp, offX, offY) { UF.back.value = 1; renderFlat(tex, opacity, r, fov, asp, offX, offY); UF.back.value = 0; }
   // imaginea acoperă tot ecranul? (atunci scena 3D de dedesubt nu mai trebuie desenată)
   const covers = (r, fov, asp, offX, offY) => { const th = Math.tan(fov * Math.PI / 360), cx = (r[0] + r[1]) / 2, cy = (r[2] + r[3]) / 2, hx = (r[1] - r[0]) / 2 * .94, hy = (r[3] - r[2]) / 2 * .94;
     return (-1 - 2 * offX) * th * asp >= cx - hx && (1 - 2 * offX) * th * asp <= cx + hx && (-1 + 2 * offY) * th >= cy - hy && (1 + 2 * offY) * th <= cy + hy; };
-  return { load, ready, render, renderFlat, covers };
+  return { load, ready, render, renderFlat, renderBack, covers };
 }

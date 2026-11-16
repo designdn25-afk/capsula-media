@@ -20,6 +20,14 @@
 .st-ai{position:absolute;z-index:3;left:max(16px,calc((100% - 1240px)/2));bottom:24px;margin:0;color:#fff;font:500 10px/1 var(--body);letter-spacing:.02em;white-space:nowrap;pointer-events:none;opacity:0;transition:opacity .4s;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .st--ai .st-ai{opacity:.72}
 .st--static .st-ai{display:none}
+/* filmarea pe ecran îngust (telefon, panou): o bandă sus, a cărei margine de jos se stinge în fundal; textul stă dedesubt */
+.st--fn .st-film{-webkit-mask-image:linear-gradient(to bottom,#000 var(--fa,40%),transparent var(--fb,60%));mask-image:linear-gradient(to bottom,#000 var(--fa,40%),transparent var(--fb,60%))}
+.st--fn .st-fveil{background:linear-gradient(to bottom,rgba(255,255,255,.72),rgba(255,255,255,0) 128px)}
+.st--fn.st--dark .st-fveil{background:linear-gradient(to bottom,rgba(7,10,20,.62),rgba(7,10,20,0) 128px)}
+.st--fn .st-clock{text-shadow:0 0 14px rgba(255,255,255,.85),0 0 4px rgba(255,255,255,.7)}
+.st--fn.st--dark .st-clock{text-shadow:0 0 14px rgba(7,10,20,.85),0 0 4px rgba(7,10,20,.7)}
+.st--fn .st-ai{top:64px;bottom:auto;left:16px}
+.st--fn .st-lab.room{font-size:9px;padding:5px 8px;letter-spacing:.1em;margin:-11px 0 0 -30px}
 .st-veil{display:none}
 .st-copy{position:absolute;top:0;bottom:0;left:50%;width:min(1240px,100% - 32px);transform:translateX(-50%);pointer-events:none;z-index:3}
 .st-ch{position:absolute;left:0;top:50%;width:min(560px,45vw);transform:translateY(calc(-50% + 22px));opacity:0;visibility:hidden;color:var(--st-ink);transition:opacity .4s ease,transform .6s var(--ease),visibility 0s .4s,color .5s}
