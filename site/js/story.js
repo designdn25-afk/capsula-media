@@ -46,6 +46,35 @@ function boot() {
     return cur;
   }
 
+  /* Filmarea reală a poveștii (ecran lat): cadrele unei filmări făcute din același drum al camerei, în grădina din Ciorogârla,
+     transformate în imagine reală (surse/ai360/CITESTE.md). Se arată cadru cu cadru, după derulare, în locul machetei 3D, până
+     la seară; partea „desfăcută pe straturi” rămâne desenată. FILM.seg = câte bucăți sunt gata (0 = fără filmare). */
+  const FILM = { dir: 'img/st/film/', seg: 0, n: 96, src: 192, K: [.03, .205, .38, .55, .715], out: .06, pos: .62 };
+  const fcv = $('.st-film'), fveil = $('.st-fveil'), film = { state: FILM.seg && fcv ? 'wait' : 'off', P: [], im: [], want: 0, a: -1, b: -1, t: -1, w: 0, h: 0, end: 0 };
+  if (film.state !== 'off') {
+    for (let k = 0; k < FILM.seg; k++) for (let j = 0; j < FILM.n; j++) film.P.push(FILM.K[k] + (FILM.K[k + 1] - FILM.K[k]) * (j * 2 / (FILM.src - 1)));
+    film.end = FILM.K[FILM.seg]; film.im = new Array(film.P.length).fill(null);
+    const req = new Uint8Array(film.P.length), rare = [0]; for (let i = 8; i < film.P.length; i += 16) rare.push(i); let act = 0;
+    const take = () => { if (rare.length) return rare.shift(); const N = film.P.length; for (let d = 0; d < N; d++) { const a = film.want + d, b = film.want - d; if (a < N && !req[a]) return a; if (b >= 0 && !req[b]) return b; } return -1; };
+    const next = () => { while (act < 6) { const i = take(); if (i < 0) return; if (req[i]) continue; req[i] = 1; act++; const im = new Image(); im.decoding = 'async';
+      const done = ok => { act--; if (ok) { film.im[i] = im; if (i === 0 && film.state === 'wait') film.state = 'on'; film.t = -1; kick(); } next(); };
+      im.onload = () => { if (im.decode) im.decode().then(() => done(1), () => done(1)); else done(1); }; im.onerror = () => done(0);
+      im.src = FILM.dir + 'f_' + String(i).padStart(4, '0') + '.webp'; } };
+    film.next = next; next(); setTimeout(() => { if (film.state === 'wait') { film.state = 'off'; kick(); } }, 6000);
+  }
+  // cadrul (și vecinul lui) pentru derularea p; desenează doar când se schimbă ceva
+  function drawFilm(p, W, H, x0, y0, iw, ih) {
+    const P = film.P, N = P.length; let lo = 0, hi = N - 1; if (p <= P[0]) hi = 0; else if (p >= P[N - 1]) lo = N - 1; else while (hi - lo > 1) { const m = (lo + hi) >> 1; if (P[m] <= p) lo = m; else hi = m; }
+    if (hi < lo) hi = lo; let t = hi > lo ? (p - P[lo]) / (P[hi] - P[lo]) : 0; film.want = lo; if (film.next) film.next();
+    let a = lo, b = hi; if (!film.im[a] || !film.im[b]) { let best = -1; for (let d = 0; d < N && best < 0; d++) { if (film.im[lo + d]) best = lo + d; else if (film.im[lo - d]) best = lo - d; } if (best < 0) return false; a = b = best; t = 0; }
+    t = Math.round(t * 50) / 50; const dpr = Math.min(1.5, devicePixelRatio || 1), cw = Math.round(W * dpr), ch = Math.round(H * dpr);
+    if (a === film.a && b === film.b && t === film.t && cw === film.w && ch === film.h) return true;
+    if (fcv.width !== cw || fcv.height !== ch) { fcv.width = cw; fcv.height = ch; }
+    const g = fcv.getContext('2d'); g.globalAlpha = 1; g.drawImage(film.im[a], x0 * dpr, y0 * dpr, iw * dpr, ih * dpr);
+    if (b !== a && t > .01) { g.globalAlpha = t; g.drawImage(film.im[b], x0 * dpr, y0 * dpr, iw * dpr, ih * dpr); }
+    film.a = a; film.b = b; film.t = t; film.w = cw; film.h = ch; return true;
+  }
+
   /* etichete așezate pe model */
   const mk = (cls, html) => { const e = document.createElement('div'); e.className = 'st-lab ' + cls; e.innerHTML = html; labBox.appendChild(e); return e; };
   const ROOMS = [['Living', 4.3, 1.0, .35], ['Bucătărie', 1.6, 1.7, -1.15], ['Baie', -.4, 2.0, -.7], ['Dormitor', -3.9, 1.0, 0]].map(r => ({ el: mk('room', r[0]), v: new THREE.Vector3(r[1], r[2], r[3]) }));
@@ -71,16 +100,24 @@ function boot() {
     if (S.fit(pin, innerWidth < 800 ? 1.75 : 2, px) || !W) { W = pin.clientWidth; H = pin.clientHeight; }
     // derularea e urmărită lin (la fel de lin la orice număr de cadre pe secundă), ca rotița mouse-ului să nu dea mișcări în trepte
     const p = progress(); ps = ps < 0 ? p : ps + (p - ps) * (1 - Math.exp(-dt * 3.6)); if (Math.abs(p - ps) < .0003) ps = p;
-    const asp = W / H, m = clamp((1.25 - asp) / .5), c = sample(ps, m);
+    const asp = W / H, real = film.state !== 'off' && asp >= 1.5, m = real ? 0 : clamp((1.25 - asp) / .5), c = sample(ps, m);
+    let fk = real ? 1 - clamp((ps - film.end) / FILM.out) : 0;   // cât se vede filmarea reală (1 = doar ea)
     mx += (tmx - mx) * .05; my += (tmy - my) * .05;
     const idle = (now - t0) / 1000, fov = lerp(30, 42, m), tn = Math.tan(fov * Math.PI / 360);
-    const dist = Math.max((c.fh / 2) / tn, (c.fw / 2) / (tn * asp));
-    S.camera.fov = fov; S.camera.setViewOffset(W, H, -c.ox * W, -c.oy * H, W, H);
-    orbit(S.camera, { az: c.az + Math.sin(idle * .22) * 1.1 + mx * 2.4 + c.bp * Math.sin(idle * .16) * 10, el: clamp(c.el - my * 1.3, 2, 88), dist, tx: c.tx, ty: c.ty, tz: 0 });
+    const dist = Math.max((c.fh / 2) / tn, (c.fw / 2) / (tn * (real ? 16 / 9 : asp)));
+    S.camera.fov = fov;
+    if (real) {   // aceeași cameră ca la filmare (16:9), decupată ca imaginea să umple ecranul: etichetele și trecerea la desen se potrivesc
+      const sc = Math.max(W / 16, H / 9), iw = 16 * sc, ih = 9 * sc, x0 = (W - iw) * FILM.pos, y0 = (H - ih) * .5;
+      S.camera.aspect = 16 / 9; S.camera.setViewOffset(iw, ih, -x0 - c.ox * iw, -y0 - c.oy * ih, W, H);
+      if (fk > 0 && film.state === 'on' && !drawFilm(ps, W, H, x0, y0, iw, ih)) fk = fk;
+    } else { S.camera.aspect = asp; S.camera.setViewOffset(W, H, -c.ox * W, -c.oy * H, W, H); }
+    if (real !== film.cls) { film.cls = real; sec.classList.toggle('st--film', real); }
+    const fo = fk.toFixed(2); if (fo !== film.op) { film.op = fo; if (fcv) fcv.style.opacity = film.state === 'on' ? fo : '0'; if (fveil) fveil.style.opacity = fo; canvas.style.opacity = real ? (1 - fk).toFixed(2) : ''; }
+    const fr3 = 1 - fk; orbit(S.camera, { az: c.az + (Math.sin(idle * .22) * 1.1 + mx * 2.4) * fr3 + c.bp * Math.sin(idle * .16) * 10, el: clamp(c.el - my * 1.3 * fr3, 2, 88), dist, tx: c.tx, ty: c.ty, tz: 0 });
     const d = S.setTime(c.t); S.x7.openRoof(c.roof); S.setBlueprint(c.bp); S.x7.explode(c.ex);
     // umbra: doar când s-a mutat soarele sau s-a mișcat capsula, și cel mult o dată la două cadre
     if ((fr & 1) && (Math.abs(c.t - shT) > .03 || Math.abs(c.roof - shR) > .01 || Math.abs(c.ex - shE) > .004 || Math.abs(c.bp - shB) > .02)) { shT = c.t; shR = c.roof; shE = c.ex; shB = c.bp; S.shadow(); }
-    S.render();
+    if (fk < 1) S.render();
     // fundalul paginii, culoarea textului, bara de sus
     const ca = d.top.getHexString(), cb = d.bot.getHexString(); if (ca !== bgA) { bgA = ca; pin.style.setProperty('--st-top', '#' + ca); } if (cb !== bgB) { bgB = cb; pin.style.setProperty('--st-bot', '#' + cb); }
     const dark = d.n > .5; if (dark !== lastDark) { lastDark = dark; sec.classList.toggle('st--dark', dark); window.__skyDark = dark; if (window.navU) window.navU(); }
