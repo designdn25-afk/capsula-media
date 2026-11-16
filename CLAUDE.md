@@ -109,6 +109,8 @@ cu planul 3D) → caracteristici → 02 Exterior (ocolul capsulei, carusel 3D + 
   (se actualizează din această sesiune Claude Code, cu același fișier `site/home.html`).
   Are limită de 511 fișiere: cadrele rotirilor T7/E7/M9 nu încap, deci acolo doar X7 se rotește „real” (nu urca acolo
   `js/gradina-data.js` cu rotirile noi; acolo X7 a rămas cu 72 de cadre). Linkul public le are pe toate.
+  Din 16 nov (seara) previzualizarea privată a rămas în urmă: nu are „Plan” real și nici rotirea nouă (noul `js/garden.js` cere
+  `PLANURI` din `gradina-data.js`, deci cele două fișiere se urcă doar împreună, cu rotirile scoase din date). Clientul se uită pe linkul public.
 - Linkurile publice vechi („oricine are linkul”), cu variantele dinainte: V2 https://claude.ai/artifact/XA6dNq77wKbmrcDCdum9Sm ·
   V1 https://claude.ai/artifact/Fj56xUcscpsXGz7k8tMrcV (neschimbate; de actualizat doar după aprobarea clientului).
 
