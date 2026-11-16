@@ -71,12 +71,21 @@ reală a lui X7). **Toate cele 12 vederi de zi sunt făcute și puse pe site** (
 | gr_m9 | 39TOwIYaJJlZL3XmmPjp | 16:9 |
 | gr_m9_p | WAU18cayCsL06NKzyqWO | 4:5 |
 
-**Ce s-a învățat la generare:** cu aceeași cerere, generatorul scoate uneori o fotografie adevărată (X7, grădina de sus, T7, E7 pe
-telefon), alteori doar o machetă „lustruită” (iarbă și copaci ca în 3D). Pentru cele slabe se face un nod nou care primește **două
-imagini**: sursa (machetă) și **imaginea reală a lui X7** ca model de aspect (~2.730 de credite). Cererea trebuie să spună apăsat că
-**așezarea vine doar din prima imagine** (fiecare hală, copac, strat de flori, lampă la locul lui), iar din a doua se ia doar felul
-în care arată iarba, frunzișul, piatra, cerul; altfel generatorul copiază și împrejurimile din poza lui X7 (așa a pățit prima
-încercare la M9). `fixflat.py` arată câte puncte s-au potrivit: sub ~50 de potriviri înseamnă că împrejurimile au fost schimbate.
+**Ce s-a învățat la generare (16 nov 2026):** cu cererea „păstrează totul exact, pixel cu pixel”, generatorul scoate uneori o
+fotografie adevărată (X7, grădina de sus, T7), alteori doar o machetă „lustruită” (iarbă și copaci ca în 3D). Rețeta care a mers
+pentru cele slabe („v4”, ~2.730 de credite, la 1K costă aproape la fel, deci se face direct la 4K):
+- nodul primește **două imagini**: sursa (macheta) și **imaginea reală a lui X7** (`Rga4CczKuD3XXHyWSCbR`) ca țintă de calitate;
+- cererea spune ce **rămâne exact** (camera, casele, platformele de piatră, aleile de dale, lămpile, conturul gardului viu și al
+  straturilor, locul halelor) și ce se **re-fotografiază liber** (gazonul: „real mown turf with mowing stripes”; frunzișul copacilor,
+  florile, pereții halelor, cerul, câmpia în loc de dealuri); „nu adăuga straturi, lămpi, alei care nu sunt în prima imagine”;
+  „a doua imagine e doar ținta de calitate, nu copia casa, așezarea sau obiectele ei”.
+- Dacă se cere prea strict („nu schimba nimic”), rămâne aspectul de machetă (E7 „v3”); dacă se lasă prea liber („potrivește gazonul,
+  halele, cerul din a doua imagine”), copiază împrejurimile din poza lui X7 (M9 „v2”, păstrată totuși pe site: arată bine și în
+  cadrul ei nu se vede altă casă).
+- `fixflat.py` arată câte puncte s-au potrivit cu sursa: sute = cadrul e păstrat; sub ~30 = generatorul a recompus (de verificat cu ochii).
+Refăcute așa și puse pe site: `gr_v3` (`2FFRoHGN59veEtifcMOy`), `gr_e7` (`TyBdwCZ5UTmb9HrNlYm3`), `gr_v3_p` (`y4IwjXaXIpufWuyG6NTM`; a
+schimbat terasa de lemn în piatră cu mobilier, de refăcut dacă deranjează), `gr_m9_p` (`dyOuHfp3VWI1HaifoxEv`), `gr_m9`
+(`kr7IWeN4aOjFR1osdC8y`). Au rămas doar „aproape reale”: `gr_x7_p` și `gr_t7_p` (telefon).
 
 În același flux au rămas 12 noduri mai vechi („… afara - real”, cu surse 360°): **nu se pornesc** (metoda abandonată; două au fost
 rulate ca probă și nu s-au folosit).
