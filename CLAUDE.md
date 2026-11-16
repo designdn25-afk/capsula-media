@@ -107,6 +107,8 @@ cu planul 3D) → caracteristici → 02 Exterior (ocolul capsulei, carusel 3D + 
   Nu scoate `noindex` fără acordul lui.
 - **Site-ul final (prima pagină nouă), previzualizare privată:** https://claude.ai/artifact/9KFViWSHxSHJm3UR87sfr9
   (se actualizează din această sesiune Claude Code, cu același fișier `site/home.html`).
+  Are limită de 511 fișiere: cadrele rotirilor T7/E7/M9 nu încap, deci acolo doar X7 se rotește „real” (nu urca acolo
+  `js/gradina-data.js` cu rotirile noi). Linkul public le are pe toate.
 - Linkurile publice vechi („oricine are linkul”), cu variantele dinainte: V2 https://claude.ai/artifact/XA6dNq77wKbmrcDCdum9Sm ·
   V1 https://claude.ai/artifact/Fj56xUcscpsXGz7k8tMrcV (neschimbate; de actualizat doar după aprobarea clientului).
 
