@@ -375,3 +375,41 @@ fh: 84 }`; camera e cu ~13% mai departe pe ecran lat, la fel de departe pe telef
 **De știut.** Rotirile caselor vechi nu arată T6 și partea nouă în fundal (au fost filmate înainte). Locul din stânga al părții noi
 (−15,5 · 40) e liber, cu un strat de flori (`GRADINA.straturiNoi`).
 
+
+## 20. Mișcare lină: filmarea de la deschidere și rotirea caselor (17 noiembrie 2026)
+
+Clientul: „când deschizi site-ul, când ai de sus în jos… îmi place tot cum arată casa, dar numai că nu se mișcă lent deloc. Și chiar
+și în grădina cu case, tot așa, unele case nu se mișcă lent deloc” („lent” = lin). Ce s-a găsit și ce s-a schimbat:
+
+**Deschiderea** (`site/js/story.js`, obiectul `FILM` și `drawFilm`).
+- Filmarea folosea un cadru din două: o treaptă a rotiței sărea ~10 cadre și se vedea sacadat. Acum sunt **toate cadrele**: 648
+  (`site/img/st/film/f_0000.webp … f_0647.webp`, 41 MB; se refac cu `surse/ai360/vederi/fixpoveste.py`, comenzile sunt în capul lui).
+  `FILM.T` spune ce bucăți are filmarea: [primul cadru, câte cadre, de unde începe în poveste, cât ține un cadru, …].
+- Derularea era urmărită cu o netezire simplă, care dădea o smucitură la fiecare treaptă a rotiței. Acum e un **arc amortizat**
+  (`FOLLOW = .34` s): viteza crește și scade lin.
+- Imaginea **urmărește mereu derularea**: dacă exact cadrul cerut nu e încă încărcat, se arată cel mai apropiat care e (înainte
+  aștepta cadrele unul după altul). Ca să existe mereu ceva aproape, din toată filmarea se țin copii mici („schița”, un cadru din
+  6–8, lățime 320–480 px), încărcate primele, de la rare la dese. Cadrele mari se despachetează în jurul locului spre care merge
+  derularea și se eliberează cele rămase departe. Două cadre vecine se amestecă doar dacă sunt aproape; la oprire rămâne un singur
+  cadru, clar. Pe telefoane se încarcă un cadru din două (`SKIP = 2`), ca să nu coste date.
+- Când filmarea acoperă tot ecranul, macheta 3D de dedesubt nu se mai calculează (acoperiș, straturi, umbre).
+- Măsurat cu `tools`-ul de probă din sesiune (derulare cu rotița, 100 px la 110 ms): imaginea rămâne la cel mult un cadru de
+  locul cerut la 20 Mbps și fără limită; la 8 Mbps, pe ecran îngust, cel mult 5 cadre pentru o clipă.
+
+**Rotirea caselor** (`site/js/garden.js`, `spinPrep`, `spinFeed`, bucla de desen).
+- Înainte, rotirea aștepta cadrele unul după altul („dacă netul nu ține pasul, rotirea așteaptă la ultimul cadru”) și le cerea abia
+  după ce alegeai casa: pe o legătură obișnuită prima mișcare venea după 2–5 secunde și părea blocată. Acum poziția arătată e mereu
+  cea a mâinii (`spin.pos = q`), iar pe ecran e cel mai apropiat cadru gata (căutat până la 64 de cadre în ambele părți); două
+  cadre se amestecă doar dacă sunt vecine și mișcarea e înceată.
+- „Schița” rotirii: copii mici (`SPW = 512` px) ale unui cadru din `SPK = 4`, ținute în memorie cât e aleasă casa. Ordinea
+  cererilor: cadrele de lângă unghiul curent → schița din 16 în 16, din 8 în 8, din 4 în 4 → restul.
+- `warmSpin()` (doar pe calculator, nu la „economisire date”): după ce grădina a apărut, aduce în memoria navigatorului, pentru
+  fiecare casă, cadrele din jurul vederii ei și un cadru din opt. La 6 Mbps prima mișcare vine acum în 0,2–2 s.
+- **„Golul” lui X7.** Filmarea lui X7 nu are imagini bune pe ~50° în spatele casei (cadrele 191 → 26 erau copii ale celor două
+  capete), deci acolo rotirea părea înțepenită, apoi sărea. Acum, în `ROTIRI.X7`, `gol: [191, 26]` spune unde e porțiunea, iar
+  pagina: nu mai cere copiile; trece prin gol de ~7 ori mai repede decât trage mâna (`GOLW = 4` cadre de tras, `spinDrag`), restul
+  turului mergând cu 12% mai încet, ca un tur complet să rămână 360° de tras; pe ecran un capăt se topește în celălalt; la oprire
+  nu rămâne niciodată în mijlocul golului. Se scoate (`gol`) când se reface filmarea lui X7.
+- Verificări (în folderul de lucru al sesiunii, nu în proiect): rotire completă trasă încet la X7 în ambele sensuri (macheta nu
+  se vede, golul ține ~15 px de tras), rotire la 6 și 20 Mbps (fără pași înapoi), vederile fără rotire rămân pe loc, trecerile
+  dintre vederi, mersul prin case.

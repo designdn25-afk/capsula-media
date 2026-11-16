@@ -80,3 +80,17 @@ Scrie planșele într-un folder al tău din scratchpad (de ex. `…/scratchpad/v
 - **Model care nu e în catalogul paginii**: datele lui se pun în rândul din `CASE` (`date: { s, sn, d, a, l, t, p }`).
 - După model urmează imaginile reale (vederi, plan, camere, rotire): `surse/ai360/CITESTE.md`, partea a cincea.
 
+## De ținut minte (din casa C20, 17 nov 2026)
+- **Planul din ofertă bate presupunerile.** La o casă din module, pereții dinăuntru nu stau neapărat la îmbinarea modulelor (la
+  C20 peretele dormitoarelor e cu 0,5 m în interiorul miezului, iar dormitoarele nu sunt egale). Mărește planul din ofertă (de 8 ori,
+  cu contrast), măsoară-l în pixeli față de dimensiunile de pe margine și verifică pe cadre din filmuleț scoase la rezoluția întreagă
+  (`ffmpeg -ss <secunda> -i film.mp4 -frames:v 1`): ce se vede prin geam din afară și unde se termină pereții spune mai mult decât
+  o planșă mică cu multe cadre.
+- **Pardoseală de altă culoare** (material local, nu `M.floor`): pagina nu mai găsește podeaua după material, deci își ia înălțimea
+  ei din punctul camerei: pune `y = pardoseala + 1,1` la toate camerele din `rooms`.
+- **Baie îngustă** (sub 1,4 m): ca să existe loc de stat, lavoarul se face suspendat (`position.y = .1`, `scale.y = .9`: razele de
+  la 0,35 m și 1,15 m trec pe sub el și pe sub oglindă), vasul de toaletă se scurtează (`scale.z = .8`), iar punctul băii se pune
+  la 0,5 m de pereți, în colțul liber.
+- **Casa nu intră în grădină fără imaginile ei reale** (altfel s-ar vedea macheta): până atunci rândul ei stă într-un script
+  (`surse/ai360/c20/pune_c20.py`: o pune pentru capturi, `--scoate` o scoate înainte de publicare).
+

@@ -150,7 +150,7 @@ export function build(M) {
   put(F.wallBox(M, .07, 1.6, WH), -.7, -.6); put(F.wallBox(M, .07, 1.6, WH), .9, -.6); put(F.wallBox(M, 1.67, .07, WH), .1, .2);   // baia
   // living: canapea la capătul din stânga, măsuță, covor, masă rotundă cu două scaune
   put(F.rug(M, 1.9, 1.5), -4.05, 0); put(F.sofa(M, 1.8), -4.72, 0, Math.PI / 2); put(F.coffee(M, .3), -3.85, .05);
-  put(F.tableRound(M, .38), -3.0, -.82); put(F.chair(M), -3.0, -.2, Math.PI); put(F.chair(M), -2.42, -.82, -Math.PI / 2);
+  put(F.tableRound(M, .38), -3.0, -.82); put(F.chair(M), -3.0, -.2, Math.PI); put(F.chair(M), -3.58, -.82, Math.PI / 2);   // al doilea scaun stă spre canapea (înainte intra în colțul bucătăriei)
   // bucătărie mică pe peretele din spate
   put(F.kitchen(M, 1.6, true), -1.62, -1.09);
   // baia: duș, WC, lavoar

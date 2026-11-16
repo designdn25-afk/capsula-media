@@ -85,7 +85,7 @@ site/                    tot ce se publică
   js/                    scenele 3D (module): kit.js (unelte comune), x7.js (modelul capsulei), stage.js + story.js (deschiderea),
                          gscene.js + genv.js + real.js + garden.js + gradina-data.js (grădina), pano.js (fotografii reale 360°
                          în interiorul caselor și imaginile realiste ale vederilor din afară), furn.js (mobilier, terase), h_<casă>.js (câte o casă:
-                         x7, t7, e7, v3, m9, t6)
+                         x7, t7, e7, v3, m9, t6; h_c20.js e casa nouă, pregătită, încă nepusă în grădină)
   vendor/                three.js 0.170 ținut local (nu se încarcă nimic de pe alte site-uri)
   img/                   imaginile; img/ext (exterior), img/int (interior), img/vid (clipuri .mp4 + postere .webp),
                          img/st și img/gd (imaginile de rezervă pentru deschidere și grădină, când 3D-ul nu poate porni)
@@ -153,6 +153,23 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
 - TikTok: @multimester. X7: 36,5 m² utili, 39 m² construiți, 11,5 × 3,4 m, h 3,45 m, 39.500 € cu TVA, rate prin TBI Bank.
 - PDF-uri: https://casecapsula.ro/docs/oferta-capsula-x7-v2.pdf și https://casecapsula.ro/docs/prezentare-tehnica-x7.pdf
 
+## Cerut pe 17 noiembrie 2026 (în lucru; ElevenLabs a rămas fără credite: 606)
+Clientul a trimis patru lucruri. Ce costă credite e **pregătit, nepornit**; i s-a spus că trebuie ≈ 60.000 de credite (≈ 11 $),
+plus ≈ 13.600 dacă vrea și rotirea lui X7 refăcută. Nodurile și pașii: `surse/ai360/CITESTE.md`, partea a șasea.
+- **„Nu se mișcă lent deloc”** (deschiderea și rotirea caselor): **făcut și publicat** (vezi mai jos „Mișcarea de la deschidere” și „Rotire reală”).
+- **„Aici scaunul este intrat în bucătărie”** (E7, living): scaunul a fost mutat în model (`site/js/h_e7.js`), dar imaginile camerelor
+  (living, bucătărie) sunt încă cele vechi: se refac cu cele două noduri pregătite (≈ 4.550 de credite). În planul lui E7 scaunul nu apare.
+- **„Aici aș vrea să arate din grădină… nu din parcare”** (X7, interior: fotografiile reale 360° din showroom): pe geamuri se va pune
+  grădina, cu AI, doar în cele patru fotografii de zi cu ferestre (living, masă, blat, dormitor); restul fotografiei rămâne neatins.
+  Noduri pregătite (≈ 10.900 de credite). Copiile cu grădina se folosesc **doar în grădină** (turul 360° păstrează fotografiile
+  adevărate), iar eticheta și nota de sub grădină trebuie să spună că grădina de la ferestre e adăugată cu AI.
+- **„Hai să mai adăugăm și casa asta”**: casa extensibilă de 20 ft din a doua proformă (5,9 × 6,2 × 2,48 m, două dormitoare + living
+  cu bucătărie + baie). Modelul e gata (`site/js/h_c20.js`, făcut după planul din ofertă și filmulețul din fabrică), dar **nu e încă
+  în grădină**: intră doar odată cu imaginile ei reale (altfel s-ar vedea macheta). Rândul ei pregătit e în
+  `surse/ai360/c20/` (loc: x = −15,5, z = 40, în locul stratului cu flori). Numele „C20” e de lucru: **de întrebat clientul** cum
+  vrea să se numească, prețul de vânzare (până atunci „Preț pe ofertă”) și dacă ușile dormitoarelor sunt albe (în filmuleț au
+  folie albastră). Proforma are date sensibile: nu se urcă în git. ≈ 38.000 de credite pentru toate imaginile și rotirea ei.
+
 ## Ce mai e de făcut (la 14 noiembrie 2026)
 - **Casele adevărate pentru grădină**: T6 e pusă (vezi mai jos). De cerut clientului celelalte case model comandate, cu poze /
   planuri, dimensiuni și preț; până atunci restul grădinii arată exemple din catalog. De întrebat și cum vrea să arate grădina
@@ -174,8 +191,11 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   (~13.600 de credite pe casă). 192 de cadre mici + 96 mari pe casă. Rotirea a fost rescrisă pe 16 nov (după trei filmulețe: „nu
   merge lin”, „tot parcă sunt blocaje”): cadrele se cer de lângă unghiul curent, sunt despachetate din timp în afara firului
   principal, pe ecran se trece doar prin cadre gata făcute (dacă netul nu ține pasul, rotirea așteaptă la ultimul cadru, nu sare
-  și nu arată macheta), mișcarea se socotește în timp, iar după ce dai drumul alunecă puțin. La X7 „stă” puțin în spatele casei
-  (filmarea ei pornea din spate). La V3 apare „V3” scris pe perete în câteva cadre. **Pe ecran îngust (vederea înaltă), la toată
+  și nu arată macheta), mișcarea se socotește în timp, iar după ce dai drumul alunecă puțin. **Rescrisă încă o dată pe 17 nov** („unele case nu se
+  mișcă lent deloc”): imaginea urmărește mereu mâna (dacă exact cadrul unghiului nu e gata, se arată cel mai apropiat care e; din
+  toată rotirea se țin copii mici, „schița”; pe calculator se aduc din timp câteva cadre ale fiecărei case). La X7 lipsesc ~50° din
+  filmare, în spatele casei (filmarea ei pornea din spate): pagina trece repede peste porțiunea aceea, topind un capăt în celălalt
+  (`gol: [191, 26]` în `ROTIRI`); dispare de tot doar dacă se reface filmarea lui X7 (~13.600 de credite). La V3 apare „V3” scris pe perete în câteva cadre. **Pe ecran îngust (vederea înaltă), la toată
   grădina și la plan nu există filmare**: acolo imaginea rămâne pe loc. Clientul a cerut „Lasă copacii”: copacii rămân în filmări.
   Copii: `versiuni/gradina-inainte-treceri-reale/`, `versiuni/gradina-inainte-rotire-noua/`, `versiuni/gradina-inainte-fara-macheta/`.
   Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
@@ -200,8 +220,12 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   **Ce nu se potrivește încă:** în rotirile caselor vechi (filmate înainte) T6 și partea nouă a grădinii nu apar în fundal; se
   potrivește doar dacă se refac rotirile (≈13.600 de credite pe casă; X7 și T7 sunt cele din care s-ar vedea). Credite folosite
   pentru T6 și grădina mărită: ≈ 37.200 (5 imagini 4K, un retuș, 4 camere, rotirea).
-- **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle
-  camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare.
+- **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de trei ori că se poticnește): nu readuce opririle
+  camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare. A treia oară (17 nov 2026: „când ai de sus
+  în jos… nu se mișcă lent deloc”): filmarea are acum **toate cadrele** (648, `f_0000…f_0647`; înainte unul din două), derularea e
+  urmărită cu un arc amortizat (fără smucitură la fiecare treaptă a rotiței), iar imaginea urmărește mereu derularea (se arată cel
+  mai apropiat cadru gata; din toată filmarea se țin copii mici, „schița”). Nu rări cadrele și nu readuce așteptarea după cadre
+  (`site/js/story.js`, `FILM`; copia dinainte: `versiuni/inainte-e7-scaun-x7-gradina/story.js`).
 - **Interior real în fiecare casă**: singurul mod ca interiorul să arate „pe bune” e cu fotografii 360° făcute în casa
   respectivă (ca la X7). Când clientul are casele, de făcut 4–5 poze 360° în fiecare; se leagă în `site/js/gradina-data.js` (rândul `pano`).
 
