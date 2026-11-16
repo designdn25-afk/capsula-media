@@ -71,7 +71,7 @@ export function build(M) {
   // materiale proprii: panourile maro cu aspect de lemn („emissive” diferit de zero, ca seara să nu fie luminate ca mobila) și pardoseala gri-bej
   const lemn = new THREE.MeshStandardMaterial({ color: 0x6f4b31, roughness: .72, metalness: .05, side: THREE.DoubleSide, emissive: 0x010101, emissiveIntensity: 0 });
   const RL = F.fadeSet({ lemn });
-  const podea = new THREE.MeshStandardMaterial({ color: 0xb9b3a7, roughness: .8 });
+  const podea = new THREE.MeshStandardMaterial({ color: 0xb9b3a7, roughness: .8, emissive: 0xb9b3a7, emissiveIntensity: .22 });   // (lumina proprie ține loc de lumina din cameră, ca la pardoseala comună)
 
   /* ---- pereții din afară: aripile (maro) cu ferestre; partea de sus, până sub acoperișul înclinat, se ridică odată cu acoperișul ---- */
   const win = c => [c, WW, WS, WH], pLo = [], pUp = [], inLo = [], inUp = [], frLo = [], frUp = [], gl = [];
@@ -113,9 +113,8 @@ export function build(M) {
   [-1, 1].forEach(s => { mesh(skyGlass(s < 0 ? -DX + .07 : .055, s < 0 ? -.055 : DX - .07, ga, YC, ga, gb, zd), GF.glass, root, false, false); mesh(skyGlass(s < 0 ? -DX + .07 : .055, s < 0 ? -.055 : DX - .07, YC, gb, ga, gb, zd), R.glass, roof, false, false); });
   root.add(box(.025, .16, .05, M.dark, -.1, FY + 1.05, zd + .05), box(.025, .16, .05, M.dark, -.1, FY + 1.05, zd - .05));
 
-  /* ---- pardoseala, luminile din tavan, ramele negre din interior (plinta, colțurile, grinzile de la îmbinarea aripilor cu miezul) ---- */
+  /* ---- pardoseala și ramele negre din interior (plinta, colțurile, grinzile de la îmbinarea aripilor cu miezul); tavanul e alb, simplu ---- */
   mesh(bx(WT - 2 * T, .04, DT - 2 * T, 0, FY - .02, 0), podea, root, false);
-  mesh(merge([bx(.04, .015, 2.6, -.25, Y1 - .14, 1.2), bx(.04, .015, 3.6, -2.1, yw(2.1) - .03, 0), bx(.04, .015, 2.2, 2.1, yw(2.1) - .03, -1.2), bx(.04, .015, 1.5, 2.1, yw(2.1) - .03, 1.75)]), R.ledIn, roof, false, false);
   const PL = .05;
   frLo.push(bx(WT - 2 * T, PL, .02, 0, FY + PL / 2, ZI + .012), bx(.02, PL, DT - 2 * T, -XI + .012, FY + PL / 2, 0), bx(.02, PL, DT - 2 * T, XI - .012, FY + PL / 2, 0));
   [[-XI, -CX], [CX, XI]].forEach(([a, b]) => frLo.push(bx(b - a, PL, .02, (a + b) / 2, FY + PL / 2, ZG - .012)));

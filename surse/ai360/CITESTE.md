@@ -306,3 +306,71 @@ Credite: 5 imagini 4K cu două referințe 13.635 · retuș 918 · 4 camere 9.088
   T7, când camera ajunge în spatele lor). Se potrivesc doar dacă se refac (≈13.600 de credite pe casă).
 - Imaginile de seară pregătite (12 noduri) sunt din grădina veche: cele două cu toată grădina trebuie refăcute, iar T6 n-are.
 
+
+# Partea a șasea: cererile din 17 nov 2026 (casa C20, scaunul din E7, grădina la ferestrele lui X7) — pregătite, fără credite
+
+Clientul a trimis a doua proformă (casa extensibilă de 20 ft), un filmuleț din fabrică și capturi: „hai să mai adăugăm și casa
+asta”, „aici scaunul este intrat în bucătărie” (E7), „aici aș vrea să arate din grădină… nu din parcare” (X7, interior). ElevenLabs
+avea 606 credite, deci **nimic din ce e mai jos n-a fost pornit**: sursele sunt atașate în flux și nodurile sunt făcute. Când sunt
+credite: `creative_run_flow_nodes` cu `generations_count: 1` (întâi `estimate_only: true`). Ordinea: E7 → X7 → C20.
+
+## 1. E7: scaunul scos din bucătărie (≈ 4.550 de credite)
+Al doilea scaun de la masa rotundă intra în corpul de bucătărie. În model a fost mutat (`site/js/h_e7.js`:
+`put(F.chair(M), -3.58, -.82, Math.PI / 2)`), iar sursele 360° au fost refăcute din aceleași puncte (`e7_living_src.jpg`,
+`e7_bucatarie_src.jpg`). În planul lui E7 (`pl_e7_1`) scaunul nu se vede, deci planul rămâne.
+| ce | nod (sursa) |
+|---|---|
+| e7_living (v2) | `siiPjhzJZxTSExNNVAtn` (`2XyYQfpalM8hIR49Rssx`) |
+| e7_bucatarie (v2) | `Xs7unmMUfxys2YxsIC2B` (`bkS5g0n7QZ7Gsn7GBqO0`) |
+După generare: `python3 fix360.py --masoara e7_living_src.jpg <generat>` (dacă a ieșit rotită, se dă deplasarea ca al treilea
+argument), `python3 fix360.py <generat> ../../site/img/gd/ai/e7_living.webp [deplasare]`, la fel bucătăria. Copiile de acum sunt
+în `versiuni/inainte-e7-scaun-x7-gradina/img/`.
+
+## 2. X7: grădina la ferestre, în fotografiile reale 360° (≈ 10.900 de credite)
+În X7 se văd fotografiile adevărate din showroom, iar pe geam se vede parcarea. Clientul vrea să se vadă grădina. Se schimbă
+**doar ce se vede prin geam**, în cele patru fotografii de zi cu ferestre (baia n-are fereastră; cele de seară au draperiile trase).
+| fotografia | nod (fotografia atașată + imaginea reală a lui X7 din afară, `Rga4CczKuD3XXHyWSCbR`, ca aspect al grădinii) |
+|---|---|
+| living | `bZeHUbN0iIaDEzBuqTx7` (`NNFGifDnIvqoUoM8yqis`) |
+| masă | `TTAGJh90S2a3blEX5VNX` (`kPPUBVKMXvMKWIncgbJ4`) |
+| blat (bucătărie) | `lMU1XbqhuBHa16ddZLOq` (`y7I3dXOva8KKg38BomYh`) |
+| dormitor | `kHaSgwieCwkHpDPNOcBI` (`jgu7e7bQMeqepd098TdO`) |
+Pașii după generare (de făcut; nimic din ei nu e încă în pagină):
+1. Rezultatul se aduce la 4096×2048 și se verifică să nu fie rotit față de fotografie (`fix360.py --masoara`).
+2. **În fotografia adevărată se lipesc doar geamurile**: masca = unde rezultatul diferă de fotografie (diferență peste un prag,
+   curățată și cu margini estompate); restul rămâne pixel cu pixel fotografia reală. De verificat de mână fiecare fereastră (ramele
+   și draperiile nu trebuie atinse). Dacă generatorul a schimbat și interiorul, masca se taie de mână pe zonele geamurilor.
+3. Copiile se pun **separat**, doar pentru grădină: `site/img/gd/x7/<punct>_m.webp` și `_l.webp` (aceleași mărimi ca în
+   `site/p360/`). Fotografiile din `site/p360/` rămân neatinse (turul 360° arată locul real).
+4. În `site/js/gradina-data.js`, la X7: `pano: { …, gradina: ['living', 'masa', 'blat', 'dorm'] }`; în `site/js/garden.js`,
+   `panoUrl` ia aceste puncte din `img/gd/x7/` (ziua); eticheta din fișă devine „Fotografii reale 360° din showroom · grădina de la
+   ferestre e adăugată cu AI”, iar pe imagine apare mențiunea mică (ca la imaginile cu AI). Se completează și nota de sub grădină
+   (`surse/final/parts/gradina.html`). **Fără aceste mențiuni nu se publică**: fotografia nu mai arată locul real.
+
+## 3. Casa C20 (extensibilă, 20 ft) (≈ 25.000 de credite imaginile + ≈ 13.600 rotirea)
+Modelul: `site/js/h_c20.js`, după planul din ofertă (mărit de 8 ori și măsurat) și după cadre din filmuleț. Datele din ofertă:
+20 ft, 5900 × 6200 × 2480 mm, „Two Bedrooms and One Living Room”, structură din țeavă de oțel zincată la cald, podea SPC 4 mm,
+pereți din panouri de 75 mm, panouri exterioare din tablă colorată (maro, cu aspect de lemn), ușă dublă din aluminiu cu rupere de
+punte termică și **geam triplu**. Proforma (prețuri de achiziție, nume, adrese) **nu se urcă în git**.
+Casa **nu e în `CASE`** cât nu are imagini reale. Pentru capturi: `python3 surse/ai360/c20/pune_c20.py` (o pune pe locul liber,
+x = −15,5, z = 40, rot 30, și scoate stratul cu flori), la sfârșit `--scoate`. Sursele sunt făcute (17 nov) și atașate:
+| ce | nod (surse) | proporție |
+|---|---|---|
+| gr_all (grădina cu C20) | `9Uu2gMiZ6PTYV5ulUJ9r` (`wOiAhxyBIm2x6mcEy4zc` + imaginea reală de acum `o8WuI6iFTbfLAqblwdyJ`) | 3:2 |
+| gr_all_p | `W16kTBL98mFbUXkglVAS` (`HJlVHE4KLJTv4WDILwdF` + `w5R2nKyezOyDnHTwX0Qu`) | 3:4 |
+| gr_c20 | `TIF2kY3kDLshwvz4yk80` (`vu9Eqh4vg9rcUNAVIycM` + X7 real) | 16:9 |
+| gr_c20_p | `bEvzkrSg8sMjke6F1lfR` (`PsyI4FdaYLWitg2IjO1W` + X7 real) | 4:5 |
+| pl_c20_1 | `HCYqL85eiRcSJ0MdjOrE` (`f3RLdja3iVjlkMVhxn3C` + planul real al lui T7) | 21:9 |
+| c20_living / bucatarie / baie / dormitor1 / dormitor2 | `OIPqfvoAl8VrPVNNu6bD` · `p1Unc8KWD93vj3shjAa1` · `C9X90umMwXNJ13LBzzgk` · `nW8p3joWw7ZEltUzfYg6` · `w5Z7XoB3jMGy5ZNNud6E` (sursele `14cCpadSaYNjC5yu0mjU` · `ntqq1jZQ2rmhlEzoXhFi` · `CyXeeOAfGbr9tcHnVvXk` · `HLfTcTsw0HrJSvOe2qzQ` · `tvRHWN1PcetDUTViyiLu`) | auto |
+Punctele camerelor (lume): living −15,779 · 41,316; bucătărie −18,044 · 39,794; baie −16,082 · 38,892; dormitor 1 −13,982 · 38,95;
+dormitor 2 −13,338 · 40,045 (y = 1,85). Cadrele vederilor: `vederi/cadre.json` (`gr_c20`, `gr_c20_p`, `pl_c20_1`).
+**După imagini:** `fixflat.py` / `fix360.py`, `pune_c20.py`, apoi în `gradina-data.js`: `ai: ['c20_living', 'c20_bucatarie',
+'c20_baie', 'c20_dormitor1', 'c20_dormitor2']`, `VEDERI.all` (fișierele noi, aceleași cadre), `VEDERI.C20`, `PLANURI.C20`.
+**Rotirea** se face ultima (nodul Aleph are nevoie de imaginea reală `gr_c20` ca referință, cea pusă pe site): filmarea machetei
+e gata și atașată în flux (`rot9-c20.mp4`, 192 de cadre, pornită din locul vederii: nodul video `bIBelmNESNdTM5ypvX5B`). Se face un
+nod `runway-aleph2` ca al lui T6 (`itW7VC4wB80UJntIPw7m`), legat la ea (`video`) și la imaginea reală `gr_c20` (`image`), cu
+descrierea casei din nodul `gr_c20`; apoi `MARI=96 python3 fixspin.py <mp4> ../../../site/img/gd/rot/c20 192 1024` și `ROTIRI.C20`
+(`az0: 60`). La urmă, imaginea de rezervă `site/img/gd/gradina.webp` din noul `gr_all`.
+**De verificat la fiecare imagine:** să nu apară clădiri în plus (ca la T6) și casa să rămână maro, cu rame negre.
+**De întrebat clientul:** numele casei („C20” e de lucru), prețul de vânzare, dacă ușile dormitoarelor sunt albe (în filmuleț au
+folie albastră de protecție) și dacă vrea în grădină și copertina separată din proformă.

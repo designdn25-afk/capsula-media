@@ -165,8 +165,9 @@ plus ≈ 13.600 dacă vrea și rotirea lui X7 refăcută. Nodurile și pașii: `
   adevărate), iar eticheta și nota de sub grădină trebuie să spună că grădina de la ferestre e adăugată cu AI.
 - **„Hai să mai adăugăm și casa asta”**: casa extensibilă de 20 ft din a doua proformă (5,9 × 6,2 × 2,48 m, două dormitoare + living
   cu bucătărie + baie). Modelul e gata (`site/js/h_c20.js`, făcut după planul din ofertă și filmulețul din fabrică), dar **nu e încă
-  în grădină**: intră doar odată cu imaginile ei reale (altfel s-ar vedea macheta). Rândul ei pregătit e în
-  `surse/ai360/c20/` (loc: x = −15,5, z = 40, în locul stratului cu flori). Numele „C20” e de lucru: **de întrebat clientul** cum
+  în grădină**: intră doar odată cu imaginile ei reale (altfel s-ar vedea macheta). Rândul ei se pune cu
+  `surse/ai360/c20/pune_c20.py` (loc: x = −15,5, z = 40, în locul stratului cu flori). Capturile machetei (vederi, plan, cinci
+  camere, filmarea de rotire) sunt făcute și atașate în flux, iar nodurile sunt pregătite: mai trebuie doar pornite. Numele „C20” e de lucru: **de întrebat clientul** cum
   vrea să se numească, prețul de vânzare (până atunci „Preț pe ofertă”) și dacă ușile dormitoarelor sunt albe (în filmuleț au
   folie albastră). Proforma are date sensibile: nu se urcă în git. ≈ 38.000 de credite pentru toate imaginile și rotirea ei.
 
