@@ -291,6 +291,10 @@ Clientul: „vreau să-mi faci toată grădina să arate așa” (vederea reală
 - Făcute și publicate cele 11 vederi de zi rămase; cinci dintre ele (V3, E7, M9 pe ecran lat; V3, M9 pe telefon) au fost refăcute cu
   o cerere mai bună, fiindcă prima dată ieșiseră „machetă lustruită”. `VEDERI` e complet.
 - Rotire reală și la T7, E7, M9 (16 nov 2026), la fel; V3 încă nu (lipsă credite).
+- Treceri reale între vederi (`xf` în `js/garden.js`): la `goTo` între două vederi din afară care au imagine, imaginea de pe ecran
+  rămâne pe loc, camera sare la vederea nouă și imaginea ei apare peste cea veche. Rotirea: `n` cadre mici (192, 1024 px) și `nl`
+  cadre mari (96, 1920 px); `fixspin.py … 192 1024` cu `MARI=96`; cadrele se cer pornind de la unghiul curent; la oprire rotirea
+  se așază pe un cadru care are și varianta mare.
 - Rotire reală la X7: `ROTIRI.X7`, 72 de cadre (din 5 în 5 grade) scoase dintr-o filmare Runway Aleph 2 a rotirii machetei.
   Proba cu Kling O3 a fost bani pierduți (a întors filmarea neschimbată).
 - `tools/test_pagini.js` a trecut (7/7) înainte de aceste imagini; după, s-au verificat cu capturi vederile din afară pe 1440×900,

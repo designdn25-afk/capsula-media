@@ -45,8 +45,8 @@ export const VEDERI = {
 // La „all” (toată grădina) filmarea acoperă doar un arc: arc = câte grade (de la az0), iar n = câte cadre are arcul.
 // Cum se fac: surse/ai360/CITESTE.md, partea a treia.
 export const ROTIRI = {
-  X7: [{ zi: 'x7', n: 72, az0: 122, r: [-1.068, 0.686, -0.514, 0.473] }, null],
-  T7: [{ zi: 't7', n: 72, az0: 58, r: [-1.065, 0.59, -0.51, 0.421] }, null],
-  E7: [{ zi: 'e7', n: 72, az0: 4, r: [-1.069, 0.712, -0.521, 0.481] }, null],
-  M9: [{ zi: 'm9', n: 72, az0: -30, r: [-0.997, 0.795, -0.525, 0.483] }, null],
+  X7: [{ zi: 'x7', n: 192, nl: 96, az0: 122, r: [-1.068, 0.686, -0.514, 0.473] }, null],
+  T7: [{ zi: 't7', n: 192, nl: 96, az0: 58, r: [-1.065, 0.59, -0.51, 0.421] }, null],
+  E7: [{ zi: 'e7', n: 192, nl: 96, az0: 4, r: [-1.069, 0.712, -0.521, 0.481] }, null],
+  M9: [{ zi: 'm9', n: 192, nl: 96, az0: -30, r: [-0.997, 0.795, -0.525, 0.483] }, null],
 };

@@ -108,7 +108,7 @@ cu planul 3D) → caracteristici → 02 Exterior (ocolul capsulei, carusel 3D + 
 - **Site-ul final (prima pagină nouă), previzualizare privată:** https://claude.ai/artifact/9KFViWSHxSHJm3UR87sfr9
   (se actualizează din această sesiune Claude Code, cu același fișier `site/home.html`).
   Are limită de 511 fișiere: cadrele rotirilor T7/E7/M9 nu încap, deci acolo doar X7 se rotește „real” (nu urca acolo
-  `js/gradina-data.js` cu rotirile noi). Linkul public le are pe toate.
+  `js/gradina-data.js` cu rotirile noi; acolo X7 a rămas cu 72 de cadre). Linkul public le are pe toate.
 - Linkurile publice vechi („oricine are linkul”), cu variantele dinainte: V2 https://claude.ai/artifact/XA6dNq77wKbmrcDCdum9Sm ·
   V1 https://claude.ai/artifact/Fj56xUcscpsXGz7k8tMrcV (neschimbate; de actualizat doar după aprobarea clientului).
 
@@ -142,7 +142,12 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   în spatele casei (filmarea ei pornea din spate; celelalte pornesc din locul vederii și sunt bune de la primul cadru).
   **V3 nu are încă rotire reală**: filmarea 3D și nodul sunt pregătite (`50qiw4TNoMphOWRT69Ck`), dar pe 16 nov au rămas 12.317 credite
   și trebuie 13.573. **Telefonul (vederea înaltă), toată grădina și seara nu au rotire reală** (se vede macheta). Clientul a cerut
-  „Lasă copacii”: copacii rămân în filmări, nu se ascund. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
+  „Lasă copacii”: copacii rămân în filmări, nu se ascund.
+  **Mișcare lină și treceri reale (16 nov, după două filmulețe: „la început arată că e pătrățos, după aia devine real… și așa la
+  fiecare mutare”, „nu se mișcă lin frumos”):** între două vederi cu imagine reală pagina trece direct de la o imagine la alta
+  (fără zborul prin machetă; nici la pornire); rotirea are 192 de cadre mici (din ~2 în 2 grade) + 96 mari, se încarcă întâi
+  cadrele de lângă unghiul la care te uiți și alunecă puțin după ce dai drumul. Nu readuce zborul 3D între vederi. Copia dinainte:
+  `versiuni/gradina-inainte-treceri-reale/`. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
 - **Seara** în grădină e încă machetă 3D: sursele și cele 12 noduri sunt pregătite în ElevenLabs (~2.730 de credite fiecare), nepornite.
   Conectorul Higgsfield din Claude **nu poate genera** (doar citește contul).
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle

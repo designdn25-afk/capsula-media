@@ -20,9 +20,11 @@ def bun(j):
     if not (ea <= j <= eb): return j
     lo, hi = (ea - 1) % F, (eb + 1) % F
     return lo if (j - ea) < (eb - j) else hi
-for i in range(n):
-    im = Image.open(frames[bun(min(F - 1, round(i * F / n)))]).convert('RGB'); w, h = im.size
-    for pre, side, q, k in (('s_', small, 72, 0), ('l_', big, 82, 1)):
+nl = int(os.environ.get('MARI', n))   # MARI=96: câte cadre mari (cele mici sunt n); n trebuie să fie multiplu
+for f in glob.glob(os.path.join(out, '[sl]_*.webp')): os.remove(f)
+for pre, cnt, side, q, k in (('s_', n, small, 72, 0), ('l_', nl, big, 82, 1)):
+    for i in range(cnt):
+        im = Image.open(frames[bun(min(F - 1, round(i * F / cnt)))]).convert('RGB'); w, h = im.size
         j = im if w <= side else im.resize((side, round(h * side / w)), Image.LANCZOS); f = os.path.join(out, '%s%03d.webp' % (pre, i)); j.save(f, 'WEBP', quality=q, method=5); tot[k] += os.path.getsize(f)
 print('%d cadre din %d · mici %.1f MB · mari %.1f MB · %s' % (n, F, tot[0] / 1e6, tot[1] / 1e6, out))
 if tmp: shutil.rmtree(tmp)
