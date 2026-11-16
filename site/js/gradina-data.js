@@ -30,7 +30,12 @@ export const GRADINA = { latime: 64, adancime: 72, centruZ: -8, intrareZ: 28 };
 // exact din locul în care stă camera în acea vedere (locurile se citesc din pagină cu __gradina.views()), deci, dacă muți o casă,
 // schimbi grădina sau locul camerei, imaginile trebuie refăcute (surse/ai360/CITESTE.md). Seara se vede macheta 3D.
 export const VEDERI = {
-  X7: [['gr_x7', -1.068, 0.686, -0.514, 0.473], null],
+  all: [['gr_all', -0.699, 0.699, -0.615, 0.503], ['gr_all_p', -0.302, 0.302, -0.492, 0.413]],
+  X7: [['gr_x7', -1.068, 0.686, -0.514, 0.473], ['gr_x7_p', -0.494, 0.309, -0.282, 0.321]],
+  T7: [['gr_t7', -1.065, 0.59, -0.51, 0.421], ['gr_t7_p', -0.491, 0.284, -0.271, 0.31]],
+  E7: [['gr_e7', -1.069, 0.712, -0.521, 0.481], ['gr_e7_p', -0.55, 0.337, -0.281, 0.311]],
+  V3: [['gr_v3', -1.143, 0.811, -0.597, 0.503], ['gr_v3_p', -0.306, 0.306, -0.279, 0.334]],
+  M9: [['gr_m9', -0.997, 0.795, -0.525, 0.483], ['gr_m9_p', -0.302, 0.302, -0.349, 0.407]],
 };
 
 // Rotirea realistă a unei case: cadrele unei filmări (făcute cu AI pornind de la rotirea machetei) care ocolește casa complet, pe
