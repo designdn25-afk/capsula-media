@@ -46,4 +46,5 @@ export const VEDERI = {
 // Cum se fac: surse/ai360/CITESTE.md, partea a treia.
 export const ROTIRI = {
   X7: [{ zi: 'x7', n: 72, az0: 122, r: [-1.068, 0.686, -0.514, 0.473] }, null],
+  E7: [{ zi: 'e7', n: 72, az0: 4, r: [-1.069, 0.712, -0.521, 0.481] }, null],
 };
