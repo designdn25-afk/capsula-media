@@ -68,3 +68,15 @@ cd /tmp/claude-0/-home-user-capsula-media/c0f66d24-07b5-53c3-9b3d-a7a84716db39/s
 PAGE=_t_house.html node shot3d.js <iesire>.jpg 1280 800 "m=v3&az=-30&el=12&dist=22" "m=v3&az=40&el=20&dist=22" "m=v3&az=-20&el=55&dist=18&roof=1" "m=v3&az=-28&el=8&dist=20&t=19.8"
 ```
 Scrie planșele într-un folder al tău din scratchpad (de ex. `…/scratchpad/v3/h_v3/`). Uită-te la ele (micșorate) și compară cu imaginea din catalog.
+
+## De ținut minte (din casa T6, 16 nov 2026)
+- **Culoare proprie pe carcasă** (o casă care nu e albă): material local `MeshStandardMaterial` cu `emissive: 0x010101,
+  emissiveIntensity: 0` (altfel `genv.js` îl trece printre lucrurile „luminate cald” seara) și un `F.fadeSet({ body })` pentru
+  partea din acoperiș, stins de mână în `openRoof` (`RL.fade(f)`), ca la `h_t7.js` / `h_t6.js`.
+- **Goluri care trec de tăietura acoperișului** (uși, vitraje înalte): fața plană se desenează cu golurile ca niște crestături în
+  marginea de la tăietură (vezi `face()` din `h_t6.js`), jos și sus separat; nu ca găuri într-o formă.
+- **Loc de stat în fiecare cameră**: în punctul din `rooms` (sau foarte aproape) trebuie ~0,5 m liber de jur împrejur la 0,35 m și la
+  1,15 m de podea; altfel pagina mută vizitatorul în altă cameră. Se verifică intrând în casă: `__gradina.H[i].walk.pts`.
+- **Model care nu e în catalogul paginii**: datele lui se pun în rândul din `CASE` (`date: { s, sn, d, a, l, t, p }`).
+- După model urmează imaginile reale (vederi, plan, camere, rotire): `surse/ai360/CITESTE.md`, partea a cincea.
+

@@ -251,3 +251,58 @@ Filmările descărcate nu sunt în git (sunt mari); se iau din nou din ElevenLab
 ## Credite pe 16 nov, după a doua încărcare (clientul a pus ~20–30 $)
 Planurile X7, V3, M9 parter 8.181 · rotirea V3 13.573 · deschiderea: 6 imagini-cheie (două refăcute) 16.362 + 4 filmări 54.292.
 În total ≈ 92.400. Soldul nu se poate citi din conector.
+
+# Partea a cincea: casa T6 și grădina mărită (16 nov 2026)
+
+Clientul a trimis proforma, un filmuleț și poze cu T6 („bagă-ne ca 3D și capsula asta”), apoi: „și o să mai fie modele de case,
+trebuie să facem grădina mai mare”. Grădina a fost mărită spre intrare, T6 a fost pusă în partea nouă și totul s-a făcut real
+într-o singură trecere. **Aceiași pași se repetă la fiecare casă nouă.**
+
+## Pașii, în ordine
+1. Modelul casei: `site/js/h_<casă>.js` (vezi `surse/final/CASE-3D.md`), probat în `site/_t_house.html?m=<casă>`.
+2. Rândul din `CASE` (`site/js/gradina-data.js`); pentru un model care nu e în catalogul paginii, datele lui în `date: {…}`.
+   Dacă a fost un strat cu flori pe locul casei (`GRADINA.straturiNoi`), se scoate.
+3. Locurile camerei: pagina deschisă, `__gradina.views()` → `vederi/locuri.json` (casele vechi trebuie să iasă neschimbate).
+   Punctele din interior: se intră în casă, `__gradina.H[i].walk.pts` (fiecare trebuie să fie chiar în camera lui: e nevoie de
+   ~0,5 m liber în jur, altfel căutarea sare în altă cameră — așa a pățit baia lui T6 până i s-a făcut loc).
+4. `python3 rects.py`, apoi `node capflat.js gr_all gr_all_p gr_<casă> gr_<casă>_p pl_<casă>_1` și, pentru camere,
+   `node ../cap360.js ../<casă>_<cameră>_src.jpg 4096 "x=…&y=…&z=…&face=1536"`.
+5. Sursele se urcă temporar pe `gh-pages` (`img/gd/src/`), se atașează în flux și se fac nodurile (mai jos). `creative_run_flow_nodes`
+   cu `estimate_only: true` arată costul fără să pornească nimic.
+6. `fixflat.py` (vederi, plan), `fix360.py` (camere), apoi rândurile din `VEDERI`, `PLANURI`, `ai: [...]`.
+7. Rotirea: `node capspin.js <casă> 192 1920` (cu `IESIRE=` în afara proiectului; ~7 minute), `ffmpeg … rot9-<casă>.mp4`, apoi nodul
+   Runway Aleph 2 cu filmarea și **imaginea reală a vederii** (cea care e pe site), `MARI=96 python3 fixspin.py <mp4> …/rot/<casă> 192 1024`
+   și rândul din `ROTIRI` (`az0` = unghiul vederii, din `info.json`).
+8. Imaginea de rezervă `site/img/gd/gradina.webp` (1600×900) se taie din `gr_all.webp`.
+
+## Ce a mers și ce nu
+- **Toată grădina**: ca țintă de calitate s-a dat **imaginea reală veche a grădinii** („aceeași grădină, înainte de a fi mărită”):
+  aspectul (gazon, hale, casele albe) a rămas același, iar casa nouă a apărut la locul ei. Din prima încercare.
+- **T6 din afară**: generatorul a pus pe margine **o căsuță de lemn care nu există** (și un rând de lespezi spre ea). Nu s-a refăcut
+  toată imaginea: s-a tăiat bucata (1304 px), s-a cerut la un model ieftin (`gemini-3.1-flash-image`, 2K, 918 credite) „scoate
+  căsuța și lespezile, pune gazon și gard viu”, iar bucata s-a lipit la loc cu margini estompate (potrivire SIFT + corecție de
+  culoare). De atunci cererile spun: „The only buildings in the picture are the ones in the first image: do not add any hut, shed,
+  cabin, pavilion…”. **De verificat la fiecare imagine dacă n-a apărut vreo clădire în plus.**
+- **Camerele**: cererea descrie finisajele văzute în filmulețul de la târg (pardoseală de stejar deschis, pereți cu furnir bej,
+  tavan alb cu spoturi, treaptă cu bandă de lumină): au ieșit foarte aproape de casa reală.
+- **Rotirea**: Aleph, cu imaginea reală retușată ca referință (cea fără căsuța de lemn, urcată separat: nodul de imagine conține
+  încă varianta cu căsuța). Bună de la primul cadru.
+
+## Nodurile (fluxul `yUzMp1srSOsKx9pUwTk2`)
+| ce | nod (sursa) | proporție |
+|---|---|---|
+| gr_all (grădina mărită) | `ZY0gsvkgRUjXQefth1fC` (`GtyWlcPxI3iDvCEyfWNs` + vechea `WdXp0s4IkSxfV22RbJLw`) | 3:2 |
+| gr_all_p | `VH8ESaLFx3Y4XlqYimSb` (`s4XLPzVURvPzqeAU6VK1` + vechea `Db4atERiuIjrOWTiUTao`) | 3:4 |
+| gr_t6 | `lWIUS8x2fKh3Cx1gH5QC` (`eTyLOILJkMbfhQ3Mrr6q` + X7 real); retuș: `VMLOTzHOvUmui3Kyx2p1` (bucata `KddUSyVzOYu76wnzCrQs`) | 16:9 |
+| gr_t6_p | `9Lop3ur1oMnhndoigiIn` (`ug72EZLfm0MaheLvqy4e` + X7 real) | 1:1 |
+| pl_t6_1 | `vnO79GkccLIkxop1mRcm` (`D3dr2JOixcBGkOesy14s` + planul real al lui T7) | 21:9 |
+| t6_living / bucatarie / baie / dormitor | `dq7vUJ8BCxmDjzzkiuRU` · `uHSotaCv6kITSuf66TrJ` · `jJi8AmXe2AovGAinepvV` · `9UClrOURv7x2J6QVHeCK` | auto |
+| rotirea T6 | `itW7VC4wB80UJntIPw7m` (filmarea `9JHGAEPqIadDP4cRq4Ds` + imaginea retușată `0BZ88RrKlv4B6lyQmEYY`) | 16:9 |
+
+Credite: 5 imagini 4K cu două referințe 13.635 · retuș 918 · 4 camere 9.088 · rotirea 13.573 → **≈ 37.200** (≈ 6,8 $).
+
+## Ce a rămas nepotrivit
+- Rotirile caselor vechi au fost filmate în grădina veche: în fundalul lor nu apar T6 și partea nouă (se vede mai ales de la X7 și
+  T7, când camera ajunge în spatele lor). Se potrivesc doar dacă se refac (≈13.600 de credite pe casă).
+- Imaginile de seară pregătite (12 noduri) sunt din grădina veche: cele două cu toată grădina trebuie refăcute, iar T6 n-are.
+

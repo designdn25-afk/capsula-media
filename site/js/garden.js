@@ -13,7 +13,8 @@ window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel p
 const DEG = Math.PI / 180;
 const sec = document.getElementById('gradina');
 const fmtA = a => String(a).replace('.', ',') + ' m²';
-const catOf = c => (window.CAT || []).find(m => m.c === c) || null;
+const inCat = c => (window.CAT || []).find(m => m.c === c) || null;
+const catOf = c => inCat(c.cod) || c.date || null;   // datele casei: din catalogul paginii sau, pentru un model care nu e în catalog, din gradina-data.js
 const priceOf = m => (!m ? '' : m.e ? m.p + ' cu TVA · la comandă' : m.p ? m.p + ' cu TVA · în stoc' : 'Preț pe ofertă');
 const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
@@ -27,15 +28,15 @@ function toStatic() {
   sec.classList.remove('gd--live'); sec.classList.add('gd--static');
   const im = sec.querySelector('.gd-still'); if (im && im.dataset.src) { im.src = im.dataset.src; im.removeAttribute('data-src'); }
   const list = sec.querySelector('.gd-list'); if (!list || list.children.length) return;
-  list.innerHTML = CASE.map(c => { const m = catOf(c.cod); return `<button type="button" class="gd-li" data-c="${esc(c.cod)}"><b>${esc(c.cod)}</b><span>${m ? fmtA(m.a) : ''}</span><i>${m ? esc(m.d) : ''}</i><em>${esc(priceOf(m))}</em></button>`; }).join('');
-  list.querySelectorAll('.gd-li').forEach(b => { b.onclick = () => { if (window.CATopen) window.CATopen(b.dataset.c); }; });
+  list.innerHTML = CASE.map(c => { const m = catOf(c); return `<button type="button" class="gd-li" data-c="${esc(c.cod)}"><b>${esc(c.cod)}</b><span>${m ? fmtA(m.a) : ''}</span><i>${m ? esc(m.d) : ''}</i><em>${esc(priceOf(m))}</em></button>`; }).join('');
+  list.querySelectorAll('.gd-li').forEach(b => { b.onclick = () => { if (window.CATopen && inCat(b.dataset.c)) window.CATopen(b.dataset.c); }; });
 }
 
 async function boot() {
   const $ = s => sec.querySelector(s), stage = $('.gd-stage'), canvas = $('.gd-gl'), pinBox = $('.gd-pins'), labBox = $('.gd-labels'), card = $('.gd-card'), chipsEl = $('.gd-chips');
   if (!webglOK()) { toStatic(); return; }
   const rm = matchMedia('(prefers-reduced-motion: reduce)').matches, fine = matchMedia('(hover:hover) and (pointer:fine)');
-  const G = createGScene(canvas, { shadowSize: Math.min(innerWidth, innerHeight) < 700 ? 1024 : 2048, half: 48 });
+  const G = createGScene(canvas, { shadowSize: Math.min(innerWidth, innerHeight) < 700 ? 1024 : 2048, half: 60 });
   const cam = G.camera; G.renderer.shadowMap.autoUpdate = false;
   let dead = false; canvas.addEventListener('webglcontextlost', e => { e.preventDefault(); dead = true; toStatic(); });
 
@@ -51,16 +52,18 @@ async function boot() {
       const g = new THREE.Group(); g.position.set(c.x, 0, c.z); g.rotation.y = c.rot * DEG; g.add(api.root); G.scene.add(g);
       const hit = new THREE.Mesh(new THREE.BoxGeometry(s.w, s.h, s.d), new THREE.MeshBasicMaterial({ visible: false })); hit.position.set(0, s.h / 2, s.cz || 0); g.add(hit);
       g.updateMatrixWorld(true);
-      H.push({ c, cat: catOf(c.cod), api, g, s, hit, k: 0, ring: null, ro: 0, side: -1, sideP: -1, center: g.localToWorld(new THREE.Vector3(0, 0, s.cz || 0)), top: g.localToWorld(new THREE.Vector3(0, s.h + 1.5, s.cz || 0)) });
+      H.push({ c, cat: catOf(c), api, g, s, hit, k: 0, ring: null, ro: 0, side: -1, sideP: -1, center: g.localToWorld(new THREE.Vector3(0, 0, s.cz || 0)), top: g.localToWorld(new THREE.Vector3(0, s.h + 1.5, s.cz || 0)) });
     } catch (e) { console.warn('gradina: casa ' + CASE[i].cod + ' nu s-a putut construi', e); }
   }
   if (!H.length || dead) { toStatic(); return; }
   const env = buildGarden(G, H);
   // din ce parte se uită camera la fiecare casă: de acolo de unde nu stă altă casă în față
+  // o casă „lungă” (de cel puțin 1,5 ori mai lată decât adâncă) se privește pe ecran înalt mai din lateral, ca să încapă; una aproape pătrată (V3, T6), mai din față
+  const isLong = s => s.w >= s.d * 1.5;
   const blocked = (h, azDeg, dist) => { const a = azDeg * DEG, dx = Math.sin(a) * dist, dz = Math.cos(a) * dist; let pen = 0;
     [...H, { center: { x: 0, z: 0 }, s: { h: 2.5 } }].forEach(o => { if (o === h) return; const ox = o.center.x - h.center.x, oz = o.center.z - h.center.z, t = clamp((ox * dx + oz * dz) / (dist * dist)), d = Math.hypot(ox - dx * t, oz - dz * t); if (d < 10) pen += (10 - d) * o.s.h; });   // ultimul = copacul din rond
     return pen + Math.abs(h.center.x + dx) * .01; };   // la egalitate: partea dinspre aleea din mijloc
-  H.forEach(h => { const r = h.c.rot, lg = h.s.w >= h.s.d; h.side = blocked(h, r - 30, 30) <= blocked(h, r + 30, 30) ? -1 : 1; h.sideP = blocked(h, r - (lg ? 56 : 26), 52) <= blocked(h, r + (lg ? 56 : 26), 52) ? -1 : 1; });
+  H.forEach(h => { const r = h.c.rot, lg = isLong(h.s); h.side = blocked(h, r - 30, 30) <= blocked(h, r + 30, 30) ? -1 : 1; h.sideP = blocked(h, r - (lg ? 56 : 26), 52) <= blocked(h, r + (lg ? 56 : 26), 52) ? -1 : 1; });
 
   /* ---------- elementele din pagină ---------- */
   const cSer = $('.gd-c-ser'), cName = $('.gd-c-name'), cNota = $('.gd-c-nota'), cDesc = $('.gd-c-desc'), cA = $('.gd-c-a'), cD = $('.gd-c-d'), cL = $('.gd-c-l'), cP = $('.gd-c-p'),
@@ -130,9 +133,9 @@ async function boot() {
   function view(m, i, l, pv) {
     let L, P;
     if (m === 'all' || i < 0) {
-      L = { tx: 0, ty: 1, tz: GZ + 3, az: 0, el: 31, fw: 82, fh: 47 }; P = { tx: 0, ty: 1, tz: GZ + 2, az: 0, el: 50, fw: 50, fh: 78 };
+      L = { tx: 0, ty: 1, tz: GZ + 10, az: 0, el: 31, fw: 82, fh: 58 }; P = { tx: 0, ty: 1, tz: GZ + 10, az: 0, el: 50, fw: 50, fh: 84 };   // grădina mărită (98 m adâncime)
     } else {
-      const h = H[i], s = h.s, r = h.c.rot, c = h.center, long = s.w >= s.d, two = h.api.levels > 1;
+      const h = H[i], s = h.s, r = h.c.rot, c = h.center, long = isLong(s), two = h.api.levels > 1;
       if (m === 'house') {
         const a = 30 * DEG, b = 56 * DEG;
         L = { tx: c.x, ty: s.h * .42, tz: c.z, az: r + h.side * 30, el: 13, fw: (s.w * Math.cos(a) + s.d * Math.sin(a)) * 1.12 + 3.5, fh: s.h * 1.7 + 3 };
@@ -322,7 +325,7 @@ async function boot() {
     lvlBox.hidden = !(inside && !walk && two); lvlBtns.forEach(b => { const on = +b.dataset.l === lvl; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
     enterBtn.textContent = inside ? 'Ieși din casă' : 'Intră în casă';
     offer.href = 'https://wa.me/40731166070?text=' + encodeURIComponent('Bună! Aș dori o ofertă pentru modelul ' + h.c.cod + (m ? ' (' + fmtA(m.a) + ', ' + m.l + ')' : '') + '. Locația mea: ');
-    photos.hidden = !(m && window.CATopen); tur.hidden = h.c.cod !== 'X7';
+    photos.hidden = !(window.CATopen && inCat(h.c.cod)); tur.hidden = h.c.cod !== 'X7';
     if (walk) rooms = w.pts.map((p, i) => { const e = document.createElement('button'); e.type = 'button'; e.className = 'gd-room go'; e.dataset.i = i; e.textContent = p.n; e.tabIndex = -1; labBox.appendChild(e); return { el: e, w: new THREE.Vector3(p.p.x, p.p.y - .45, p.p.z), i }; });
     else if (inside) rooms = (h.api.rooms || []).map(r => { const e = document.createElement('div'); e.className = 'gd-room'; e.textContent = r.n; labBox.appendChild(e); return { el: e, v: new THREE.Vector3(r.x, r.y, r.z), lvl: r.lvl || 1 }; });
   }
@@ -337,7 +340,7 @@ async function boot() {
   viewBtns.forEach(b => { b.onclick = () => setView(b.dataset.v); });
   cRooms.addEventListener('click', e => { const b = e.target.closest('.gd-rm'); if (b) room(+b.dataset.i); });
   labBox.addEventListener('click', e => { const b = e.target.closest('.gd-room.go'); if (b) room(+b.dataset.i); });
-  photos.onclick = () => { if (sel >= 0 && window.CATopen) window.CATopen(H[sel].c.cod); };
+  photos.onclick = () => { if (sel >= 0 && window.CATopen && inCat(H[sel].c.cod)) window.CATopen(H[sel].c.cod); };
   dnBtns.forEach(b => { b.onclick = () => setEvening(b.dataset.t === 'seara'); });
   tourBtn.onclick = () => (auto ? stopAuto() : startAuto());
   if (rm) tourBtn.hidden = true;
@@ -500,7 +503,8 @@ async function boot() {
     if (rooms.length && wk) { const cw = H[sel].walk.i, sh = W3.k >= 1 && blend.k >= 1; rooms.forEach(r => { v.copy(r.w).project(cam); const ok = sh && r.i !== cw && v.z < 1 && Math.abs(v.x) < .96 && Math.abs(v.y) < .9; r.el.style.opacity = ok ? '1' : '0'; r.el.style.pointerEvents = ok ? 'auto' : 'none'; if (ok) r.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; }); }
     else if (rooms.length) { const h = H[sel]; rooms.forEach(r => { const o = mode === 'in' ? 1 - clamp(Math.abs(h.k - r.lvl) / .3) : 0; r.el.style.opacity = o.toFixed(2); if (o > .01) { h.g.localToWorld(v.copy(r.v)).project(cam); r.el.style.transform = `translate(${((v.x * .5 + .5) * W).toFixed(1)}px,${((-v.y * .5 + .5) * Hh).toFixed(1)}px)`; } }); }
     // pânza se arată abia când prima imagine reală e pe ea (până atunci rămâne „Se pregătește grădina…”); dacă imaginea întârzie mult, se arată macheta
-    if (!bootT) bootT = now; if (!live && (pOp >= 1 || !extKey() || now - bootT > 9000)) { live = true; sec.classList.add('gd--live'); }
+    if (!bootT) bootT = now;
+    if (!live) { if (pOp >= 1 || !extKey() || now - bootT > 9000) { live = true; sec.classList.add('gd--live'); } else awake = Math.max(awake, 12); }   // până apare scena, desenul nu adoarme (altfel, dacă imaginea nu vine, ar rămâne „Se pregătește”)
   }
   const kick = () => { if (!raf && visible && !dead && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } };
   new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; if (visible) awake = 40; kick(); }, { rootMargin: '120px 0px' }).observe(stage);

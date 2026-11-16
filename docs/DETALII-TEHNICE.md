@@ -331,3 +331,47 @@ ora filmării (`FILM.time`), textul devine deschis de la `FILM.dark`.
 **Teste** (în scratchpad-ul sesiunii, de refăcut la nevoie după aceleași idei): `gwalk.js` (drumul casă → înăuntru → cameră → plan →
 afară, numără cadrele în care nu e nicio imagine reală pe ecran: trebuie 0), `gsmooth.js` (rotire pe net încet: fără machetă, fără
 pași înapoi), `glock.js` (vederile fixe rămân pe loc), `story.js` (capturi ale deschiderii la derulări date).
+
+## 19. Casa T6 și grădina mărită (16 noiembrie 2026)
+
+**Cererea.** Clientul a trimis proforma, un filmuleț și poze de la târg cu „Tiny House T6” (prima casă comandată) și a cerut să fie
+pusă în grădină ca model 3D; apoi: „și o să mai fie modele de case, trebuie să facem grădina mai mare”.
+
+**Modelul (`site/js/h_t6.js`).** Casă care se extinde: modulul din față (fix, 5,85 × 2,27 m, colțurile de sus rotunjite) are livingul
+cu chicinetă; partea din spate (5,45 m lățime, cu 12 cm mai joasă, podeaua cu 10 cm mai sus) are baia și dormitorul. Carcasa e un
+material propriu, gri (cu `emissive` diferit de zero, ca `genv.js` să nu o treacă printre lucrurile luminate seara). Fațada e o
+singură formă plană cu golurile ușii și vitrajului tăiate ca niște crestături (golurile trec de tăietura acoperișului, deci nu pot fi
+„găuri” într-o formă). Partea de deasupra tăieturii (`YC`) e în grupul acoperișului, cu seturi `fadeSet`. Camerele: Living,
+Bucătărie, Baie, Dormitor (în această ordine sunt și imaginile `ai`).
+
+**Datele casei.** T6 nu e în catalogul paginii (`window.CAT`), așa că rândul ei din `CASE` are `date: { s, sn, d, a, l, t, p }`;
+`garden.js` ia datele cu `catOf(c)` = catalog sau `c.date`. Butonul „Fotografii” (care deschide fișa din catalog) apare doar la
+casele din catalog (`inCat`).
+
+**Grădina mărită.** `GRADINA = { latime: 64, adancime: 98, centruZ: 5, intrareZ: 54, straturiNoi }` (înainte 72 / −8 / 28): gardul
+din spate a rămas la z = −44, cel din față s-a mutat de la 28 la 54. În `genv.js`:
+- generatorul de numere „la întâmplare” e unul singur, cu sămânță fixă; ca partea veche să rămână exact la fel, după gardul viu
+  (acum mai lung) sămânța e readusă la valoarea pe care o avea în grădina veche, iar tot ce e nou (aleea de la poarta nouă, aleile
+  caselor din partea nouă, straturile, tufele și copacii din față) își ia numerele din șirul separat `extra(() => …)`. S-a verificat
+  că valorile seminței după alei, straturi și copaci sunt aceleași ca înainte (1891905295 / 273289321 / 926850888 / 394009525);
+- `VECHI = { ez: 28, gz: -8 }` ține locul porții și mijlocul vechi: aleea veche, straturile de lângă vechiul gard din față, lampa din
+  spatele rondului și cercurile de copaci din afara gardului se așază după ele, nu după grădina nouă;
+- curtea de asfalt și stâlpii porții se mută odată cu poarta.
+Vederea cu toată grădina (`view()` în `garden.js`): `L = { tz: GZ + 10, el: 31, fw: 82, fh: 58 }`, `P = { tz: GZ + 10, el: 50, fw: 50,
+fh: 84 }`; camera e cu ~13% mai departe pe ecran lat, la fel de departe pe telefon. Umbrele acoperă acum ±60 m (`half: 60`).
+
+**Alte schimbări din aceeași trecere.**
+- `isLong(s)` = casă de cel puțin 1,5 ori mai lată decât adâncă: doar acelea se privesc „din lateral” pe ecran înalt (T6, aproape
+  pătrată, se vede din față, ca V3). Casele vechi au rămas cu aceleași locuri ale camerei (verificat cu `__gradina.views()`).
+- Indiciul „Apasă pe o casă…” stă acum jos, deasupra barei cu case, pe orice ecran (sus acoperea eticheta casei din fundul grădinii).
+- Până apare scena, desenul nu mai adoarme (`awake` rămâne treaz cât `live` e fals): dacă imaginea reală nu venea, scena putea
+  rămâne la „Se pregătește grădina…” până la prima atingere.
+- `surse/ai360/vederi/capflat.js` citește ordinea caselor din `gradina-data.js` (nu mai are lista scrisă de mână).
+
+**Imaginile reale** (toate făcute în aceeași zi; rețeta și nodurile: `surse/ai360/CITESTE.md`, partea a cincea): `gr_all`, `gr_all_p`
+(grădina mărită), `gr_t6`, `gr_t6_p`, `pl_t6_1`, `t6_living`, `t6_bucatarie`, `t6_baie`, `t6_dormitor`, cadrele `img/gd/rot/t6/`.
+`img/gd/gradina.webp` (imaginea de rezervă) e tăiată din `gr_all`. Copia dinainte: `versiuni/gradina-inainte-t6/`.
+
+**De știut.** Rotirile caselor vechi nu arată T6 și partea nouă în fundal (au fost filmate înainte). Locul din stânga al părții noi
+(−15,5 · 40) e liber, cu un strat de flori (`GRADINA.straturiNoi`).
+
