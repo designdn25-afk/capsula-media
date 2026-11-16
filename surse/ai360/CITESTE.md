@@ -125,18 +125,38 @@ Clientul a văzut vederea reală a lui X7 și i-a plăcut, dar: „când miști 
 5. Rândul din `ROTIRI`: `X7: [{ zi: 'x7', n: 72, az0: <az0 din info.json>, r: [cadrul din cadre.json] }, null]`.
    Mecanismul a fost probat cu cadrele machetei (X7, az0 122): merge, etichetele celorlalte case rămân la locul lor.
 
-## Prețuri (estimări date de ElevenLabs pe 15 nov 2026, fără să se fi rulat nimic)
-- Kling O3 Video Edit: ~815 credite pe secundă de filmare; filmarea de 8 s se taxează ca 10 s → **~8.150 pe rotire**, ~1,6 $.
-- Kling 4.0 Video Edit, 1080p: ~1.370 credite pe secundă → **~13.700 pe rotire**, ~2,7 $.
-- Seedance 2.5 Video Edit, 1080p: ~30.000 de credite pentru o probă de 4 secunde (prea scump).
-- O imagine (zi sau seară), 4K: ~2.270 de credite.
-Nimic din toate acestea nu s-a putut proba: contul ElevenLabs legat în Claude avea 0 credite (din 50.254). Întâi se probează o
-singură rotire (X7) cu Kling O3 și, dacă nu e destul de bună, cu Kling 4; abia apoi restul caselor.
+## Ce a ieșit la probe (16 nov 2026, după ce clientul a pus credite)
+- **Kling O3 Video Edit** (`uI69SqM6B14cKERVIcod`, 8.144 credite): **nereușit**. A întors filmarea aproape neschimbată (tot machetă 3D).
+  Cererea era plină de „păstrează exact / nu schimba nimic” și modelul n-a schimbat nimic. Nu se mai folosește.
+- **Runway Aleph 2** (`4YNdcVsqsZcG3TfXQPXp`, 13.573 credite, 1920×1080, 192 de cadre): **reușit**. Gazon, hale, cer și interior reale,
+  iar casa și grădina rămân pe traseul machetei cadru cu cadru. E mai „moale” decât imaginea fixă 4K, dar mult peste machetă.
+  Cererea scurtă, de tip „restyle” (e în nod): „Restyle this 3D animation as photorealistic live-action drone footage of a real place,
+  with the look of the reference photo: … Same camera movement …”. Primește filmarea 3D și imaginea reală a vederii.
+- **Capcana lui Aleph:** pornește de la imaginea de referință. Rotirea lui X7 pornea din spatele casei, deci primele ~25 de cadre au
+  ieșit greșite (casa văzută din față, trecând treptat la traseu) și pe peretele din spate a apărut o ușă. Pe site aceste cadre sunt
+  ocolite (`EVITA=0-25` la `fixspin.py`: rotirea „stă” puțin în spatele casei). **De acum rotirea pornește din locul vederii**
+  (`capspin.js` face asta implicit), ca primul cadru să fie chiar imaginea de referință.
+- Pe site: **X7 are rotire reală** (ecran lat): `ROTIRI.X7 = [{ zi: 'x7', n: 72, az0: 122, r: [...] }, null]`, cadrele în
+  `site/img/gd/rot/x7/` (3,9 MB cele mici, 9,2 MB cele mari).
+
+## Ce urmează la rotire (când clientul spune să continui)
+1. Filmările 3D pornite din locul vederii, pentru toate casele: `rot9-<casă>.mp4` (făcute pe 16 nov în folderul de lucru al sesiunii;
+   se refac oricând cu `node capspin.js <casă> 192 1920`). Se urcă temporar pe `gh-pages` și se atașează în flux.
+2. Pentru fiecare casă: nod `video-generation`, model `runway-aleph2`, legat la filmare (`video`) și la imaginea reală de zi a casei
+   (`image`), cu cererea din nodul lui X7 și descrierea casei. ~13.600 de credite pe casă.
+3. `python3 fixspin.py filmare.mp4 ../../../site/img/gd/rot/<casă> 72`, apoi rândul din `ROTIRI` cu `az0` din `info.json` (= unghiul vederii).
+4. Opțional: X7 refăcut la fel (ca să dispară porțiunea „înghețată” din spate), rotiri pentru telefon (`capspin.js <casă> 192 1920 1`),
+   rotiri de seară, un arc pentru toată grădina.
+
+## Prețuri (16 nov 2026)
+- Runway Aleph 2: **~13.600 de credite pe rotire** (8 s). Kling O3 Edit: ~8.150, dar nu transformă. Kling 4 Edit 1080p: ~13.700 (neprobat).
+- O imagine 4K cu o referință: ~2.270; cu două referințe: ~2.730 (la 1K: ~2.440, deci nu merită coborâtă rezoluția).
 
 ## Ce e pregătit în fluxul ElevenLabs „Gradina cu case - vizualizare reala” (`yUzMp1srSOsKx9pUwTk2`), nepornit
 - ~~11 imagini de zi~~: făcute pe 16 nov 2026 (tabelul din partea a doua).
-- **12 imagini de seară** (fiecare primește sursa de seară + imaginea de zi a aceleiași vederi, ca locul să arate la fel; deci se
-  pornesc **după** imaginile de zi). Sursele: `vederi/gr_*_n_src.jpg`; cererile: `vederi/cereri.json`.
+- **12 imagini de seară** (fiecare primește sursa de seară + imaginea de zi a aceleiași vederi, ca locul să arate la fel). Atenție:
+  nodurile de seară sunt legate la primele noduri de zi; pentru V3, E7, M9 imaginea de zi folosită pe site vine din nodurile „v4”
+  (vezi partea a doua), deci nodul de seară trebuie legat la acela (sau făcut din nou) înainte de pornire. Sursele: `vederi/gr_*_n_src.jpg`; cererile: `vederi/cereri.json`.
 
 | imagine | nod |
 |---|---|
@@ -154,9 +174,7 @@ singură rotire (X7) cu Kling O3 și, dacă nu e destul de bună, cu Kling 4; ab
 | gr_m9_p_n | g0rxya8dqrhE49mJOewI |
 
   După descărcare: `fixflat.py` cu sursa de seară, apoi numele fișierului se adaugă ca al șaselea element în rândul vederii din `VEDERI`.
-- **Rotirea X7, proba** (filmarea de 8 s, cu imaginea reală a lui X7 ca referință): **`uI69SqM6B14cKERVIcod`** (Kling O3, ~8.150
-  credite) și, doar dacă prima nu e destul de bună, **`TvODuvG3eff1v3crrz9n`** (Kling 4, ~13.700). Nodurile mai vechi „ROTIRE X7 zi”
-  (filmarea de 288 de cadre) și „proba 4s” au fost doar pentru estimarea prețului: **nu se pornesc**.
+- **Rotirea X7**: făcută cu Runway Aleph 2 (vezi mai sus). Nodurile „ROTIRE … Kling …” și „proba 4s” **nu se mai pornesc**.
 - **Filmările 3D ale celorlalte case** sunt deja atașate în flux (nu mai trebuie urcate): T7 `OScVVLsjG0YoZVJylusI`, E7
   `CAFUSu5rQaEmOL9s8q5O`, V3 `0EdU80lAjiT2nO27ISmY`, M9 `CJRhjOHLkgQZCo9JK1GB` (X7: `8XUP7obXZHWDERwtIbiU`). După probă se face pentru
   fiecare un nod ca al lui X7, cu modelul care a ieșit mai bine, legat la filmare și la imaginea de zi a casei (nodul ei din tabelul

@@ -129,25 +129,18 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   orientativă” — **nu scoate mențiunea** (generatorul schimbă detalii de mobilier și finisaje). Cum se refac: `surse/ai360/CITESTE.md`.
   Dacă se schimbă forma sau mobila unei case, imaginile ei trebuie refăcute (altfel nu se mai potrivesc cu macheta). X7 rămâne cu
   fotografiile reale. Un film de prezentare făcut la fel (animație → video cu AI) nu s-a făcut încă; cere din nou acordul pentru credite.
-- **Vederile din afară, „reale” cu AI** (cerut pe 14–15 nov 2026: grădina de sus și fiecare casă din afară să arate real, cu hale în
-  jur, „să vadă că suntem în România, în Ciorogârla”; „folosește ambele, și Higgsfield, și ElevenLabs”): în jurul grădinii sunt hale și
-  o curte de asfalt, iar fiecare vedere din afară poate primi o imagine realistă făcută din același loc (`VEDERI` în
-  `site/js/gradina-data.js`), care apare peste macheta 3D ziua, cu mențiunea „Vizualizare realizată cu AI, orientativă” (**nu o scoate**).
-  **Gata doar X7 pe ecran lat** (calculator, tabletă, panoul îngust). Celelalte 11 (grădina de sus, X7 pe telefon, T7, E7, V3, M9) sunt
-  pregătite în ElevenLabs, dar **s-au terminat creditele** (au rămas 270): fie clientul mai pune ~25.000 de credite și se pornesc
-  dintr-o comandă, fie le generează el în Higgsfield (conectorul Higgsfield din Claude **nu poate genera**, doar citește contul).
-  Pagina făcută pentru el, cu pozele și textele de lipit în Higgsfield: https://claude.ai/artifact/5DRE5A9xasjCnU9aXFuMQR
-  Pașii, nodurile pregătite și cifrele: `surse/ai360/CITESTE.md`, partea a doua. Dacă se mută o casă, se schimbă grădina sau locul
-  camerei, imaginile trebuie refăcute.
-- **Rotire reală și seară reală** (cerut pe 15 nov 2026, cu filmuleț: „când miști capsula 360 tot așa apare pătrățos… și pe zi și pe
-  noapte”; poza reală pe loc îi place): pagina **știe deja** să arate, la rotire, cadrele unei filmări reale în locul machetei
-  (`ROTIRI` în `site/js/gradina-data.js`) și imagini de seară (al șaselea element din `VEDERI`), dar **nu există încă nici cadre, nici
-  imagini de seară**: contul ElevenLabs avea 0 credite. Sunt pregătite acolo, nepornite: 11 imagini de zi (~25.000 credite), 12 de
-  seară (~27.000) și proba de rotire pentru X7 (~8.150 pe rotire cu Kling O3, ~13.700 cu Kling 4; filmările 3D ale tuturor
-  celor cinci case sunt deja atașate acolo). Clientul a întrebat cum cumpără
-  credite (ElevenLabs → Subscription → Pay As You Go sau abonament mai mare, pe **același cont** legat în Claude). Când apar: întâi
-  imaginile de zi, apoi seara, apoi **o singură rotire de probă** și abia după aceea restul. Pași, noduri, prețuri:
-  `surse/ai360/CITESTE.md`, părțile a doua și a treia.
+- **Vederile din afară, „reale” cu AI** (cerut pe 14–16 nov 2026: „vreau să-mi faci toată grădina să arate așa”, cu hale în jur,
+  „să vadă că suntem în România, în Ciorogârla”; clientul a pus credite la ElevenLabs pe 16 nov): **toate cele 12 vederi de zi sunt
+  pe site** (toată grădina + fiecare casă, pe ecran lat și pe telefon; `VEDERI` în `site/js/gradina-data.js`), cu mențiunea
+  „Vizualizare realizată cu AI, orientativă” (**nu o scoate**). Dacă se mută o casă, se schimbă grădina sau locul camerei, imaginile
+  trebuie refăcute. Rețeta care dă fotografie adevărată (nu machetă „lustruită”) și nodurile: `surse/ai360/CITESTE.md`, partea a doua.
+- **Rotire reală** (cerut pe 15 nov cu filmuleț: „când miști capsula 360 tot așa apare pătrățos”): la rotire pagina arată cadrele
+  unei filmări reale în locul machetei (`ROTIRI`). **Gata la X7** (ecran lat), făcută cu Runway Aleph 2 din rotirea machetei
+  (~13.600 de credite pe casă; proba cu Kling O3 n-a transformat nimic). E mai moale decât imaginea fixă și „stă” puțin în spatele
+  casei. **Celelalte patru case, telefonul și seara nu au încă rotire reală** (se vede macheta): de întrebat clientul dacă îi
+  place rotirea lui X7 înainte de a cheltui pentru restul. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
+- **Seara** în grădină e încă machetă 3D: sursele și cele 12 noduri sunt pregătite în ElevenLabs (~2.730 de credite fiecare), nepornite.
+  Conectorul Higgsfield din Claude **nu poate genera** (doar citește contul).
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle
   camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare.
 - **Interior real în fiecare casă**: singurul mod ca interiorul să arate „pe bune” e cu fotografii 360° făcute în casa
