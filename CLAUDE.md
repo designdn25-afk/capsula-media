@@ -135,10 +135,12 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   „Vizualizare realizată cu AI, orientativă” (**nu o scoate**). Dacă se mută o casă, se schimbă grădina sau locul camerei, imaginile
   trebuie refăcute. Rețeta care dă fotografie adevărată (nu machetă „lustruită”) și nodurile: `surse/ai360/CITESTE.md`, partea a doua.
 - **Rotire reală** (cerut pe 15 nov cu filmuleț: „când miști capsula 360 tot așa apare pătrățos”): la rotire pagina arată cadrele
-  unei filmări reale în locul machetei (`ROTIRI`). **Gata la X7** (ecran lat), făcută cu Runway Aleph 2 din rotirea machetei
-  (~13.600 de credite pe casă; proba cu Kling O3 n-a transformat nimic). E mai moale decât imaginea fixă și „stă” puțin în spatele
-  casei. **Celelalte patru case, telefonul și seara nu au încă rotire reală** (se vede macheta): de întrebat clientul dacă îi
-  place rotirea lui X7 înainte de a cheltui pentru restul. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
+  unei filmări reale în locul machetei (`ROTIRI`). **Gata la X7, T7, E7 și M9** (ecran lat), făcută cu Runway Aleph 2 din rotirea
+  machetei (~13.600 de credite pe casă; proba cu Kling O3 n-a transformat nimic). E mai moale decât imaginea fixă; la X7 „stă” puțin
+  în spatele casei (filmarea ei pornea din spate; celelalte pornesc din locul vederii și sunt bune de la primul cadru).
+  **V3 nu are încă rotire reală**: filmarea 3D și nodul sunt pregătite (`50qiw4TNoMphOWRT69Ck`), dar pe 16 nov au rămas 12.317 credite
+  și trebuie 13.573. **Telefonul (vederea înaltă), toată grădina și seara nu au rotire reală** (se vede macheta). Clientul a cerut
+  „Lasă copacii”: copacii rămân în filmări, nu se ascund. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
 - **Seara** în grădină e încă machetă 3D: sursele și cele 12 noduri sunt pregătite în ElevenLabs (~2.730 de credite fiecare), nepornite.
   Conectorul Higgsfield din Claude **nu poate genera** (doar citește contul).
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle

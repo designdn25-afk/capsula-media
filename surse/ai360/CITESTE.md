@@ -177,6 +177,12 @@ Clientul a văzut vederea reală a lui X7 și i-a plăcut, dar: „când miști 
 | gr_m9_p_n | g0rxya8dqrhE49mJOewI |
 
   După descărcare: `fixflat.py` cu sursa de seară, apoi numele fișierului se adaugă ca al șaselea element în rândul vederii din `VEDERI`.
+- **Rotirile T7, E7, M9 (16 nov)**: filmări 3D pornite din locul vederii (`capspin.js`, az0 = unghiul vederii: T7 58, E7 4, V3 −66,
+  M9 −30), trecute prin Runway Aleph 2 cu imaginea de zi a casei ca referință; bune de la primul cadru, fără `EVITA`. Noduri: E7
+  `vuMso6SpPr1IjThalhUG`, T7 `nASV7ZSwyRPsQ9O1Wi9U`, M9 `okTRyEwlp1REDWShl65Y`. **V3 e pregătit, nepornit** (lipsă credite): nodul
+  `50qiw4TNoMphOWRT69Ck` (filmarea `B9m5USznZq8Rdm9S0S2H` + imaginea `2FFRoHGN59veEtifcMOy`); după rulare: `fixspin.py … rot/v3 72` și
+  rândul `V3: [{ zi: 'v3', n: 72, az0: -66, r: [-1.143, 0.811, -0.597, 0.503] }, null]` în `ROTIRI`. Filmările vechi (pornite din
+  spate) de mai jos nu se folosesc cu Aleph. Copacii rămân în filmări (cererea clientului).
 - **Rotirea X7**: făcută cu Runway Aleph 2 (vezi mai sus). Nodurile „ROTIRE … Kling …” și „proba 4s” **nu se mai pornesc**.
 - **Filmările 3D ale celorlalte case** sunt deja atașate în flux (nu mai trebuie urcate): T7 `OScVVLsjG0YoZVJylusI`, E7
   `CAFUSu5rQaEmOL9s8q5O`, V3 `0EdU80lAjiT2nO27ISmY`, M9 `CJRhjOHLkgQZCo9JK1GB` (X7: `8XUP7obXZHWDERwtIbiU`). După probă se face pentru
