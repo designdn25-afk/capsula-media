@@ -51,15 +51,16 @@ ale scenei 3D). O primă încercare cu imagini 360° n-a mers: generatorul a rec
 4. `fixflat.py`, apoi rândul din `VEDERI` (în `site/js/gradina-data.js`): `[fișier, stânga, dreapta, jos, sus]` cu cifrele din `cadre.json`.
    Unde lipsește o imagine (`null`), se vede macheta 3D. Seara se vede mereu macheta.
 
-## Unde s-a ajuns (15 nov 2026)
-Făcută și pusă pe site: **X7, ecran lat** (`gr_x7`). Creditele ElevenLabs s-au terminat (au rămas 270 din 50.254), așa că restul de
-11 sunt doar pregătite în fluxul „Gradina cu case - vizualizare reala” (`yUzMp1srSOsKx9pUwTk2`), cu referința și cererea puse, nepornite.
-Când sunt credite (~25.000), se pornesc dintr-o singură comandă (`creative_run_flow_nodes`, `generations_count: 1`):
+## Unde s-a ajuns (16 nov 2026)
+Clientul a pus credite la ElevenLabs („gata, verifică acum”) după ce a cerut: „vreau să-mi faci toată grădina să arate așa” (ca vederea
+reală a lui X7). **Toate cele 12 vederi de zi sunt făcute și puse pe site** (`VEDERI` complet: `gr_all`, `gr_x7`, `gr_t7`, `gr_e7`,
+`gr_v3`, `gr_m9` și perechile lor `_p` pentru ecran înalt). Nodurile din flux (pentru refaceri):
 
 | imagine | nod | proporție |
 |---|---|---|
 | gr_all | WdXp0s4IkSxfV22RbJLw | 5:4 |
 | gr_all_p | Db4atERiuIjrOWTiUTao | 2:3 |
+| gr_x7 | Rga4CczKuD3XXHyWSCbR | 16:9 |
 | gr_x7_p | UmRKiNBhhAH3aqg1Ljp6 | 4:3 |
 | gr_t7 | tz3zv44F6xiD3KsA5qKT | 16:9 |
 | gr_t7_p | RDC6yKIHJnjQJTF0IA57 | 4:3 |
@@ -70,15 +71,19 @@ Când sunt credite (~25.000), se pornesc dintr-o singură comandă (`creative_ru
 | gr_m9 | 39TOwIYaJJlZL3XmmPjp | 16:9 |
 | gr_m9_p | WAU18cayCsL06NKzyqWO | 4:5 |
 
+**Ce s-a învățat la generare:** cu aceeași cerere, generatorul scoate uneori o fotografie adevărată (X7, grădina de sus, T7, E7 pe
+telefon), alteori doar o machetă „lustruită” (iarbă și copaci ca în 3D). Pentru cele slabe se face un nod nou care primește **două
+imagini**: sursa (machetă) și **imaginea reală a lui X7** ca model de aspect (~2.730 de credite). Cererea trebuie să spună apăsat că
+**așezarea vine doar din prima imagine** (fiecare hală, copac, strat de flori, lampă la locul lui), iar din a doua se ia doar felul
+în care arată iarba, frunzișul, piatra, cerul; altfel generatorul copiază și împrejurimile din poza lui X7 (așa a pățit prima
+încercare la M9). `fixflat.py` arată câte puncte s-au potrivit: sub ~50 de potriviri înseamnă că împrejurimile au fost schimbate.
+
 În același flux au rămas 12 noduri mai vechi („… afara - real”, cu surse 360°): **nu se pornesc** (metoda abandonată; două au fost
 rulate ca probă și nu s-au folosit).
 
 **Higgsfield** (cerut de client): conectorul din Claude poate doar să citească din cont (modele, imaginile făcute, credite), nu poate
-genera și nu poate urca imagini. Clientul are abonament Ultra, cu „Nano Banana Pro” (același model) nelimitat: dacă generează el acolo
-cu sursele și cererile de mai sus, imaginile se pot lua cu `show_generations` și se pun pe site cu `fixflat.py`.
-Pagina pregătită pentru el, cu cele 11 poze, formatul fiecăreia și textul de lipit: https://claude.ai/artifact/5DRE5A9xasjCnU9aXFuMQR
-(privată; butonul „Deschide poza mare” duce la sursele urcate temporar pe `gh-pages`, în `img/gd/src/fl-*.jpg`: după fiecare
-publicare cu `tools/publica_pages.sh` trebuie urcate din nou acolo, cât timp mai e nevoie de ele).
+genera și nu poate urca imagini. Pagina făcută atunci pentru el (pozele și textele de lipit în Higgsfield) nu mai e necesară:
+https://claude.ai/artifact/5DRE5A9xasjCnU9aXFuMQR
 
 # Rotirea „reală” în jurul caselor și vederile de seară (15 nov 2026, ziua)
 
@@ -120,7 +125,7 @@ Nimic din toate acestea nu s-a putut proba: contul ElevenLabs legat în Claude a
 singură rotire (X7) cu Kling O3 și, dacă nu e destul de bună, cu Kling 4; abia apoi restul caselor.
 
 ## Ce e pregătit în fluxul ElevenLabs „Gradina cu case - vizualizare reala” (`yUzMp1srSOsKx9pUwTk2`), nepornit
-- **11 imagini de zi**: tabelul de mai sus (partea a doua).
+- ~~11 imagini de zi~~: făcute pe 16 nov 2026 (tabelul din partea a doua).
 - **12 imagini de seară** (fiecare primește sursa de seară + imaginea de zi a aceleiași vederi, ca locul să arate la fel; deci se
   pornesc **după** imaginile de zi). Sursele: `vederi/gr_*_n_src.jpg`; cererile: `vederi/cereri.json`.
 
