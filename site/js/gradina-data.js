@@ -44,4 +44,6 @@ export const VEDERI = {
 // n = câte cadre are o rotire completă; az0 = unghiul primului cadru (grade); r = ce cuprinde un cadru: [stânga, dreapta, jos, sus].
 // La „all” (toată grădina) filmarea acoperă doar un arc: arc = câte grade (de la az0), iar n = câte cadre are arcul.
 // Cum se fac: surse/ai360/CITESTE.md, partea a treia.
-export const ROTIRI = {};
+export const ROTIRI = {
+  X7: [{ zi: 'x7', n: 72, az0: 122, r: [-1.068, 0.686, -0.514, 0.473] }, null],
+};
