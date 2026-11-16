@@ -148,6 +148,14 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
   (fără zborul prin machetă; nici la pornire); rotirea are 192 de cadre mici (din ~2 în 2 grade) + 96 mari, se încarcă întâi
   cadrele de lângă unghiul la care te uiți și alunecă puțin după ce dai drumul. Nu readuce zborul 3D între vederi. Copia dinainte:
   `versiuni/gradina-inainte-treceri-reale/`. Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
+- **„Plan” real (16 nov, „când apăs pe plan arată pătrățos”):** vederea „Plan” (acoperișul ridicat) are imagine reală făcută cu AI la
+  **T7, E7 și M9 (etajul)**, pe ecran lat, ziua (`PLANURI` în `site/js/gradina-data.js`, fișiere `img/gd/ai/pl_*.webp`, cu mențiunea AI).
+  **X7 și V3 au ieșit „machetă lustruită” și nu s-au pus** (de refăcut cu rețeta cu două referințe, ~2.730 credite fiecare); **M9
+  parterul** nu s-a făcut. Creditele ElevenLabs s-au terminat pe 16 nov (au rămas ~950). Rotirea are acum și amestec între cadre vecine.
+- **Deschiderea site-ului „reală” (cerut pe 16 nov, cu captură: „și la început aici tot așa arată pătrățos și pe exterior și pe
+  interior… trebuie să schimbăm să arate frumos și real”):** NEFĂCUT. Trebuie filmarea 3D a poveștii transformată cu Runway Aleph
+  (câte ~13.600 credite pe 8 secunde; povestea are 5–6 capitole) și arătată cadru cu cadru la derulare, ca rotirile. De stabilit cu
+  clientul câte credite pune și dacă partea „desfăcută pe straturi” rămâne desen (AI-ul nu o redă corect).
 - **Seara** în grădină e încă machetă 3D: sursele și cele 12 noduri sunt pregătite în ElevenLabs (~2.730 de credite fiecare), nepornite.
   Conectorul Higgsfield din Claude **nu poate genera** (doar citește contul).
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de două ori că se poticnește): nu readuce opririle

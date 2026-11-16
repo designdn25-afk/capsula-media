@@ -54,4 +54,7 @@ export const ROTIRI = {
 /* Planul fiecărei case (vederea „Plan”, cu acoperișul ridicat) ca imagine realistă, pe ecran lat, ziua: câte un rând pe nivel,
    în ordinea butoanelor de nivel (lvl 1, lvl 2): [fișier din img/gd/ai, stânga, dreapta, jos, sus] sau null. Vezi surse/ai360/CITESTE.md. */
 export const PLANURI = {
+  T7: [['pl_t7_1', -1.128, 0.551, -0.61, 0.51]],
+  E7: [['pl_e7_1', -1.129, 0.561, -0.613, 0.513]],
+  M9: [['pl_m9_1', -1.129, 0.561, -0.614, 0.513], null],
 };

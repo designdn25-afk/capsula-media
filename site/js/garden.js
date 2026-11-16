@@ -151,7 +151,7 @@ async function boot() {
   function station(out) { const o = view(mode, sel, lvl, pvOf(mode, sel, lvl)); CAMK.forEach(k => { out[k] = o[k]; }); return out; }
   // imaginea realistă a vederii de acum (doar ziua, doar din afară), dacă există: [fișier, stânga, dreapta, jos, sus]
   const extOf = (i, pv) => { const e = VEDERI[i < 0 ? 'all' : H[i].c.cod]; return (e && e[pv]) || null; };
-  const planKey = () => { if (inView !== 'plan' || sel < 0 || timeGoal > 15 || pvOf('in', sel, lvl)) return null; const e = PLANURI[H[sel].c.cod]; return (e && e[lvl - 1]) || null; };   // planul casei (acoperișul ridicat), ecran lat, ziua
+  const planKey = () => { if (inView !== 'plan' || sel < 0 || timeGoal > 15 || W < 900 || pvOf('in', sel, lvl)) return null; const e = PLANURI[H[sel].c.cod]; return (e && e[lvl - 1]) || null; };   // planul casei (acoperișul ridicat), ecran lat, ziua
   const extKey = () => { if (mode === 'in') return planKey(); const e = extOf(mode === 'all' ? -1 : sel, pvOf(mode, sel, 1)); if (!e || timeGoal <= 15) return e; return e[5] ? [e[5], e[1], e[2], e[3], e[4]] : null; };   // seara: imaginea de seară, dacă există
   const extLoad = () => { const e = extKey(); if (e) pano.load(panoUrl('ai:' + e[0]), true); };
 

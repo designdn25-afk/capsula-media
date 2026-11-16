@@ -188,3 +188,13 @@ Clientul a văzut vederea reală a lui X7 și i-a plăcut, dar: „când miști 
   `CAFUSu5rQaEmOL9s8q5O`, V3 `0EdU80lAjiT2nO27ISmY`, M9 `CJRhjOHLkgQZCo9JK1GB` (X7: `8XUP7obXZHWDERwtIbiU`). După probă se face pentru
   fiecare un nod ca al lui X7, cu modelul care a ieșit mai bine, legat la filmare și la imaginea de zi a casei (nodul ei din tabelul
   cu imaginile de zi; deci după ce imaginile de zi există). Unghiul de pornire și cadrul fiecărei rotiri: `vederi/rotiri.json`.
+
+# Planul caselor ca imagine reală (16 nov 2026)
+Vederea „Plan” (acoperișul ridicat) se face ca vederile din afară: `__gradina.views()` dă și locurile `<casă>#<nivel>`, `rects.py` le
+calculează doar pentru ecran lat, `node capflat.js pl_t7_1 …` scoate sursele `pl_<casă>_<nivel>_src.jpg` (pagina de captură primește
+`&open=<index casă>:<nivel>`), apoi generatorul (o referință, 4K, proporția din `cadre.json`, 2.272 credite) și `fixflat.py`. Rândul
+merge în `PLANURI`. Cererea care a mers: „…a real house whose roof has been lifted off, so the furnished rooms are seen from above like
+a real-life architectural cutaway model at full scale… do not put the roof back…” (nodurile `pl_* plan real` din flux).
+Reușite: T7 `Xjy2htRyjjQ4ON447P3N`, E7 `K3gqnB6xn4njOTnkffQO`, M9 etaj `Zz5SUguBVAxxLrx5th2q` (casa a rămas puțin „desenată”).
+Nereușite (aproape neschimbate, nefolosite): X7 `fa4nSEYMFzgqegjZnMpJ`, V3 `QL2dAnC7yskQhKt0hWg9` — de refăcut cu a doua referință
+(planul reușit al lui T7, nodul de mai sus) ca țintă de calitate. M9 parter: sursa e atașată (`9ql03ssygXQf8zohvVjG`), fără nod.
