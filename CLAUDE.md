@@ -174,9 +174,10 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
   (ecran lat + telefon), planul, cinci camere (Living, Bucătărie, Baie, Dormitor 1, Dormitor 2) și rotirea (ecran lat). Modelul:
   `site/js/h_c20.js`, după planul din ofertă și filmulețul din fabrică. Date (din ofertă, fără cele sensibile): 20 ft,
   5,9 × 6,2 × 2,48 m, ≈ 36,6 m², două dormitoare + living cu bucătărie + baie; structură din țeavă de oțel zincată, pereți din
-  panouri de 75 mm, tablă maro cu aspect de lemn, ușă dublă din aluminiu cu **geam triplu**. **De întrebat clientul** (a fost
-  întrebat, n-a răspuns încă): cum vrea să se numească („C20” e nume de lucru), prețul de vânzare (acum „Preț pe ofertă”) și dacă
-  ușile dormitoarelor sunt albe (în filmuleț au folie albastră). Proforma are date sensibile: nu se urcă în git. În imaginea băii,
+  panouri de 75 mm, tablă maro cu aspect de lemn, ușă dublă din aluminiu cu **geam triplu**. Clientul a fost întrebat cum vrea
+  să se numească („C20” e nume de lucru), ce preț de vânzare are (acum „Preț pe ofertă”), dacă ușile dormitoarelor sunt albe (în
+  filmuleț au folie albastră) și dacă vrea refăcută rotirea lui X7; a răspuns **„lasă așa”** (17 nov; înțeles ca: rămân „C20”,
+  „Preț pe ofertă”, ușile albe, iar rotirea lui X7 nu se reface deocamdată). Nu-l mai întreba până nu aduce el vorba. Proforma are date sensibile: nu se urcă în git. În imaginea băii,
   așezarea obiectelor diferă puțin de machetă (generatorul le-a mutat), fără efect pentru vizitator.
 
 ## Ce mai e de făcut (la 14 noiembrie 2026)
