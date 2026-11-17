@@ -81,7 +81,8 @@ async function boot() {
     time = 10.6, timeGoal = 10.6, hover = -1, visible = false, raf = 0, last = 0, awake = 30, needMeasure = 2, started = false, auto = null, drag = null, lastN = -1, snap = 0, freeW = 1, freeH = 1, px = 3e6, slow = 0;
   const wake = () => { awake = 40; kick(); };
   // în casă: 'walk' = la nivelul ochilor, 'plan' = de sus, cu acoperișul ridicat
-  let inView = 'walk', pOp = 0, pA = null, pH = 0, pR = null, pAI = false, aiOn = false, noPano = false, backT = 0;   // pR = cât cuprinde imaginea vederii din afară (null = fotografie 360°)
+  const aiEl = sec.querySelector('.gd-ai'), AI_TXT = [aiEl ? aiEl.textContent : '', 'Fotografie reală · grădina de la ferestre e adăugată cu AI']; let aiTxt = 1;
+  let inView = 'walk', pOp = 0, pA = null, pH = 0, pR = null, pAI = 0, aiOn = false, noPano = false, backT = 0;   // pR = cât cuprinde imaginea vederii din afară (null = fotografie 360°)
   const W3 = { pos: new THREE.Vector3(), from: new THREE.Vector3(), to: new THREE.Vector3(), k: 1, yaw: 0, tyaw: 0, pitch: -4, tpitch: -4 },
     blend = { k: 1, dur: 1.6, fov0: 34, p0: new THREE.Vector3(), q0: new THREE.Quaternion() }, tP = new THREE.Vector3(), tQ = new THREE.Quaternion(), pano = createPano(G.renderer);
   const walking = () => mode === 'in' && inView === 'walk';
@@ -94,7 +95,7 @@ async function boot() {
     const pts = [], VT = window.VTN, pn = h.c.pano, M = G.M; h.g.updateMatrixWorld(true);
     if (pn && VT) pn.pts.forEach(([n, k]) => {   // fotografii reale: chiar locurile din care s-a fotografiat
       const d = VT[k]; if (!d) return; const kn = (window.VTNIGHT || {})[k], dn = kn && VT[kn];
-      pts.push({ n, p: h.g.localToWorld(new THREE.Vector3(d.p[0] - pn.x0, pn.ochi, d.p[1] + pn.z0)), yaw: h.c.rot + d.H + 180 - d.v[0], pitch: d.v[1], k, H: d.H, kn: dn ? kn : null, Hn: dn ? dn.H : 0 });
+      pts.push({ n, p: h.g.localToWorld(new THREE.Vector3(d.p[0] - pn.x0, pn.ochi, d.p[1] + pn.z0)), yaw: h.c.rot + d.H + 180 - d.v[0], pitch: d.v[1], k, H: d.H, kn: dn ? kn : null, Hn: dn ? dn.H : 0, g: !!(pn.gradina && pn.gradina.includes(k)) });
     });
     if (!pts.length) {   // machetă: se caută în fiecare cameră un loc liber pe podea și direcția cea mai deschisă
       const ms = []; h.api.root.traverse(o => { if (o.isMesh && o.material && o.material.visible !== false) ms.push(o); });
@@ -124,7 +125,10 @@ async function boot() {
   }
   // fotografiile mari (6144 px) doar pe ecrane mari, cu placă video care le duce; altfel cele de 4096 px
   const bigPano = G.renderer.capabilities.maxTextureSize >= 6144 && fine.matches && Math.max(innerWidth, innerHeight) * Math.min(devicePixelRatio || 1, 2) > 1500;
-  const panoUrl = k => (k.slice(0, 3) === 'ai:' ? 'img/gd/ai/' + k.slice(3) + '.webp' : 'p360/' + k + (bigPano ? '_l' : '_m') + '.webp');
+  // fotografiile reale ale unei case pot avea, doar pentru grădină, copii în care la ferestre se vede grădina (pano.gradina în gradina-data.js):
+  // acelea se iau din img/gd/x7/; turul 360° păstrează fotografiile neschimbate din p360/
+  const PG = new Set(CASE.flatMap(c => (c.pano && c.pano.gradina) || []));
+  const panoUrl = k => (k.slice(0, 3) === 'ai:' ? 'img/gd/ai/' + k.slice(3) + '.webp' : (PG.has(k) ? 'img/gd/x7/' : 'p360/') + k + (bigPano ? '_l' : '_m') + '.webp');
 
   /* Unde stă camera: toată grădina, o casă văzută din față, o casă văzută de sus (planul). Pentru fiecare există un loc pe ecran
      lat (pv = 0) și unul pe ecran înalt (pv = 1). Locul e fix, iar unghiul de vedere se potrivește după ecran: așa, din același
@@ -348,7 +352,7 @@ async function boot() {
     if (walk) { cRoomsT.textContent = 'Mergi în'; cRoomsV.innerHTML = w.pts.map((p, i) => `<button type="button" class="gd-rm${i === w.i ? ' on' : ''}" data-i="${i}" aria-pressed="${i === w.i}">${esc(p.n)}</button>`).join(''); }
     else if (inside) { cRoomsT.textContent = two ? (lvl === 1 ? 'La etaj' : 'La parter') : 'Camere'; cRoomsV.textContent = [...new Set(rs.map(r => r.n))].join(' · '); }
     viewBox.hidden = !inside; viewBtns.forEach(b => { const on = b.dataset.v === inView; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
-    cReal.hidden = !walk; if (walk) cReal.textContent = w.pts.some(p => p.ai) ? 'Imagini realizate cu AI · orientative' : w.pts.some(p => p.k) ? 'Fotografii reale 360°, făcute în showroom' : 'Machetă 3D orientativă';
+    cReal.hidden = !walk; if (walk) cReal.textContent = w.pts.some(p => p.ai) ? 'Imagini realizate cu AI · orientative' : w.pts.some(p => p.g) ? 'Fotografii reale 360° din showroom · grădina de la ferestre e adăugată cu AI' : w.pts.some(p => p.k) ? 'Fotografii reale 360°, făcute în showroom' : 'Machetă 3D orientativă';
     sec.dataset.view = inside ? inView : '';
     lvlBox.hidden = !(inside && !walk && two); lvlBtns.forEach(b => { const on = +b.dataset.l === lvl; b.classList.toggle('on', on); b.setAttribute('aria-pressed', on); });
     enterBtn.textContent = inside ? 'Ieși din casă' : 'Intră în casă';
@@ -477,9 +481,9 @@ async function boot() {
       spinFeed(spin.on ? p0 + tuaz / 360 * n : p0);
     } else if (spin.on && !sc) spin.on = false;
     // fotografia reală a camerei (dacă există): apare după ce camera a ajuns; la mers și la schimbarea zi/seară se vede macheta
-    let pt = null, ph = 180, pr = null, pai = false;
-    if (wk) { if (W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k && !(p.ai && timeGoal > 15)) { const night = timeGoal > 15 && p.kn, u = panoUrl(night ? p.kn : p.k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); ph = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; pai = !!p.ai; } } }
-    else if (tr >= 1 && blend.k >= 1 && Math.abs(uaz) + Math.abs(uel) < .05) { const e = extKey(); if (e && (mode !== 'in' || H[sel].k === lvl)) { const u = panoUrl('ai:' + e[0]); pt = pano.ready(u); if (!pt) pano.load(u, true).then(wake); pr = e.slice(1); pai = true; } }   // din afară: imaginea realistă a vederii
+    let pt = null, ph = 180, pr = null, pai = 0;   // pai: 1 = imagine făcută cu AI, 2 = fotografie reală în care doar grădina de la ferestre e adăugată cu AI
+    if (wk) { if (W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k && !(p.ai && timeGoal > 15)) { const night = timeGoal > 15 && p.kn, u = panoUrl(night ? p.kn : p.k); pt = pano.ready(u); if (!pt) pano.load(u).then(wake); ph = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; pai = p.ai ? 1 : p.g && !night ? 2 : 0; } } }
+    else if (tr >= 1 && blend.k >= 1 && Math.abs(uaz) + Math.abs(uel) < .05) { const e = extKey(); if (e && (mode !== 'in' || H[sel].k === lvl)) { const u = panoUrl('ai:' + e[0]); pt = pano.ready(u); if (!pt) pano.load(u, true).then(wake); pr = e.slice(1); pai = 1; } }   // din afară: imaginea realistă a vederii
     if (pt && pt !== pA && pOp < .02) { pA = pt; pH = ph; pR = pr; pAI = pai; }
     const sg = sk >= 0 ? 1 : 0; if (spin.op !== sg) { spin.op += clamp(sg - spin.op, -dt * 5, dt * 7); busy = true; }
     const hold = sk >= 0 && spin.op < 1 && pA && pR && pOp > 0;   // imaginea vederii rămâne până când cadrul rotirii a apărut de tot (să nu se vadă macheta între ele)
@@ -490,6 +494,7 @@ async function boot() {
     { const fx = !wk && !drag && rotLocked(); if (fx !== fixCls) { fixCls = fx; canvas.classList.toggle('fix', fx); } }
     if (!warmed && pOp >= 1 && !wk) { warmed = -1; setTimeout(() => { warmed = 0; warm(); }, 1800); setTimeout(warmSpin, 4200); }
     if (aiOn !== ((pAI && pOp > .5) || spin.op > .5 || !!xf)) { aiOn = !aiOn; sec.classList.toggle('gd--ai', aiOn); }
+    if (aiOn && aiEl) { const k = pAI === 2 && pOp > .5 && spin.op < .5 && !xf ? 2 : 1; if (k !== aiTxt) { aiTxt = k; aiEl.textContent = k === 2 ? AI_TXT[1] : AI_TXT[0]; } }   // mențiunea mică de pe imagine spune ce anume e făcut cu AI
     // acoperișurile și inelul auriu
     H.forEach((h, i) => {
       const kg = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0;
@@ -549,7 +554,7 @@ async function boot() {
   document.addEventListener('visibilitychange', () => { awake = 40; kick(); });
   addEventListener('resize', () => { needMeasure = 1; wake(); });
   sync();
-  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, views() { const o = []; [['all', -1], ...H.map((h, i) => [h.c.cod, i])].forEach(([k, i]) => [0, 1].forEach(pv => { const add = (k, q) => o.push({ k, pv, tx: +q.tx.toFixed(3), ty: +q.ty.toFixed(3), tz: +q.tz.toFixed(3), az: +q.az.toFixed(3), el: +q.el.toFixed(3), dist: +q.dist.toFixed(3), fw: +q.fw.toFixed(3), fh: +q.fh.toFixed(3) }); add(k, view(i < 0 ? 'all' : 'house', i, 1, pv)); if (i >= 0) for (let l = 1; l <= (H[i].api.levels || 1); l++) add(k + '#' + l, view('in', i, l, pv)); })); return o; }, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, mP, uaz: +uaz.toFixed(1), spin: { on: spin.on, cur: spin.a, pos: +spin.pos.toFixed(3), mix: +spin.mix.toFixed(2), op: +spin.op.toFixed(2), n: spin.im.filter(Boolean).length, nb: spin.bm.filter(Boolean).length, xf: !!xf, big: spin.lOk }, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
+  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, views() { const o = []; [['all', -1], ...H.map((h, i) => [h.c.cod, i])].forEach(([k, i]) => [0, 1].forEach(pv => { const add = (k, q) => o.push({ k, pv, tx: +q.tx.toFixed(3), ty: +q.ty.toFixed(3), tz: +q.tz.toFixed(3), az: +q.az.toFixed(3), el: +q.el.toFixed(3), dist: +q.dist.toFixed(3), fw: +q.fw.toFixed(3), fh: +q.fh.toFixed(3) }); add(k, view(i < 0 ? 'all' : 'house', i, 1, pv)); if (i >= 0) for (let l = 1; l <= (H[i].api.levels || 1); l++) add(k + '#' + l, view('in', i, l, pv)); })); return o; }, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, mP, wk: +W3.k.toFixed(2), bl: +blend.k.toFixed(2), pa: !!pA, uaz: +uaz.toFixed(1), spin: { on: spin.on, cur: spin.a, pos: +spin.pos.toFixed(3), mix: +spin.mix.toFixed(2), op: +spin.op.toFixed(2), n: spin.im.filter(Boolean).length, nb: spin.bm.filter(Boolean).length, xf: !!xf, big: spin.lOk }, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
 }
 
 /* Mai puține desene pe cadru (contează pe telefoane): piesele unei case care au același material și se mișcă împreună

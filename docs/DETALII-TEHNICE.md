@@ -413,3 +413,29 @@ Clientul: „când deschizi site-ul, când ai de sus în jos… îmi place tot c
 - Verificări (în folderul de lucru al sesiunii, nu în proiect): rotire completă trasă încet la X7 în ambele sensuri (macheta nu
   se vede, golul ține ~15 px de tras), rotire la 6 și 20 Mbps (fără pași înapoi), vederile fără rotire rămân pe loc, trecerile
   dintre vederi, mersul prin case.
+
+## 21. Casa C20, grădina la ferestrele lui X7, scaunul din E7 (17 noiembrie 2026)
+
+**Casa C20** (extensibilă, 20 ft; a doua casă comandată de client). `site/js/h_c20.js`: miez de 2,2 m cu ramă neagră și două aripi
+cu acoperiș înclinat; pereții dinăuntru sunt după planul din ofertă (peretele dormitoarelor la x = 0,62, în interiorul miezului;
+dormitoare inegale; baia de 1,39 m). Material propriu pentru panourile maro (`lemn`, cu `emissive` diferit de zero) și pentru
+pardoseală (`podea`, cu lumină proprie constantă: materialele proprii nu primesc lumina de interior a celor comune, iar fără ea
+pardoseala ieșea aproape neagră în capturile 360°). Fiindcă pardoseala nu e `M.floor`, pagina își ia înălțimea podelei din punctul
+camerei: toate camerele au `y = pardoseala + 1,1`. În grădină stă pe locul din stânga al părții noi (−15,5 · 40, rot 30), în locul
+stratului cu flori; datele ei sunt în rândul `date` (ca la T6). Are toate imaginile reale (vedere lată + de telefon, plan, cinci
+camere, rotire): `VEDERI.C20`, `PLANURI.C20`, `ROTIRI.C20`, `ai: [...]`. `surse/ai360/c20/pune_c20.py` o pune / o scoate din
+`gradina-data.js` (a fost ținută afară cât nu avea imagini, ca să nu se vadă macheta).
+
+**X7: grădina la ferestre.** `CASE[X7].pano.gradina = ['living', 'masa', 'blat', 'dorm']`: pentru aceste puncte `panoUrl` (în
+`garden.js`) ia fotografia din `img/gd/x7/` (copie a fotografiei reale în care doar ce e dincolo de geam e schimbat cu AI), ziua;
+seara și baia rămân pe `p360/`. Punctele poartă `g: true`; fișa casei scrie „Fotografii reale 360° din showroom · grădina de la
+ferestre e adăugată cu AI”, iar mențiunea mică de pe imagine (`.gd-ai`) își schimbă textul după ce e pe ecran (`pAI`: 1 = imagine
+făcută cu AI, 2 = fotografie reală cu grădina adăugată). Turul 360° (secțiunea 05) folosește în continuare `p360/` neschimbat.
+Cum s-au făcut copiile: `surse/ai360/CITESTE.md`, partea a șasea, și `surse/ai360/x7_geamuri/`.
+
+**E7.** Scaunul care intra în corpul de bucătărie a fost scos din `e7_living.webp` și `e7_bucatarie.webp` printr-un retuș pe
+bucăți (`surse/ai360/retus/`).
+
+**De știut la probe.** Imediat după încărcare, pe calculatorul de probă (fără placă video) pagina desenează foarte rar (filmarea de
+la deschidere și rotirile își aduc cadrele din timp): o probă care intră într-o casă trebuie să aștepte până când `state.pOp`,
+`state.bl` și `state.wk` ajung la 1 (au fost adăugate în `__gradina.state`), nu un număr fix de secunde.

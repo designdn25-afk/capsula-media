@@ -51,7 +51,8 @@ povestea de la deschidere și grădina cu case model. Detaliile tehnice și isto
   ridică) și vezi camerele, m², dimensiunile și prețul. Cerința clientului: „o grădină frumoasă… clientul să meargă frumos prin
   fiecare casă, apasă pe casă și să poată intra în casă, să vadă configurația, metri pătrați, tot, ca un fel de tur 3D”.
   **Cinci case sunt exemple din catalog** (X7, T7, E7, V3, M9), cu datele adevărate din `window.CAT`; a șasea, **T6** (din 16 nov
-  2026), e prima casă comandată de client (nu e în catalog: datele ei stau în rândul `date` din `site/js/gradina-data.js`). Clientul
+  2026), e prima casă comandată de client (nu e în catalog: datele ei stau în rândul `date` din `site/js/gradina-data.js`); a șaptea,
+  **C20** (din 17 nov 2026), e casa extensibilă de 20 ft din a doua proformă (tot cu `date`; numele „C20” e de lucru). Clientul
   a spus că va trimite și celelalte case model comandate („nu toate casele alea din video le-am luat… o să-ți dau eu casele model”):
   se schimbă în `site/js/gradina-data.js`, iar modelul 3D al fiecărei case se face după `surse/final/CASE-3D.md`.
   Machetele sunt orientative (scrie și sub scenă); nu inventa dotări, prețuri sau suprafețe.
@@ -59,16 +60,21 @@ povestea de la deschidere și grădina cu case model. Detaliile tehnice și isto
   în casă”. De aceea: grădina are cer, iarbă, copaci și materiale realiste (`js/real.js`, `js/gscene.js`, `js/genv.js`), iar
   „Intră în casă” te duce **în interior, la nivelul ochilor** (te uiți în jur, treci dintr-o cameră în alta). În **X7 se văd
   fotografiile reale 360° din showroom** (`site/p360`), aliniate cu macheta; celelalte case arată interiorul 3D până primim
-  poze 360° din ele. „Plan” (acoperișul ridicat) a rămas ca a doua vedere. Varianta dinainte (machetă simplă, doar acoperișul
+  poze 360° din ele. **Din 17 nov 2026, la ferestrele lui X7 se vede grădina, nu parcarea** (clientul: „aici aș vrea să arate din
+  grădină… nu din parcare”): în cele patru fotografii de zi cu ferestre (living, masă, blat, dormitor) doar ce e dincolo de geam
+  a fost schimbat cu AI, restul e fotografia reală. Copiile stau în `site/img/gd/x7/` și se folosesc **doar în grădină**
+  (`pano.gradina` în `gradina-data.js`); turul 360° păstrează fotografiile neschimbate. Pe fișa casei scrie „Fotografii reale 360°
+  din showroom · grădina de la ferestre e adăugată cu AI”, pe imagine apare mențiunea mică „Fotografie reală · grădina de la
+  ferestre e adăugată cu AI”, iar nota de sub grădină spune același lucru: **nu scoate aceste mențiuni**. „Plan” (acoperișul ridicat) a rămas ca a doua vedere. Varianta dinainte (machetă simplă, doar acoperișul
   ridicat) e în `versiuni/gradina-macheta/`.
 - **Grădina mărită + casa T6 (16 nov 2026).** Clientul: „bagă-ne ca 3D și capsula asta” (T6), apoi „și o să mai fie modele de case,
   trebuie să facem grădina mai mare”. Grădina a fost **mărită spre intrare** (adâncime 72 → 98 m; `GRADINA` în `gradina-data.js`).
   Reguli (nu le strica): **casele vechi și tot ce e în partea veche rămân exact pe loc** (imaginile reale și rotirile lor au fost
   făcute cu ele acolo; în `js/genv.js` lucrurile noi își iau numerele „la întâmplare” din șirul separat `extra(...)`, vezi comentariul
-  de acolo); casele noi se pun în partea din față (locuri: x = ±15,5, z = 40). **T6 e pe locul din dreapta**; **locul din stânga e
-  liber** (are un strat cu flori, `straturiNoi`), păstrat pentru următoarea casă. Când vine altă casă: modelul ei, rândul din `CASE`,
-  se scoate stratul de pe locul ei, apoi se refac **cele două imagini cu toată grădina** și se fac imaginile casei (pașii:
-  `surse/ai360/CITESTE.md`, partea a cincea). Dacă nu mai e loc, grădina se mai mărește tot spre intrare. Copia dinainte:
+  de acolo); casele noi se pun în partea din față (locuri: x = ±15,5, z = 40). **T6 e pe locul din dreapta, C20 (din 17 nov) pe cel
+  din stânga**: partea din față e plină. Când vine altă casă: grădina se mai mărește tot spre intrare (ca pe 16 nov), apoi modelul
+  ei, rândul din `CASE`, **cele două imagini cu toată grădina** refăcute și imaginile casei (pașii: `surse/ai360/CITESTE.md`, partea
+  a cincea; cum s-a făcut C20: partea a șasea). Copia dinainte:
   `versiuni/gradina-inainte-t6/`. T6 e **gri, ca la târg** (în poza din proformă era neagră cu lemn: clientul n-a confirmat încă
   culoarea comandată) și are **„Preț pe ofertă”** (prețul de vânzare nu se știe: nu-l inventa; prețul din proformă e de achiziție
   și nu se pune nicăieri).
@@ -85,10 +91,11 @@ site/                    tot ce se publică
   js/                    scenele 3D (module): kit.js (unelte comune), x7.js (modelul capsulei), stage.js + story.js (deschiderea),
                          gscene.js + genv.js + real.js + garden.js + gradina-data.js (grădina), pano.js (fotografii reale 360°
                          în interiorul caselor și imaginile realiste ale vederilor din afară), furn.js (mobilier, terase), h_<casă>.js (câte o casă:
-                         x7, t7, e7, v3, m9, t6; h_c20.js e casa nouă, pregătită, încă nepusă în grădină)
+                         x7, t7, e7, v3, m9, t6, c20)
   vendor/                three.js 0.170 ținut local (nu se încarcă nimic de pe alte site-uri)
   img/                   imaginile; img/ext (exterior), img/int (interior), img/vid (clipuri .mp4 + postere .webp),
-                         img/st și img/gd (imaginile de rezervă pentru deschidere și grădină, când 3D-ul nu poate porni)
+                         img/st și img/gd (deschiderea și grădina: img/gd/ai = imaginile reale ale vederilor și camerelor,
+                         img/gd/rot = cadrele rotirilor, img/gd/x7 = fotografiile lui X7 cu grădina la ferestre)
   p360/                  panoramele turului: <punct>_{s,m,l,x}.webp și miniaturile t_<punct>.jpg
 surse/final/home.base.html   SURSA paginii principale: tot în afară de părțile de mai jos (banda cu cifre, caracteristici,
                              model, tur, la comandă, galerie, contact, subsol, CSS/JS comun, Pannellum)
@@ -153,25 +160,24 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
 - TikTok: @multimester. X7: 36,5 m² utili, 39 m² construiți, 11,5 × 3,4 m, h 3,45 m, 39.500 € cu TVA, rate prin TBI Bank.
 - PDF-uri: https://casecapsula.ro/docs/oferta-capsula-x7-v2.pdf și https://casecapsula.ro/docs/prezentare-tehnica-x7.pdf
 
-## Cerut pe 17 noiembrie 2026 (în lucru; ElevenLabs a rămas fără credite: 297)
-Clientul a trimis patru lucruri. Ce costă credite e **pregătit, nepornit**; i s-a spus că trebuie ≈ 50.000–60.000 de credite
-(≈ 10–11 $: grădina la ferestrele lui X7 ≈ 10.900, casa nouă ≈ 38.600), plus ≈ 13.600 dacă vrea și rotirea lui X7 refăcută. Nodurile și pașii: `surse/ai360/CITESTE.md`, partea a șasea.
-- **„Nu se mișcă lent deloc”** (deschiderea și rotirea caselor): **făcut și publicat** (vezi mai jos „Mișcarea de la deschidere” și „Rotire reală”).
-- **„Aici scaunul este intrat în bucătărie”** (E7, living): **rezolvat și publicat** printr-un retuș ieftin (309 credite, din cele
-  rămase): scaunul a fost scos din cele două imagini ale camerelor (living, bucătărie); masa are acum un singur scaun în imagini.
-  În model scaunul e mutat lângă masă (`site/js/h_e7.js`); cele două noduri de refacere completă (≈ 4.550 de credite) rămân
-  opționale, pentru când vrea ambele scaune la locul lor. Cum s-a făcut: `surse/ai360/retus/retus_e7.py`.
-- **„Aici aș vrea să arate din grădină… nu din parcare”** (X7, interior: fotografiile reale 360° din showroom): pe geamuri se va pune
-  grădina, cu AI, doar în cele patru fotografii de zi cu ferestre (living, masă, blat, dormitor); restul fotografiei rămâne neatins.
-  Noduri pregătite (≈ 10.900 de credite). Copiile cu grădina se folosesc **doar în grădină** (turul 360° păstrează fotografiile
-  adevărate), iar eticheta și nota de sub grădină trebuie să spună că grădina de la ferestre e adăugată cu AI.
-- **„Hai să mai adăugăm și casa asta”**: casa extensibilă de 20 ft din a doua proformă (5,9 × 6,2 × 2,48 m, două dormitoare + living
-  cu bucătărie + baie). Modelul e gata (`site/js/h_c20.js`, făcut după planul din ofertă și filmulețul din fabrică), dar **nu e încă
-  în grădină**: intră doar odată cu imaginile ei reale (altfel s-ar vedea macheta). Rândul ei se pune cu
-  `surse/ai360/c20/pune_c20.py` (loc: x = −15,5, z = 40, în locul stratului cu flori). Capturile machetei (vederi, plan, cinci
-  camere, filmarea de rotire) sunt făcute și atașate în flux, iar nodurile sunt pregătite: mai trebuie doar pornite. Numele „C20” e de lucru: **de întrebat clientul** cum
-  vrea să se numească, prețul de vânzare (până atunci „Preț pe ofertă”) și dacă ușile dormitoarelor sunt albe (în filmuleț au
-  folie albastră). Proforma are date sensibile: nu se urcă în git. ≈ 38.000 de credite pentru toate imaginile și rotirea ei.
+## Cerut pe 17 noiembrie 2026 — făcut și publicat în aceeași zi
+Clientul a trimis patru lucruri și a pus credite la ElevenLabs („gata ai credite”). Cum s-a făcut fiecare și nodurile: `surse/ai360/CITESTE.md`,
+partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încercare nereușită la X7).
+- **„Nu se mișcă lent deloc”** (deschiderea și rotirea caselor): făcut (vezi mai jos „Mișcarea de la deschidere” și „Rotire reală”).
+- **„Aici scaunul este intrat în bucătărie”** (E7): scaunul a fost scos din cele două imagini ale camerelor printr-un retuș ieftin
+  (`surse/ai360/retus/retus_e7.py`); masa are acum un singur scaun în imagini. În model scaunul e mutat lângă masă
+  (`site/js/h_e7.js`); cele două noduri de refacere completă (≈ 4.550 de credite) au rămas nepornite, opționale.
+- **„Aici aș vrea să arate din grădină… nu din parcare”** (X7, interior): făcut (vezi „Decizii”, la grădină). Încercarea de a edita
+  toată fotografia 360° dintr-o dată **nu a mers** (generatorul a inventat ferestre unde sunt pereți); a mers editarea pe bucăți,
+  lipită înapoi doar unde s-a schimbat ceva (`surse/ai360/x7_geamuri/`).
+- **„Hai să mai adăugăm și casa asta”**: casa extensibilă de 20 ft (**C20**) e în grădină, toată în imagini reale: vederea din afară
+  (ecran lat + telefon), planul, cinci camere (Living, Bucătărie, Baie, Dormitor 1, Dormitor 2) și rotirea (ecran lat). Modelul:
+  `site/js/h_c20.js`, după planul din ofertă și filmulețul din fabrică. Date (din ofertă, fără cele sensibile): 20 ft,
+  5,9 × 6,2 × 2,48 m, ≈ 36,6 m², două dormitoare + living cu bucătărie + baie; structură din țeavă de oțel zincată, pereți din
+  panouri de 75 mm, tablă maro cu aspect de lemn, ușă dublă din aluminiu cu **geam triplu**. **De întrebat clientul** (a fost
+  întrebat, n-a răspuns încă): cum vrea să se numească („C20” e nume de lucru), prețul de vânzare (acum „Preț pe ofertă”) și dacă
+  ușile dormitoarelor sunt albe (în filmuleț au folie albastră). Proforma are date sensibile: nu se urcă în git. În imaginea băii,
+  așezarea obiectelor diferă puțin de machetă (generatorul le-a mutat), fără efect pentru vizitator.
 
 ## Ce mai e de făcut (la 14 noiembrie 2026)
 - **Casele adevărate pentru grădină**: T6 e pusă (vezi mai jos). De cerut clientului celelalte case model comandate, cu poze /
@@ -179,18 +185,18 @@ Clientul a trimis patru lucruri. Ce costă credite e **pregătit, nepornit**; i 
   (alei, flori, lămpi).
 - **Interiorul caselor, „real” cu AI** (cerut de client pe 14 nov 2026: „înăuntru… arată tot pătrățos, vreau să faci real, ca pe
   video”; a aprobat explicit trimiterea imaginilor la ElevenLabs și consumul de credite pentru toate casele): din fiecare cameră a
-  caselor T7, E7, V3, M9 și (din 16 nov) T6 s-a scos o imagine 360° a machetei și a fost transformată în imagine realistă (23 de imagini, în
+  caselor T7, E7, V3, M9, T6 (16 nov) și C20 (17 nov) s-a scos o imagine 360° a machetei și a fost transformată în imagine realistă (28 de imagini, în
   `site/img/gd/ai/`, legate în `site/js/gradina-data.js` prin `ai: [...]`). Pe site apar cu mențiunea „Vizualizare realizată cu AI,
   orientativă” — **nu scoate mențiunea** (generatorul schimbă detalii de mobilier și finisaje). Cum se refac: `surse/ai360/CITESTE.md`.
   Dacă se schimbă forma sau mobila unei case, imaginile ei trebuie refăcute (altfel nu se mai potrivesc cu macheta). X7 rămâne cu
   fotografiile reale. Un film de prezentare făcut la fel (animație → video cu AI) nu s-a făcut încă; cere din nou acordul pentru credite.
 - **Vederile din afară, „reale” cu AI** (cerut pe 14–16 nov 2026: „vreau să-mi faci toată grădina să arate așa”, cu hale în jur,
-  „să vadă că suntem în România, în Ciorogârla”; clientul a pus credite la ElevenLabs pe 16 nov): **toate cele 14 vederi de zi (cu T6 și cu grădina mărită) sunt
+  „să vadă că suntem în România, în Ciorogârla”; clientul a pus credite la ElevenLabs pe 16 nov): **toate cele 16 vederi de zi (cu T6, C20 și grădina mărită) sunt
   pe site** (toată grădina + fiecare casă, pe ecran lat și pe telefon; `VEDERI` în `site/js/gradina-data.js`), cu mențiunea
   „Vizualizare realizată cu AI, orientativă” (**nu o scoate**). Dacă se mută o casă, se schimbă grădina sau locul camerei, imaginile
   trebuie refăcute. Rețeta care dă fotografie adevărată (nu machetă „lustruită”) și nodurile: `surse/ai360/CITESTE.md`, partea a doua.
 - **Rotire reală** (cerut pe 15 nov cu filmuleț: „când miști capsula 360 tot așa apare pătrățos”): la rotire pagina arată cadrele
-  unei filmări reale (`ROTIRI`). **Gata la toate cele șase case** (ecran lat; T6 din 16 nov), făcută cu Runway Aleph 2 din rotirea machetei
+  unei filmări reale (`ROTIRI`). **Gata la toate cele șapte case** (ecran lat; T6 din 16 nov, C20 din 17 nov), făcută cu Runway Aleph 2 din rotirea machetei
   (~13.600 de credite pe casă). 192 de cadre mici + 96 mari pe casă. Rotirea a fost rescrisă pe 16 nov (după trei filmulețe: „nu
   merge lin”, „tot parcă sunt blocaje”): cadrele se cer de lângă unghiul curent, sunt despachetate din timp în afara firului
   principal, pe ecran se trece doar prin cadre gata făcute (dacă netul nu ține pasul, rotirea așteaptă la ultimul cadru, nu sare
@@ -202,7 +208,7 @@ Clientul a trimis patru lucruri. Ce costă credite e **pregătit, nepornit**; i 
   grădina și la plan nu există filmare**: acolo imaginea rămâne pe loc. Clientul a cerut „Lasă copacii”: copacii rămân în filmări.
   Copii: `versiuni/gradina-inainte-treceri-reale/`, `versiuni/gradina-inainte-rotire-noua/`, `versiuni/gradina-inainte-fara-macheta/`.
   Pași și capcane: `surse/ai360/CITESTE.md`, partea a treia.
-- **„Plan” real**: toate casele au planul ca imagine reală (`PLANURI`: X7, T7, E7, V3, M9 etaj + parter, T6), folosit pe orice ecran
+- **„Plan” real**: toate casele au planul ca imagine reală (`PLANURI`: X7, T7, E7, V3, M9 etaj + parter, T6, C20), folosit pe orice ecran
   (pe ecran îngust se folosește tot imaginea „lată”). La X7 și la M9 parter casa a rămas puțin „desenată”.
 - **Deschiderea reală** (cerută pe 16 nov: „și la început aici tot așa arată pătrățos… vreau să faci totul real și lin”): **făcută**.
   Patru filmări Aleph (dimineața, ridicarea acoperișului, de sus → seara, seara) + cinci imagini-cheie. Între prânz și seară imaginea
@@ -221,7 +227,8 @@ Clientul a trimis patru lucruri. Ce costă credite e **pregătit, nepornit**; i 
   ofertă”), culoarea comandată (pe site e gri, ca la târg; în proformă apare neagră cu lemn) și dacă vrea un rând de notă sub nume.
   În proformă e prețul de achiziție: nu se pune pe site și nu se urcă în git, la fel datele personale și pozele cu oameni de la târg.
   **Ce nu se potrivește încă:** în rotirile caselor vechi (filmate înainte) T6 și partea nouă a grădinii nu apar în fundal; se
-  potrivește doar dacă se refac rotirile (≈13.600 de credite pe casă; X7 și T7 sunt cele din care s-ar vedea). Credite folosite
+  potrivește doar dacă se refac rotirile (≈13.600 de credite pe casă; X7 și T7 sunt cele din care s-ar vedea). La fel C20: apare
+  doar în rotirea ei și în cele două imagini cu toată grădina. Credite folosite
   pentru T6 și grădina mărită: ≈ 37.200 (5 imagini 4K, un retuș, 4 camere, rotirea).
 - **Mișcarea de la deschidere** trebuie să rămână lină (clientul a reclamat de trei ori că se poticnește): nu readuce opririle
   camerei între capitole și nu ridica bugetul de pixeli fără să probezi pe un ecran mare. A treia oară (17 nov 2026: „când ai de sus
