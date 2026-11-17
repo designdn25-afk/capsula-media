@@ -314,7 +314,11 @@ asta”, „aici scaunul este intrat în bucătărie” (E7), „aici aș vrea s
 avea 606 credite, deci **nimic din ce e mai jos n-a fost pornit**: sursele sunt atașate în flux și nodurile sunt făcute. Când sunt
 credite: `creative_run_flow_nodes` cu `generations_count: 1` (întâi `estimate_only: true`). Ordinea: E7 → X7 → C20.
 
-## 1. E7: scaunul scos din bucătărie (≈ 4.550 de credite)
+## 1. E7: scaunul scos din bucătărie (≈ 4.550 de credite; între timp rezolvat cu un retuș de 309 credite)
+**Făcut pe 17 nov, din creditele rămase:** scaunul a fost scos din cele două imagini printr-un retuș pe bucăți (cele două bucăți
+puse într-o singură imagine de 1376×768, `gemini-3.1-flash-lite-image` la 1K: 309 credite; nodul `OMfHZTV8Rw0ahpkNGNOL`, sursa
+`5Z0ap2vvqv9QGNvqLFhU`), lipit la loc cu `retus/retus_e7.py` (în `retus/` sunt și bucățile și rezultatul). Imaginile de pe site
+au acum masa cu un singur scaun. Refacerea completă de mai jos a rămas opțională (ar aduce al doilea scaun la locul lui).
 Al doilea scaun de la masa rotundă intra în corpul de bucătărie. În model a fost mutat (`site/js/h_e7.js`:
 `put(F.chair(M), -3.58, -.82, Math.PI / 2)`), iar sursele 360° au fost refăcute din aceleași puncte (`e7_living_src.jpg`,
 `e7_bucatarie_src.jpg`). În planul lui E7 (`pl_e7_1`) scaunul nu se vede, deci planul rămâne.

@@ -153,12 +153,14 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
 - TikTok: @multimester. X7: 36,5 m² utili, 39 m² construiți, 11,5 × 3,4 m, h 3,45 m, 39.500 € cu TVA, rate prin TBI Bank.
 - PDF-uri: https://casecapsula.ro/docs/oferta-capsula-x7-v2.pdf și https://casecapsula.ro/docs/prezentare-tehnica-x7.pdf
 
-## Cerut pe 17 noiembrie 2026 (în lucru; ElevenLabs a rămas fără credite: 606)
-Clientul a trimis patru lucruri. Ce costă credite e **pregătit, nepornit**; i s-a spus că trebuie ≈ 60.000 de credite (≈ 11 $),
-plus ≈ 13.600 dacă vrea și rotirea lui X7 refăcută. Nodurile și pașii: `surse/ai360/CITESTE.md`, partea a șasea.
+## Cerut pe 17 noiembrie 2026 (în lucru; ElevenLabs a rămas fără credite: 297)
+Clientul a trimis patru lucruri. Ce costă credite e **pregătit, nepornit**; i s-a spus că trebuie ≈ 50.000–60.000 de credite
+(≈ 10–11 $: grădina la ferestrele lui X7 ≈ 10.900, casa nouă ≈ 38.600), plus ≈ 13.600 dacă vrea și rotirea lui X7 refăcută. Nodurile și pașii: `surse/ai360/CITESTE.md`, partea a șasea.
 - **„Nu se mișcă lent deloc”** (deschiderea și rotirea caselor): **făcut și publicat** (vezi mai jos „Mișcarea de la deschidere” și „Rotire reală”).
-- **„Aici scaunul este intrat în bucătărie”** (E7, living): scaunul a fost mutat în model (`site/js/h_e7.js`), dar imaginile camerelor
-  (living, bucătărie) sunt încă cele vechi: se refac cu cele două noduri pregătite (≈ 4.550 de credite). În planul lui E7 scaunul nu apare.
+- **„Aici scaunul este intrat în bucătărie”** (E7, living): **rezolvat și publicat** printr-un retuș ieftin (309 credite, din cele
+  rămase): scaunul a fost scos din cele două imagini ale camerelor (living, bucătărie); masa are acum un singur scaun în imagini.
+  În model scaunul e mutat lângă masă (`site/js/h_e7.js`); cele două noduri de refacere completă (≈ 4.550 de credite) rămân
+  opționale, pentru când vrea ambele scaune la locul lor. Cum s-a făcut: `surse/ai360/retus/retus_e7.py`.
 - **„Aici aș vrea să arate din grădină… nu din parcare”** (X7, interior: fotografiile reale 360° din showroom): pe geamuri se va pune
   grădina, cu AI, doar în cele patru fotografii de zi cu ferestre (living, masă, blat, dormitor); restul fotografiei rămâne neatins.
   Noduri pregătite (≈ 10.900 de credite). Copiile cu grădina se folosesc **doar în grădină** (turul 360° păstrează fotografiile
