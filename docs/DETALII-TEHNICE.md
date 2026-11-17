@@ -439,3 +439,61 @@ bucăți (`surse/ai360/retus/`).
 **De știut la probe.** Imediat după încărcare, pe calculatorul de probă (fără placă video) pagina desenează foarte rar (filmarea de
 la deschidere și rotirile își aduc cadrele din timp): o probă care intră într-o casă trebuie să aștepte până când `state.pOp`,
 `state.bl` și `state.wk` ajung la 1 (au fost adăugate în `__gradina.state`), nu un număr fix de secunde.
+
+## 22. Filmul comprimat: imagine mare și în mișcare (17 noiembrie 2026, după-amiază)
+
+Clientul (cu un filmuleț al ecranului): „când dai în jos, de sus, când deschizi site-ul, nu se mișcă destul de lin… Și când vrei să
+miști capsula 360, parcă își pierde din calitate… la toate casele… și pe fundal”. Ce se vedea în filmuleț: cât stă pe loc, imaginea
+de 3840 px; la rotire, pozele mici (1024 px) sau „schița” (512 px) întinse pe tot ecranul, uneori două cadre amestecate (imagine
+dublă). Ce s-a măsurat: despachetarea unui cadru cu `createImageBitmap(<img>)` se face, în Chrome, **pe firul principal** (~13 ms pe
+cadru pe mașina de probă): la o derulare a poveștii, 91 de blocări de peste 50 ms (6,3 s din 15). Cu `createImageBitmap(blob)` se
+face în afara lui.
+
+**Ce s-a schimbat.**
+- `site/js/clip.js` + `site/js/clip-worker.js` — „filmul comprimat”. Aceleași cadre, la **1920×1080**, într-un film AV1 tăiat în
+  bucăți (`h_00.bin …`, câte 16 cadre la rotiri și 24 la deschidere; un cadru-cheie la 8 cadre) plus un film mic (`lo.bin`, 640 px).
+  O rotire are ≈ 11 MB (înainte: 8 MB de poze de 1024 px + 13 MB de cadre mari); deschiderea 28 MB (înainte 39 MB la 1280 px).
+  Fișierele: `site/img/gd/rot/<casă>/v/` și `site/img/st/film/v/`; le scrie `surse/ai360/vederi/faclip.py` (formatul e în capul lui).
+- Firul separat aduce bucățile (întâi cele de lângă locul curent), desface grupurile de cadre cu WebCodecs (`VideoDecoder`, AV1, în
+  procesor: `prefer-software`, la fel pe orice calculator) și **ține cadrele desfăcute la el**, în forma compactă (YUV). Pagina cere
+  ca imagine doar cadrele pe care le arată: cel sub care va fi „mâna” când sosește imaginea (ținta se mută în față cu întârzierea
+  măsurată, `lat`), următorul pe drum și cel de aici; ține doar câteva imagini (puțină memorie video). `c.want(poziție, viteză,
+  cadrele de pe ecran)` se cheamă la fiecare cadru desenat, `c.pick(poziție)` spune ce se arată.
+- Ce se arată: cadrul mare cel mai apropiat de poziție. Cadrul mic (`lo`) apare doar cât bucata mare de acolo **nu a sosit din rețea**;
+  dacă a sosit, se așteaptă cadrul mare (câteva sutimi de secundă) cu cel mare de alături pe ecran. Două cadre vecine se topesc unul
+  în altul doar la mișcare foarte lentă (sub `SLOWMIX = 14` cadre pe secundă) și doar pe mijlocul drumului dintre ele; altfel e mereu
+  un singur cadru, clar.
+- Unde nu merge (navigator fără WebCodecs sau fără AV1 în procesor: Safari; orice eroare pe parcurs), `state` devine `'off'` și se
+  folosesc **pozele separate**, ca înainte (`s_*.webp`, `f_*.webp`), aduse acum ca Blob și despachetate în afara firului principal.
+  Telefoanele și tabletele rămân pe poze (filmul comprimat se deschide doar cu mouse: `(hover:hover) and (pointer:fine)`).
+- Calculator fără placă video (desenul în procesor; și mașina de probă): transformarea cadrului în imagine se face pe firul separat,
+  la jumătate de mărime (`soft`), ca să nu se înfunde desenul paginii. `window.__clipSoft = true / false` alege cu mâna.
+- Când rotirea se oprește, vine ca înainte cadrul mare de oprire (`l_*.webp`), acum de **2560 px**.
+- Cât secțiunea nu e pe ecran, cadrele desfăcute se eliberează (`c.rest()`); la casa următoare clipul vechi se închide.
+- `warmSpin()` aduce din timp, pentru fiecare casă, filmul mic și bucățile din jurul vederii (un sfert de tur). La deschidere, restul
+  filmului se aduce în fundal abia după ce pagina s-a încărcat (și nu la „economisire date”).
+
+- **Ordinea pe o legătură înceată** (probat la 4 Mbps): ce e pe ecran are întâietate. Filmul unei case se deschide în bucla de
+  desen abia când imaginea vederii e gata (`spin.pend`; cel mult două secunde de așteptare); firul separat aduce întâi bucata de la
+  unghiul vederii, singură, apoi filmul mic, singur, apoi restul câte trei; restul rotirii vine în fundal doar după ce imaginea e pe
+  ecran sau vizitatorul a început să rotească (`all`); `warm()` și `warmSpin()` așteaptă cât `hungry()` (imaginea de pe ecran încă se
+  încarcă). Înainte de asta, la 4 Mbps imaginea casei apărea după ~30 s; acum după ~5 s, iar rotirea e gata la ~3 s.
+- Plasă de siguranță: dacă grupul de la unghiul curent e desfăcut de 6 secunde și tot nu a venit nicio imagine, sau trei cereri de
+  imagine la rând sunt refuzate, clipul se închide (`why` spune de ce; în `__gradina.state.spin.why`) și rămân pozele separate.
+
+**Sursele.** Toate filmările (7 rotiri, 4 bucăți ale deschiderii) au fost trecute prin Topaz („Rhea”, 4K): margini mai clare, fără
+detalii inventate. Rotirile lui X7 și T7 au fost refăcute din locul vederii, în grădina de acum (X7: fără „gol”, codul golului a fost
+scos; T7: fără dungile maronii de pe gazon). Detalii, noduri și credite: `surse/ai360/CITESTE.md`, partea a șaptea.
+
+**Cum se reface.** `python3 surse/ai360/vederi/farotire.py <casă> <filmare.mp4> [--mici]` (filmul comprimat + cadrele de oprire +,
+la cerere, pozele mici); pentru deschidere `cadrepoveste.py` apoi `faclip.py … --seg 24`. Apoi se mărește `v` în `ROTIRI` (respectiv
+`FILM.v` în `story.js`).
+
+**De știut la probe.**
+- `node --check fisier.js` **nu** prinde greșelile de sintaxă din modulele paginii (le citește ca scripturi obișnuite și trece mai
+  departe): se copiază fișierul cu extensia `.mjs` și se verifică acela.
+- Starea de probă: `__gradina.state.spin.vc` și `__story.film.vc` (`state`, `soft`, `lat` = întârzierea măsurată în ms, `gms` = cât
+  durează desfăcutul unui grup, `hi` = câte imagini mari ține pagina, `dec` = câte grupuri sunt desfăcute, `seg` = câte bucăți au sosit).
+- Pe mașina de probă (4 procesoare, fără placă video) un grup de cadre se desface în 110–180 ms (pe un calculator obișnuit, de
+  câteva ori mai repede), deci la derulare rapidă imaginea rămâne în urmă acolo; la derulare normală urmărește la sub un cadru.
+  Măsurat la aceeași derulare a poveștii: varianta veche 91 de blocări ale firului principal (6,3 s), cea nouă niciuna.

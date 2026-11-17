@@ -2,6 +2,7 @@
 // Marcajul și stilurile sunt în surse/final/parts/story.html. Modelul: js/x7.js; scena: js/stage.js.
 import { THREE, clamp, lerp, smooth, webglOK, clock } from './kit.js';
 import { createStage, orbit } from './stage.js';
+import { openClip } from './clip.js';
 
 const sec = document.getElementById('top');
 if (sec && sec.classList.contains('st')) boot();
@@ -10,9 +11,9 @@ function boot() {
   const $ = s => sec.querySelector(s), pin = $('.st-pin'), canvas = $('.st-gl'), chs = [...sec.querySelectorAll('.st-ch')],
     clk = $('.st-clock'), clkT = $('#stClock'), dayEl = $('.st-day'), rail = [...sec.querySelectorAll('.st-rail li')], labBox = $('.st-labels');
   const rm = matchMedia('(prefers-reduced-motion: reduce)');
-  let live = false;
+  let live = false, closeClip = null;
   const toStatic = () => {
-    live = false; sec.classList.remove('st--live', 'st--dark', 'st--film', 'st--fn', 'st--ai'); sec.classList.add('st--static');
+    live = false; if (closeClip) closeClip(); sec.classList.remove('st--live', 'st--dark', 'st--film', 'st--fn', 'st--ai'); sec.classList.add('st--static');
     sec.querySelectorAll('.st-still[data-src]').forEach(im => { im.src = im.dataset.src; im.removeAttribute('data-src'); });
     window.__skyDark = false; if (window.navU) window.navU();
   };
@@ -53,7 +54,7 @@ function boot() {
      Primele trei merg pe drumul camerei 3D (de aceea etichetele camerelor cad la locul lor); ultima (seara) are pasul ei.
      Ca derularea să fie lină: cadrele din jurul locului curent sunt despachetate din timp, în afara firului principal
      (ImageBitmap), iar pe ecran se trece doar prin cadre gata făcute (dacă netul nu ține pasul, imaginea vine din urmă lin). */
-  const FILM = { dir: 'img/st/film/', on: true, dis: 28, end: .8, out: .07, dark: .47,
+  const FILM = { dir: 'img/st/film/', v: 1, on: true, dis: 28, end: .8, out: .07, dark: .47,   // v = versiunea filmului comprimat din img/st/film/v/ (0 = nu există)
     // bucățile filmării: [primul cadru, câte cadre, derularea primului cadru, pasul, se topește în bucata următoare]. Din 17 nov 2026
     // sunt toate cadrele filmărilor (648; înainte doar unul din două): la o treaptă a rotiței imaginea trece prin de două ori mai multe.
     T: [[0, 192, .03, .175 / 192, 1], [192, 192, .205, .175 / 192, 1], [384, 72, .38, .17 / 191, 0], [456, 192, .38 + .17 * 72 / 191, (.78 - (.38 + .17 * 72 / 191)) / 191, 0]],
@@ -69,41 +70,55 @@ function boot() {
        orice loc al poveștii are repede ceva de arătat, oricât de iute se derulează;
      - cadrele mari se pregătesc în jurul locului spre care merge derularea (acolo unde se va opri imaginea), nu pe unde doar trece;
      - pe telefoane și tablete se cere doar un cadru din două (jumătate din date și din memorie). */
+  /* A doua rescriere din 17 nov 2026 (clientul, cu filmuleț: „nu se mișcă destul de lin… își pierde din calitate când o miști”):
+     - pe calculator, unde navigatorul poate, cadrele vin dintr-un film comprimat (clip.js; FILM.v): toate la 1920 px, desfăcute pe un
+       fir separat. În mișcare se văd cadre mari, nu schița; se cere separat doar primul cadru (apare imediat, înaintea filmului);
+     - pozele separate (telefoane, navigatoare fără WebCodecs) se aduc ca Blob și se despachetează în afara firului principal
+       (createImageBitmap dintr-un <img> se face, în Chrome, pe firul principal: ~10 ms pe cadru, de acolo poticnelile);
+     - între două cadre vecine nu se mai face amestec decât la mișcare foarte lentă și doar o clipă (amestecul dădea imagine dublă). */
   const PK = fineP ? 6 : 8, PW = fineP ? 480 : 320, SKIP = fineP ? 1 : 2;
+  let pageUp = document.readyState === 'complete'; if (!pageUp) addEventListener('load', () => setTimeout(() => { pageUp = true; }, 1500), { once: true });
+  // (bucățile din față se aduc din timp; restul filmului, în fundal, abia după ce s-a încărcat pagina și doar dacă vizitatorul nu economisește date)
+  const VC = { base: FILM.dir + 'v/', n: 648, seg: 24, gop: 8, w: 1920, h: 1080, lo: [480, 270], loop: false, ver: FILM.v, pre: 2, all: () => pageUp && !(navigator.connection && navigator.connection.saveData) };
+  const PKF = { a: -1, ra: null, b: -1, rb: null, t: 0, hi: false }, SLOWMIX = 14, sm01 = x => { x = clamp(x); return x * x * (3 - 2 * x); };
   const FW = fineP ? { load: 160, fwd: 26, back: 10, keep: 30 } : { load: 64, fwd: 16, back: 6, keep: 20 };   // în cadre, în jurul locului curent
-  const film = { state: FILM.on && fcv ? 'wait' : 'off', P: [], trk: [], im: [], bm: [], px: [], busy: null, nb: 0, np: 0, pq: [], cnt: 0, gc: 0, want: 0, dir: 1, pos: -1, a: -1, b: -1, ra: null, rb: null, t: -1, sw: -1, ww: 0, w: 0, h: 0, still: 0, next: null };
+  const film = { state: FILM.on && fcv ? 'wait' : 'off', P: [], trk: [], im: [], bm: [], px: [], busy: null, nb: 0, np: 0, pq: [], cnt: 0, gc: 0, want: 0, dir: 1, pos: -1, a: -1, b: -1, ra: null, rb: null, t: -1, sw: -1, ww: 0, w: 0, h: 0, still: 0, next: null, vc: null, vel: 0, lt: 0 };
+  const vcOn = () => !!film.vc && film.vc.state !== 'off';
   if (film.state !== 'off') {
     FILM.T.forEach((t, ti) => { for (let k = 0; k < t[1]; k++) { film.P[t[0] + k] = t[2] + t[3] * k; film.trk[t[0] + k] = ti; } });
     const N = film.P.length; film.im = new Array(N).fill(null); film.bm = new Array(N).fill(null); film.px = new Array(N).fill(null); film.busy = new Uint8Array(N);
-    const req = new Uint8Array(N), err = new Uint8Array(N), can = i => i >= 0 && i < N && !req[i] && (i % SKIP === 0 || i === N - 1); let act = 0;
+    if (FILM.v && fineP) { film.vc = openClip(VC, () => kick()); closeClip = () => { if (film.vc) film.vc.close(); }; }
+    const req = new Uint8Array(N), err = new Uint8Array(N), can = i => i >= 0 && i < N && !req[i] && (i % SKIP === 0 || i === N - 1) && (!vcOn() || i === 0); let act = 0;   // (cu filmul comprimat se cere doar primul cadru)
+    // un cadru adus ca Blob (se despachetează în afara firului principal); fără createImageBitmap, ca <img>
+    const loadFrame = url => (hasBitmap && typeof fetch === 'function' ? fetch(url).then(r => (r.ok ? r.blob() : Promise.reject(new Error('img'))))
+      : new Promise((ok, no) => { const im = new Image(); im.decoding = 'async'; im.onload = () => ok(im); im.onerror = no; im.src = url; }));
     // ordinea în care se cer cadrele: (1) cele de lângă locul curent, (2) schița rară a întregii filmări, (3) fereastra din jur,
     // (4) schița deasă. În fiecare grupă, întâi cele mai apropiate de locul curent.
     const around = (lim, back) => { const w0 = film.want - film.want % SKIP; for (let d = 0; d <= lim; d += SKIP) { const a = w0 + film.dir * d; if (can(a)) return a; if (d <= back) { const b = w0 - film.dir * d; if (can(b)) return b; } } return -1; };
     const sketch = st => { let best = -1, bd = 1e9; for (let i = 0; i < N; i += st) if (can(i)) { const d = Math.abs(i - film.want); if (d < bd) { bd = d; best = i; } } return best; };
     const pickNext = () => { let i = around(12, 12); if (i < 0) i = sketch(PK * 8); if (i < 0) i = sketch(PK * 4); if (i < 0) i = around(FW.load, FW.load / 3); if (i < 0) i = sketch(PK * 2); if (i < 0) i = sketch(PK); return i; };
-    const next = () => { while (act < 8) { const i = pickNext(); if (i < 0) return; req[i] = 1; act++; const im = new Image(); im.decoding = 'async';
-      im.onload = () => { act--; film.im[i] = im; if (!hasBitmap) film.bm[i] = im; else if (i % PK === 0) { film.pq.push(i); pump(); } kick(); next(); };
-      im.onerror = () => { act--; if (++err[i] < 3) setTimeout(() => { req[i] = 0; next(); }, 900 * err[i]); next(); };   // un cadru care nu vine deloc e sărit: se arată vecinii lui
-      im.src = FILM.dir + 'f_' + String(i).padStart(4, '0') + '.webp'; } };
+    const next = () => { while (act < 8) { const i = pickNext(); if (i < 0) return; req[i] = 1; act++;
+      loadFrame(FILM.dir + 'f_' + String(i).padStart(4, '0') + '.webp').then(im => { act--; film.im[i] = im; if (!hasBitmap) film.bm[i] = im; else if (vcOn()) bitmapOf(i); else if (i % PK === 0) { film.pq.push(i); pump(); } kick(); next(); },
+        () => { act--; if (++err[i] < 3) setTimeout(() => { req[i] = 0; next(); }, 900 * err[i]); next(); }); } };   // un cadru care nu vine deloc e sărit: se arată vecinii lui
     film.next = next; next(); setTimeout(() => { if (film.state === 'wait') { film.state = 'off'; kick(); } }, 9000);
   }
   // copia mică a unui cadru din schiță (rămâne în memorie cât e pagina deschisă); cel mult două deodată, să nu țină în loc cadrele mari
   function pump() {
     while (film.np < 2 && film.pq.length) { const i = film.pq.shift(), im = film.im[i]; if (!im || film.px[i]) continue; film.np++; let pr = null;
-      try { pr = createImageBitmap(im, { resizeWidth: PW, resizeHeight: Math.round(im.height * PW / im.width), resizeQuality: 'low' }); } catch (_) { pr = null; }
+      try { pr = createImageBitmap(im, { resizeWidth: PW, resizeQuality: 'low' }); } catch (_) { pr = null; }   // (înălțimea se potrivește singură)
       const done = b => { film.np--; if (b) film.px[i] = b; kick(); pump(); }; if (pr) pr.then(done, () => done(null)); else done(null); }
   }
   // despachetează un cadru mare în afara firului principal (pe telefoane și tablete, la o mărime mai mică, să țină mai puțină memorie)
   function bitmapOf(i) {
     const im = film.im[i]; if (!im || film.bm[i] || film.busy[i]) return; film.busy[i] = 1; film.nb++;
-    const ok = b => { film.nb--; film.busy[i] = 0; film.bm[i] = b; film.cnt++; kick(); }, plain = () => createImageBitmap(im).then(ok, () => { film.nb--; film.busy[i] = 0; film.bm[i] = im; kick(); });
-    if (!fineP && im.width > 960) { let pr; try { pr = createImageBitmap(im, { resizeWidth: 960, resizeHeight: Math.round(im.height * 960 / im.width), resizeQuality: 'medium' }); } catch (_) { pr = null; } if (pr) { pr.then(ok, plain); return; } }
+    const ok = b => { film.nb--; film.busy[i] = 0; film.bm[i] = b; film.cnt++; kick(); }, plain = () => createImageBitmap(im).then(ok, () => { film.nb--; film.busy[i] = 0; film.im[i] = null; kick(); });   // (un cadru stricat e sărit)
+    if (!fineP) { let pr; try { pr = createImageBitmap(im, { resizeWidth: 960, resizeQuality: 'medium' }); } catch (_) { pr = null; } if (pr) { pr.then(ok, plain); return; } }
     plain();
   }
   // pregătește cadrele mari din jurul locului c (locul spre care merge derularea) și le eliberează pe cele rămase departe
   function feedFilm(c) {
     const N = film.P.length; film.want = Math.max(0, Math.min(N - 1, Math.round(c))); if (film.next) film.next();
-    if (!hasBitmap) return;
+    if (!hasBitmap || vcOn()) return;
     const w0 = film.want - film.want % SKIP;
     for (let d = 0; d <= FW.fwd && film.nb < 5; d += SKIP) for (let k = 0; k < 2 && film.nb < 5; k++) { if (k && (!d || d > FW.back)) continue; const i = w0 + (k ? -d : d) * film.dir; if (i >= 0 && i < N) bitmapOf(i); }
     if (film.nb < 5 && film.want === N - 1) bitmapOf(N - 1);
@@ -121,24 +136,37 @@ function boot() {
   // desenează filmarea pentru derularea p (urmărită lin); pd = unde e derularea de fapt (acolo se va opri imaginea). Desenează doar
   // când se schimbă ceva. Întoarce false cât timp nu are nimic de arătat.
   function drawFilm(p, pd, now, W, H, x0, y0, iw, ih, part) {
-    const N = film.P.length, tf = filmAt(p), td = filmAt(pd);
+    const N = film.P.length, tf = filmAt(p), td = filmAt(pd), vc = vcOn() ? film.vc : null;
     if (film.pos >= 0 && Math.abs(td - film.pos) > .01) film.dir = td > film.pos ? 1 : -1;
     if (film.pos < 0 || Math.abs(tf - film.pos) > .004) film.still = now;
+    { const ds = Math.max(.004, Math.min(.1, (now - (film.lt || now)) / 1000 || .016)); film.vel += ((film.pos >= 0 ? (tf - film.pos) / ds : 0) - film.vel) * Math.min(1, ds * 14); film.lt = now; }   // viteza, în cadre pe secundă (netezită)
     film.pos = tf; feedFilm(td);
-    // cele mai apropiate cadre care au ceva de arătat (mare sau schiță), înainte și după locul curent
-    const fl = Math.floor(tf), ce = Math.ceil(tf); let a = -1, b = -1;
-    for (let i = fl; i >= 0 && i >= fl - 128; i--) if (filmSrc(i)) { a = i; break; }
-    for (let i = ce; i < N && i <= ce + 128; i++) if (filmSrc(i)) { b = i; break; }
-    if (a < 0 && b < 0) return film.a >= 0;
-    if (a < 0) a = b; else if (b < 0) b = a;
-    let t = b > a ? (tf - a) / (b - a) : 0;
-    if (b - a > 8) t = t < .5 ? 0 : 1;                                   // prea departe unul de altul ca să fie amestecate: cel mai apropiat
-    else if (now - film.still > 140) t = t < .5 ? 0 : 1;                // când derularea stă pe loc, rămâne un singur cadru, clar
-    if (t > .98) { a = b; t = 0; } else if (t < .02) { b = a; t = 0; } t = Math.round(t * 50) / 50;
-    const ra = filmSrc(a), rb = filmSrc(b);
+    const calm = Math.abs(film.vel) < SLOWMIX && now - film.still <= 140;   // mișcare foarte lentă: trecerea dintre două cadre vecine se topește o clipă
+    let a = -1, b = -1, t = 0, ra = null, rb = null;
+    if (vc) {   // filmul comprimat: cadre mari, cele mai apropiate de locul curent
+      const p0 = film.bm[0] || film.px[0];   // primul cadru, adus separat
+      if (vc.pick(tf, PKF) && (PKF.hi || tf > .5 || !p0)) { a = PKF.a; b = PKF.b; ra = PKF.ra; rb = PKF.rb; t = b !== a ? PKF.t : 0; }
+      else if (p0 && tf < 2) { a = b = 0; ra = rb = p0; }
+      else { vc.want(tf, film.vel, [film.a, film.b, film.sw]); return film.a >= 0; }
+      if (t) t = calm ? sm01((t - .3) / .4) : t < .5 ? 0 : 1;
+      if (t > .98) { a = b; ra = rb; t = 0; } else if (t < .02) { b = a; rb = ra; t = 0; }
+    } else {
+      // cele mai apropiate cadre care au ceva de arătat (mare sau schiță), înainte și după locul curent
+      const fl = Math.floor(tf), ce = Math.ceil(tf);
+      for (let i = fl; i >= 0 && i >= fl - 128; i--) if (filmSrc(i)) { a = i; break; }
+      for (let i = ce; i < N && i <= ce + 128; i++) if (filmSrc(i)) { b = i; break; }
+      if (a < 0 && b < 0) return film.a >= 0;
+      if (a < 0) a = b; else if (b < 0) b = a;
+      t = b > a ? (tf - a) / (b - a) : 0;
+      t = b - a > SKIP || !calm ? (t < .5 ? 0 : 1) : sm01((t - .3) / .4);   // un singur cadru, cel mai apropiat (fără imagine dublă)
+      if (t > .98) { a = b; t = 0; } else if (t < .02) { b = a; t = 0; }
+      ra = filmSrc(a); rb = filmSrc(b);
+    }
+    t = Math.round(t * 50) / 50;
     // la granița dintre două bucăți filmate în lumini diferite, sfârșitul bucății se topește în primul cadru al următoarei
-    const tr = FILM.T[film.trk[a]], nx = tr[0] + tr[1], jf = a - tr[0] + t * (b - a); let sw = -1, w = 0, rs = null;
-    if (tr[4] && nx < N && jf > tr[1] - 1 - FILM.dis) { if (hasBitmap) bitmapOf(nx); rs = filmSrc(nx); if (rs) { sw = nx; w = Math.round(clamp((jf - (tr[1] - 1 - FILM.dis)) / FILM.dis) * 50) / 50; } }
+    const tr = FILM.T[film.trk[a]], nx = tr[0] + tr[1], jf = a - tr[0] + t * (b - a), near = tr[4] && nx < N && jf > tr[1] - 1 - FILM.dis - 12; let sw = -1, w = 0, rs = null;
+    if (vc) vc.want(tf, film.vel, [a, b, near ? nx : -1]);   // (cadrele de pe ecran și primul cadru al bucății următoare rămân desfăcute)
+    if (tr[4] && nx < N && jf > tr[1] - 1 - FILM.dis) { if (vc) rs = vc.get(nx); else { if (hasBitmap) bitmapOf(nx); rs = filmSrc(nx); } if (rs) { sw = nx; w = Math.round(clamp((jf - (tr[1] - 1 - FILM.dis)) / FILM.dis) * 50) / 50; } }
     const dpr = Math.min(1.5, devicePixelRatio || 1), cw = Math.round(W * dpr), ch = Math.round(H * dpr);
     const geo = Math.round(x0) + ',' + Math.round(y0) + ',' + Math.round(iw);
     if (ra === film.ra && rb === film.rb && t === film.t && w === film.ww && cw === film.w && ch === film.h && geo === film.geo) return true;
@@ -228,10 +256,10 @@ function boot() {
     LAYERS.forEach(o => place(o, 6.3, S.x7.OFF[o.part] * c.ex + o.y, 0, lo, W, H));
   }
   const kick = () => { if (!raf && live && visible && !document.hidden) raf = requestAnimationFrame(frame); };
-  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; kick(); }).observe(sec);
+  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; if (!visible && film.vc) film.vc.rest(); kick(); }).observe(sec);   // (cât povestea nu e pe ecran, cadrele mari ale filmului se eliberează)
   document.addEventListener('visibilitychange', kick);
   addEventListener('resize', () => { W = 0; kick(); });
   live = true; sec.classList.add('st--live'); window.__skyDark = false; if (window.navU) window.navU();
   kick();
-  window.__story = { stage: S, get p() { return ps; }, get film() { return { state: film.state, pos: film.pos, a: film.a, b: film.b, t: film.t, big: !!(film.a >= 0 && film.bm[film.a]), n: film.cnt, sk: film.px.filter(Boolean).length, im: film.im.filter(Boolean).length }; } };
+  window.__story = { stage: S, get p() { return ps; }, get film() { return { state: film.state, pos: film.pos, a: film.a, b: film.b, t: film.t, big: !!(film.a >= 0 && film.bm[film.a]), n: film.cnt, sk: film.px.filter(Boolean).length, im: film.im.filter(Boolean).length, w: film.ra ? film.ra.width : 0, vel: +film.vel.toFixed(1), vc: film.vc ? film.vc.stat : null }; } };
 }

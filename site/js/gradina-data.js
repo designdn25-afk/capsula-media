@@ -65,17 +65,20 @@ export const VEDERI = {
 // macheta 3D. zi / seara = folderul cadrelor din img/gd/rot/ (s_000.webp … mici, pentru mișcare; l_000.webp … mari, pentru oprire);
 // n = câte cadre are o rotire completă; az0 = unghiul primului cadru (grade); r = ce cuprinde un cadru: [stânga, dreapta, jos, sus].
 // La „all” (toată grădina) filmarea acoperă doar un arc: arc = câte grade (de la az0), iar n = câte cadre are arcul.
-// gol = [de la cadrul, până la cadrul]: porțiunea din care filmarea nu are imagini bune (cadrele ei sunt copii ale celor două capete);
-// pagina trece repede peste ea, topind un capăt în celălalt (js/garden.js, „golul”). La X7: 50° în spatele casei; se scoate când se reface filmarea.
+// v = versiunea „filmului comprimat” al rotirii (img/gd/rot/<casă>/v/: aceleași cadre, la 1920 px, într-un film AV1 tăiat în bucăți;
+// js/clip.js). Unde navigatorul poate, în mișcare se văd cadrele lui (mari); pozele s_… rămân pentru celelalte navigatoare. Numărul
+// se mărește la fiecare refacere a fișierelor (ca navigatorul să nu amestece bucăți vechi cu bucăți noi).
+// Toate rotirile pornesc din locul vederii casei (az0 = unghiul vederii); cea a lui X7 a fost refăcută așa pe 17 nov 2026 (cea
+// veche pornea din spate și avea o porțiune fără imagini bune).
 // Cum se fac: surse/ai360/CITESTE.md, partea a treia.
 export const ROTIRI = {
-  X7: [{ zi: 'x7', n: 192, nl: 96, az0: 122, r: [-1.068, 0.686, -0.514, 0.473], gol: [191, 26] }, null],
-  T7: [{ zi: 't7', n: 192, nl: 96, az0: 58, r: [-1.065, 0.59, -0.51, 0.421] }, null],
-  E7: [{ zi: 'e7', n: 192, nl: 96, az0: 4, r: [-1.069, 0.712, -0.521, 0.481] }, null],
-  V3: [{ zi: 'v3', n: 192, nl: 96, az0: -66, r: [-1.143, 0.811, -0.597, 0.503] }, null],
-  M9: [{ zi: 'm9', n: 192, nl: 96, az0: -30, r: [-0.997, 0.795, -0.525, 0.483] }, null],
-  T6: [{ zi: 't6', n: 192, nl: 96, az0: -60, r: [-1.149, 0.805, -0.597, 0.503] }, null],
-  C20: [{ zi: 'c20', n: 192, nl: 96, az0: 60, r: [-1.164, 0.79, -0.597, 0.503] }, null],
+  X7: [{ zi: 'x7', n: 192, nl: 96, az0: -58, r: [-1.068, 0.686, -0.514, 0.473], v: 1 }, null],
+  T7: [{ zi: 't7', n: 192, nl: 96, az0: 58, r: [-1.065, 0.59, -0.51, 0.421], v: 1 }, null],
+  E7: [{ zi: 'e7', n: 192, nl: 96, az0: 4, r: [-1.069, 0.712, -0.521, 0.481], v: 1 }, null],
+  V3: [{ zi: 'v3', n: 192, nl: 96, az0: -66, r: [-1.143, 0.811, -0.597, 0.503], v: 1 }, null],
+  M9: [{ zi: 'm9', n: 192, nl: 96, az0: -30, r: [-0.997, 0.795, -0.525, 0.483], v: 1 }, null],
+  T6: [{ zi: 't6', n: 192, nl: 96, az0: -60, r: [-1.149, 0.805, -0.597, 0.503], v: 1 }, null],
+  C20: [{ zi: 'c20', n: 192, nl: 96, az0: 60, r: [-1.164, 0.79, -0.597, 0.503], v: 1 }, null],
 };
 
 /* Planul fiecărei case (vederea „Plan”, cu acoperișul ridicat) ca imagine realistă, pe ecran lat, ziua: câte un rând pe nivel,

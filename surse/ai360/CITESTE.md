@@ -386,3 +386,70 @@ dormitor 2 −13,338 · 40,045 (y = 1,85). Cadrele vederilor: `vederi/cadre.json
   fereastră mică): nu se știe cum arată spatele casei reale.
 **De întrebat clientul:** numele casei („C20” e de lucru), prețul de vânzare, dacă ușile dormitoarelor sunt albe (în filmuleț au
 folie albastră de protecție) și dacă vrea în grădină și copertina separată din proformă.
+
+# Partea a șaptea: „își pierde din calitate când o miști” — film comprimat, filmări mai clare, rotirea nouă a lui X7 (17 nov 2026, după-amiază)
+
+Clientul a filmat ecranul și a scris: „când dai în jos, de sus, când deschizi site-ul, nu se mișcă destul de lin… Și când vrei să
+miști capsula 360, parcă își pierde din calitate… la toate casele… și pe fundal și în spate, genul unei grădini”, apoi: „Mai sunt
+218.000 de credite. Rezolvă toate problemele ca să fie cum trebuie.”
+
+## Ce s-a găsit (în filmulețul lui și în măsurători)
+- Cât stă pe loc se vede imaginea de 3840 px. La rotire pagina arăta pozele mici (`s_`, 1024 px) sau, cât nu soseau, „schița” de
+  512 px, întinse pe tot ecranul: de aici „își pierde din calitate”. La deschidere, la fel (cadre de 1280 px și schiță de 480 px).
+- Despachetarea cadrelor (`createImageBitmap` dintr-un `<img>`) se face, în Chrome, **pe firul principal**: ~13 ms pe cadru pe mașina
+  de probă. La o derulare a poveștii: 91 de blocări de peste 50 ms, 6,3 s în total din 15 s. De aici „nu se mișcă lin”.
+- Amestecul dintre două cadre vecine dădea imagine dublă (stâlpul de lampă apărea de două ori).
+
+## Ce s-a făcut
+1. **Film comprimat** (`site/js/clip.js`, `site/js/clip-worker.js`; cum funcționează: `docs/DETALII-TEHNICE.md`, §22). Cadrele stau
+   într-un film AV1 tăiat în bucăți, desfăcut cu WebCodecs pe un fir separat: în mișcare se văd cadre de **1920 px**.
+2. **Filmările trecute prin Topaz** (nod `video-generation`, model `topaz-video-upscale-v2`, legat la nodul filmării Runway;
+   `model_parameters: { upscale_factor: 2, model: 'Rhea' }`; **2.424 de credite** pe o filmare de 8 s, oricare ar fi mărirea; iese
+   HEVC 3840×2160 marcat BT.709). Probate pe C20:
+   - `Starlight Fast 2` (5.453): cel mai mult detaliu, dar inventează (acoperiș „vălurit”, model în dungi pe copaci): **nu**;
+   - `Rhea` (2.424): margini clare, fără nimic inventat: **ales**. `Starlight Precise 2.6` / `Starlight HQ` costă 10.301 (neprobate).
+   Din filmarea de 4K se fac: cadrele de mișcare (1920 px, în filmul comprimat) și cadrele mari de oprire (`l_*.webp`, **2560 px**).
+3. **Rotirea lui X7, refăcută** din locul vederii (cea veche pornea din spate: arăta altfel decât imaginea casei și avea 50° fără
+   imagini bune). `node capspin.js x7 192 1920` → `rot10-x7.mp4` → Runway Aleph 2 cu imaginea de pe site ca referință (13.573) →
+   Topaz Rhea. `ROTIRI.X7`: `az0: -58`, fără `gol` (tot codul „golului” a fost scos din `garden.js`).
+4. **Rotirea lui T7, refăcută** la fel (cea veche avea dungi maronii pe gazon, în spatele casei, și grădina dinainte de mărire în
+   fundal). În cerere s-a adăugat: „a real, evenly green, freshly mown lawn with soft mowing stripes (no brown, dry or bare patches)”
+   și lista caselor din fundal. A ieșit din prima: gazon verde peste tot, T6 și C20 la locul lor.
+
+## Comenzile (din `surse/ai360/vederi/`)
+```
+# o rotire: filmul comprimat + cadrele mari de oprire (+ pozele mici, cu --mici, pentru navigatoarele fără WebCodecs)
+python3 farotire.py <casă> <filmarea Topaz .mp4> [--mici]          # o filmare Runway nemarcată: --m601
+# deschiderea: întâi cadrele mari (648, 1920×1080), apoi filmul comprimat
+python3 cadrepoveste.py <folder> --a0 … --a1 … --a2 … --a3r … --k0 … --k1 … --k2 … --k4 …
+python3 faclip.py <folder> ../../../site/img/st/film/v --seg 24
+```
+După o refacere se mărește `v` (în rândul casei din `ROTIRI`, respectiv `FILM.v` în `story.js`), ca navigatorul să nu amestece
+bucăți vechi cu bucăți noi. `faclip.py` are nevoie de `ffmpeg` cu `libsvtav1`.
+**Culori:** filmările Runway (nemarcate) au fost citite mereu cu matricea BT.601 (`--m601`), așa arată pe site; cele Topaz sunt
+marcate BT.709 și se citesc așa. Imaginile-cheie ale deschiderii: `first0_ai.png`, `key1_ai.png`, `key2c_ai.png`, `key4_ai.png`.
+
+## Nodurile (fluxul `yUzMp1srSOsKx9pUwTk2`)
+| ce | nod |
+|---|---|
+| Topaz C20 (întâi Starlight Fast 2, apoi Rhea, pe același nod) | `yZBuwl9hcUNUL7R4NsFy` |
+| Topaz Rhea: T7 · E7 · M9 | `tBie91yoYrleGaA6d8dB` · `eQStDyFW1FjSyejOzQVH` · `gkbp2N8ZT3O6mt4mxJqN` |
+| Topaz Rhea: V3 · T6 | `1BfpCeyPh5ITJwavtAsu` · `sUFlKdNUG8zGhdmjlVQJ` |
+| Topaz Rhea: deschiderea 0 · 1 · 2 · 3r | `HpeODGUn0m7uyhYS9p60` · `mvPok8wmQvxSg0H1d9OA` · `GkOB4lobZinJMydfF8NH` · `BCiaOtSGHghEuep51ugq` |
+| rotirea nouă X7: filmarea 3D · imaginea de referință | `v2f6DTwXMauh5KL58ax5` · `JsO7RiGpkr8JlOf3kbXM` |
+| rotirea nouă X7: Runway Aleph 2 · Topaz Rhea | `Vn8IbnzQqGtjfUAwZ5HR` · `JFvZ4roVqw7ilNTF2tGy` |
+| rotirea nouă T7: filmarea 3D · imaginea de referință | `1s0QnZPAAHEZFEztlV6I` · `6pgvOENzNkffyOCn3YX1` |
+| rotirea nouă T7: Runway Aleph 2 · Topaz Rhea | `GGixoDRcXs1r7O3M8838` · `Ba6espxwT6m4z9KGUob4` |
+
+La T7 și M9 prima rulare Topaz a eșuat („Error from model provider”); a doua a mers. Filmările descărcate (4K, 70–200 MB fiecare) nu
+sunt în git: se iau din nou din istoricul generărilor.
+
+## Credite (17 nov, după-amiază)
+Topaz: proba Starlight 5.453 · Rhea pentru 7 rotiri, 4 filmări ale deschiderii și cele două rotiri refăcute 31.512 (+ 4.848 dacă
+cele două rulări eșuate au fost taxate) · rotirile noi ale lui X7 și T7 27.146. În total **≈ 64.100–69.000** din cele 218.000
+anunțate de client.
+
+## Ce a rămas
+- În rotirile caselor E7, V3 și M9 fundalul e tot grădina dinainte de mărire (T6 și C20 nu apar); X7 și T7 sunt acum la zi.
+- Filmările Runway au limitele lor, pe care mărirea nu le repară: copacii din fundal se deformează puțin în timpul ocolului.
+- Navigatoarele fără WebCodecs / AV1 (Safari) și telefoanele rămân pe pozele separate (mai line ca înainte, dar la aceeași mărime).
