@@ -129,7 +129,12 @@ async function boot() {
   // fotografiile reale ale unei case pot avea, doar pentru grădină, copii în care la ferestre se vede grădina (pano.gradina în gradina-data.js):
   // acelea se iau din img/gd/x7/; turul 360° păstrează fotografiile neschimbate din p360/
   const PG = new Set(CASE.flatMap(c => (c.pano && c.pano.gradina) || []));
-  const panoUrl = k => (k.slice(0, 3) === 'ai:' ? 'img/gd/ai/' + k.slice(3) + '.webp' : (PG.has(k) ? 'img/gd/x7/' : 'p360/') + k + (bigPano ? '_l' : '_m') + '.webp');
+  // Pe ecran mic (telefon, panoul îngust), imaginile vederilor din afară și ale planurilor se iau la jumătate de mărime (img/gd/ai/m/,
+  // făcute de surse/ai360/vederi/famedii.py): pânza are acolo cel mult ~1300 px, deci nu se vede mai puțin clar, dar poza unei case
+  // vine de patru ori mai repede (pe telefonul clientului, la 17 nov 2026, poza casei alese apărea după 2–3 secunde sau deloc).
+  const lite = () => innerWidth < 800;
+  const slowNet = () => { const c = navigator.connection; return !!(c && (c.saveData || /(^|-)2g$|^3g$/.test(c.effectiveType || ''))); };
+  const panoUrl = k => (k.slice(0, 3) === 'ai:' ? 'img/gd/ai/' + (lite() && /^ai:(gr|pl)_/.test(k) ? 'm/' : '') + k.slice(3) + '.webp' : (PG.has(k) ? 'img/gd/x7/' : 'p360/') + k + (bigPano ? '_l' : '_m') + '.webp');
 
   /* Unde stă camera: toată grădina, o casă văzută din față, o casă văzută de sus (planul). Pentru fiecare există un loc pe ecran
      lat (pv = 0) și unul pe ecran înalt (pv = 1). Locul e fix, iar unghiul de vedere se potrivește după ecran: așa, din același
@@ -159,16 +164,20 @@ async function boot() {
   // planul casei (acoperișul ridicat) are imagine reală doar din locul „lat”: unde există, acel loc se folosește pe orice ecran
   const planImg = () => { const e = sel >= 0 && PLANURI[H[sel].c.cod]; return (e && e[lvl - 1]) || null; };
   const pvNow = () => (mode === 'in' && inView === 'plan' && planImg() ? 0 : pvOf(mode, sel, lvl));
+  // locul (ecran lat / înalt) din care se va vedea toată grădina sau casa i atunci când e aleasă: socotit cu spațiul liber de atunci
+  // (cu fișa casei pe ecran), nu cu cel de acum. Pentru imaginile aduse din timp.
+  const pvIn = (m, i) => { const fw = freeW, fh = freeH; if (m === 'all') { freeW = W; freeH = Hh - 64; } else if (W >= 900) { freeW = W - card.offsetWidth - 28; freeH = Hh - 64; } else { freeW = W; freeH = Math.max(166, Hh - Math.max(card.offsetHeight, 200) - 70) - 46; }
+    const pv = pvOf(m, i, 1); freeW = fw; freeH = fh; return pv; };
   function station(out) { const o = view(mode, sel, lvl, pvNow()); CAMK.forEach(k => { out[k] = o[k]; }); return out; }
   // imaginea realistă a vederii de acum (doar ziua, doar din afară), dacă există: [fișier, stânga, dreapta, jos, sus]
   const extOf = (i, pv) => { const e = VEDERI[i < 0 ? 'all' : H[i].c.cod]; return (e && e[pv]) || null; };
   const planKey = () => (inView === 'plan' && timeGoal <= 15 ? planImg() : null);   // (ziua)
   const extKey = () => { if (mode === 'in') return planKey(); const e = extOf(mode === 'all' ? -1 : sel, pvOf(mode, sel, 1)); if (!e || timeGoal <= 15) return e; return e[5] ? [e[5], e[1], e[2], e[3], e[4]] : null; };   // seara: imaginea de seară, dacă există
-  const extLoad = () => { const e = extKey(); if (e) pano.load(panoUrl('ai:' + e[0]), true); };
+  const extLoad = () => { const e = extKey(); if (e) { hungryT = performance.now(); pano.load(panoUrl('ai:' + e[0]), true); } };   // (din clipa aceasta, cele aduse „din timp” așteaptă)
 
   /* Trecerea „reală” dintre două vederi din afară: imaginea de pe ecran rămâne pe loc, camera sare direct la vederea nouă, iar
      imaginea ei apare peste cea veche (fără drumul prin macheta 3D). xf = imaginea veche, așa cum era desenată. */
-  let xf = null, lastFov = 40, roofSnap = false, glide = 0, fixCls = false, spun = false, lastPY = 0, lastPP = 0, live = false, bootT = 0;
+  let xf = null, lastFov = 40, roofSnap = false, glide = 0, fixCls = false, spun = false, lastPY = 0, lastPP = 0, live = false, bootT = 0, roomPre = null;
   const GLIDE = .3;   // cât mai alunecă rotirea după ce dai drumul (constanta de timp, în secunde)
   /* Rotirea reală a unei case (ROTIRI din gradina-data.js): cadrele unei filmări care ocolește casa pe cercul vederii ei.
      Ca mișcarea să fie lină pe orice calculator și la orice viteză a netului:
@@ -179,8 +188,8 @@ async function boot() {
        o clipă la ultimul cadru gata și apoi merge mai departe (nu sare la alt unghi și nu arată niciodată macheta 3D);
      · mișcarea se socotește în timp, nu în cadre desenate (arată la fel la 30, 60 sau 120 de cadre pe secundă).
      spin.pos = poziția arătată, în cadre (cu zecimale, fără întoarcere la 0): între două cadre vecine se face un amestec. */
-  const spin = { key: '', cfg: null, im: [], bm: [], px: [], pq: [], np: 0, busy: null, nb: 0, gc: 0, texS: null, texB: null, texL: null, lbm: null, cnt: 0, a: -1, b: -1, ra: null, rb: null, mix: 0, pos: 0, at: 0, lReq: -1, lOk: false, on: false, op: 0, more: null, next: null, want: 0, dir: 1, vc: null, vel: 0, pend: null, pendT: 0, why: '' };
-  const SPK = 4, SPW = 512;   // schița rotirii: copii mici (SPW px) ale unui cadru din SPK, ținute în memorie cât e aleasă casa
+  const spin = { key: '', cfg: null, im: [], bm: [], px: [], lo: [], pb: null, np: 0, pk: 0, pkn: 0, busy: null, nb: 0, gc: 0, texS: null, texB: null, texL: null, lbm: null, cnt: 0, a: -1, b: -1, ra: null, rb: null, mix: 0, pos: 0, at: 0, lReq: -1, lT: 0, lOk: false, on: false, op: 0, more: null, next: null, start: null, want: 0, dir: 1, vc: null, vel: 0, pend: null, pendT: 0, why: '', tier: 1, ac: null, rested: false };
+  const SPL = 2, SPS = 16;   // pachetul mic al rotirii are un cadru din SPL; din el, un cadru din SPS rămâne mereu desfăcut (restul, doar în jurul locului curent)
   const hasBitmap = typeof createImageBitmap === 'function';
   const wrap = (i, n) => ((i % n) + n) % n;
   /* Din 17 nov 2026 (a doua oară în aceeași zi; clientul: „când miști casa își pierde din calitate… nu se mișcă lin deloc”):
@@ -195,78 +204,127 @@ async function boot() {
   let hungryT = -1e9; const hungry = () => performance.now() - hungryT < 600;   // imaginea vederii de acum încă se încarcă (pus în bucla de desen)
   const PK = { a: -1, ra: null, b: -1, rb: null, t: 0, hi: false }, SLOWMIX = 14;   // (sub SLOWMIX cadre pe secundă, trecerea dintre două cadre se topește scurt)
   const sm01 = x => { x = clamp(x); return x * x * (3 - 2 * x); };
-  // un cadru adus ca Blob (se despachetează în afara firului principal); fără createImageBitmap, ca <img>
-  const loadFrame = url => (hasBitmap && typeof fetch === 'function' ? fetch(url).then(r => (r.ok ? r.blob() : Promise.reject(new Error('img'))))
+  // un cadru adus ca Blob (se despachetează în afara firului principal); fără createImageBitmap, ca <img>. signal = cererea se
+  // poate opri (când vizitatorul alege altă casă, cadrele casei dinainte nu mai țin legătura ocupată)
+  const loadFrame = (url, signal) => (hasBitmap && typeof fetch === 'function' ? fetch(url, signal ? { signal, priority: 'low' } : undefined).then(r => (r.ok ? r.blob() : Promise.reject(new Error('img'))))
     : new Promise((ok, no) => { const im = new Image(); im.decoding = 'async'; im.onload = () => ok(im); im.onerror = no; im.src = url; }));
   const frameTex = () => { const t = new THREE.Texture(); t.colorSpace = THREE.SRGBColorSpace; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; t.magFilter = THREE.LinearFilter; t.flipY = false; t.userData.fy = -1; return t; };
   const setFrame = (t, img) => { const u = t.userData; if (u.w && (u.w !== img.width || u.h !== img.height)) t.dispose(); u.w = img.width; u.h = img.height; t.image = img; t.needsUpdate = true; };
-  const spinCfg = () => { if (mode !== 'house' || sel < 0 || noPano) return null; const e = ROTIRI[H[sel].c.cod], c = e && e[pvOf(mode, sel, 1)]; if (!c) return null; const dir = timeGoal > 15 ? c.seara : c.zi; return dir ? { dir, n: c.n, nl: c.nl || c.n, az0: c.az0, r: c.r, v: c.v || 0 } : null; };
+  const spinCfg = () => { if (mode !== 'house' || sel < 0 || noPano) return null; const e = ROTIRI[H[sel].c.cod], c = e && e[pvOf(mode, sel, 1)]; if (!c) return null; const dir = timeGoal > 15 ? c.seara : c.zi; return dir ? { dir, n: c.n, nl: c.nl || c.n, az0: c.az0, r: c.r, v: c.v || 0, p: timeGoal > 15 ? 0 : c.p || 0 } : null; };
   const spinUrl = (c, big, i) => 'img/gd/rot/' + c.dir + '/' + (big ? 'l_' : 's_') + String(i).padStart(3, '0') + '.webp';
   const spinP = (c, az) => (az - c.az0) / 360 * c.n;   // unghi (grade) → poziție în cadre
   const spinSrc = i => { const k = wrap(i, spin.cfg.n); return spin.bm[k] || spin.px[k] || null; };   // ce se poate arăta pentru cadrul i: cadrul mare sau copia mică
   /* Rotirea (rescrisă pe 17 nov 2026, după „unele case nu se mișcă lin deloc”): imaginea urmărește mereu mâna. Dacă exact cadrul
-     unghiului nu e încă gata, se arată cel mai apropiat care e (înainte rotirea aștepta acolo și părea blocată). Ca să existe
-     mereu ceva aproape, din toată rotirea se țin copii mici ale unui cadru din patru („schița”), cerute primele, de la rare la dese. */
-  function spinPrep() {   // cere cadrele casei alese (o singură dată pe casă și pe zi/seară)
+     unghiului nu e încă gata, se arată cel mai apropiat care e (înainte rotirea aștepta acolo și părea blocată).
+     Pozele separate (telefoane, tablete, navigatoare fără film comprimat), din 17 nov 2026 seara (clientul, cu filmuleț de pe telefon:
+     „am deschis pe telefon… nu merge deloc bine”; acolo poza casei alese venea după 2–3 secunde sau deloc, iar rotirea pornea în salturi):
+     · nimic din rotire nu se cere până când imaginea vederii nu e pe ecran (spin.pend): pe o legătură de telefon, cele 44 de cadre
+       cerute deodată îi luau imaginii toată viteza; când vizitatorul alege altă casă, cererile casei dinainte se opresc (spin.ac);
+     · întâi vine „pachetul mic” (p.bin: un cadru din două, 640 px, un singur fișier de ~1,4 MB, folosit pe măsură ce sosește:
+       întâi câte un cadru din 16 de jur împrejur, apoi tot mai dese): rotirea are repede ce arăta la orice unghi, deci nu mai sare
+       și nu mai așteaptă. Cadrele lui se desfac doar în jurul locului curent (țin puțină memorie);
+     · apoi pozele de 1024 px, de la cele mai apropiate de locul la care se uită vizitatorul, câte puține deodată (ca alegerea
+       cadrului următor să țină pasul cu mâna);
+     · pe ecran nu se amestecă la întâmplare cadre clare cu cadre din pachet (ar pâlpâi): la mișcare se arată cadre din pachet până
+       când cele clare sunt gata pe o bucată bună înainte, apoi doar clare (spin.tier). */
+  function spinDrop() { spin.bm.forEach(b => { if (b && b.close) b.close(); }); spin.px.forEach(b => { if (b && b.close) b.close(); }); spin.bm = []; spin.px = []; }
+  // vederea aleasă nu are rotire (toată grădina, o casă văzută din locul „înalt”): cererile rotirii dinainte se opresc și memoria ei se eliberează
+  function spinStop() { if (spin.ac) { try { spin.ac.abort(); } catch (_) {} spin.ac = null; } spinDrop(); spin.key = ''; spin.cfg = null; spin.im = []; spin.lo = []; spin.pend = null; spin.next = spin.start = spin.more = null; spin.on = false; spin.a = spin.b = -1; spin.ra = spin.rb = null; spin.lOk = false; spin.lReq = -1; spin.pk = spin.pkn = 0; }
+  function spinPrep() {   // pregătește rotirea casei alese (o singură dată pe casă și pe zi/seară)
     const c = spinCfg(); if (!c || spin.key === c.dir) return;
-    spin.bm.forEach(b => { if (b && b.close) b.close(); }); spin.px.forEach(b => { if (b && b.close) b.close(); });
-    const n = c.n, key = c.dir; spin.key = key; spin.cfg = c; spin.im = new Array(n).fill(null); spin.bm = new Array(n).fill(null); spin.px = new Array(n).fill(null); spin.pq = []; spin.np = 0; spin.busy = new Uint8Array(n); spin.nb = 0; spin.cnt = 0;
+    spinDrop(); if (spin.ac) { try { spin.ac.abort(); } catch (_) {} } spin.ac = typeof AbortController === 'function' ? new AbortController() : null;
+    const n = c.n, key = c.dir, sig = spin.ac ? spin.ac.signal : null; spin.key = key; spin.cfg = c; spin.im = new Array(n).fill(null); spin.bm = new Array(n).fill(null); spin.px = new Array(n).fill(null); spin.lo = new Array(n).fill(null);
+    spin.busy = new Uint8Array(n); spin.pb = new Uint8Array(n); spin.nb = 0; spin.np = 0; spin.cnt = 0; spin.pk = 0; spin.pkn = 0; spin.tier = 1; spin.rested = false;
     spin.a = spin.b = -1; spin.ra = spin.rb = null; spin.mix = 0; spin.lReq = -1; spin.lOk = false; spin.on = false; spin.dir = 1; spin.vel = 0;
     if (!spin.texS) { spin.texS = frameTex(); spin.texB = frameTex(); spin.texL = frameTex(); }
     if (spin.vc) { spin.vc.close(); spin.vc = null; }
-    // filmul comprimat se deschide în bucla de desen, îndată ce imaginea vederii e gata (sau după două secunde): pe o legătură înceată,
-    // imaginea de pe ecran are întâietate. Dacă nu merge în acest navigator, rămân pozele separate (vezi „useImg”).
-    spin.pend = c.v && fine.matches ? c : null; spin.pendT = performance.now();
-    const useImg = () => !spin.pend && (!spin.vc || spin.vc.state === 'off');
+    // totul pornește din bucla de desen, îndată ce imaginea vederii e gata (sau după câteva secunde): imaginea de pe ecran are
+    // întâietate. Pe calculator, unde se poate, cadrele vin din filmul comprimat; altfel din pachetul mic și din pozele separate.
+    spin.pend = c; spin.pendT = performance.now();
+    const useImg = () => !spin.pend && (!spin.vc || spin.vc.state === 'off') && mode === 'house';
     spin.want = wrap(Math.round(spinP(c, view('house', sel, 1, pvOf('house', sel, 1)).az)), n);   // locul vederii: de acolo pornește rotirea
-    // ordinea: (1) cadrele de lângă unghiul curent, (2) schița (din 16 în 16, din 8 în 8, din 4 în 4), (3) restul, cele mai apropiate
-    // întâi (în direcția de mers, de două ori mai multe). Pe ecranele cu atingere se cer întâi doar primele, iar restul la prima rotire.
-    const req = new Uint8Array(n), err = new Uint8Array(n); let act = 0, cnt = 0, lim = fine.matches ? n : 44;
-    const fail = i => { if (spin.key !== key) return; if (++err[i] < 3) setTimeout(() => { if (spin.key === key) { req[i] = 0; cnt--; next(); } }, 900 * err[i]); };   // un cadru care nu vine deloc e sărit: se arată vecinii lui
+    // ordinea pozelor: (1) cele de lângă unghiul curent, (2) restul, cele mai apropiate întâi (în direcția de mers, de două ori mai
+    // multe). Tot turul casei alese se aduce în fundal (câte puține deodată), ca la rotire cadrele clare să fie deja acolo; cine
+    // economisește date sau are legătură foarte înceată primește din (2) doar câteva.
+    const req = new Uint8Array(n), err = new Uint8Array(n); let act = 0, cnt = 0, lim = slowNet() ? 24 : n;
+    const fail = i => { if (spin.key !== key) return; if (++err[i] < 3) setTimeout(() => { if (spin.key === key) { req[i] = 0; next(); } }, 900 * err[i]); };   // un cadru care nu vine deloc e sărit: se arată vecinii lui
     const near = m => { for (let d = 0; d <= m; d++) { const a = wrap(spin.want + spin.dir * d, n); if (!req[a]) return a; const b = wrap(spin.want - spin.dir * d, n); if (!req[b]) return b; } return -1; };
-    const sketch = st => { let best = -1, bd = 1e9; for (let i = 0; i < n; i += st) if (!req[i]) { let d = Math.abs(i - spin.want); d = Math.min(d, n - d); if (d < bd) { bd = d; best = i; } } return best; };
     const rest = () => { for (let d = 0; d < n; d++) { const a = wrap(spin.want + spin.dir * d, n); if (!req[a]) return a; if (!(d & 1)) { const b = wrap(spin.want - spin.dir * (d >> 1), n); if (!req[b]) return b; } } return -1; };
-    const pickNext = () => { let i = near(6); if (i < 0) i = sketch(16); if (i < 0) i = sketch(8); if (i < 0) i = sketch(SPK); if (i < 0) i = rest(); return i; };
-    const small = () => { while (spin.key === key && spin.np < 2 && spin.pq.length) { const i = spin.pq.shift(), im = spin.im[i]; if (!im || spin.px[i]) continue; spin.np++; let pr = null;
-      try { pr = createImageBitmap(im, { resizeWidth: SPW, resizeQuality: 'low' }); } catch (_) { pr = null; }   // (înălțimea se potrivește singură)
-      const done = b => { if (spin.key !== key) { if (b && b.close) b.close(); return; } spin.np--; if (b) spin.px[i] = b; wake(); small(); }; if (pr) pr.then(done, () => done(null)); else done(null); } };
-    const next = () => { while (spin.key === key && useImg() && act < 16 && cnt < lim) { const i = pickNext(); if (i < 0) return; req[i] = 1; act++; cnt++;
-      loadFrame(spinUrl(c, 0, i)).then(im => { act--; if (spin.key === key) { spin.im[i] = im; if (!hasBitmap) spin.bm[i] = im; else if (i % SPK === 0) { spin.pq.push(i); small(); } wake(); } next(); },
-        () => { act--; fail(i); next(); }); } };
-    spin.more = () => { if (spin.key === key && lim < n) { lim = n; next(); } };
-    spin.next = next; next();
+    const next = () => { const top = spin.pk === 1 ? 0 : fine.matches ? 12 : 6;   // (cât vine pachetul mic, nimic altceva: el dă primul rotirii ce arăta; pe telefon, puține deodată)
+      while (spin.key === key && useImg() && act < top) { const calm = !hungry(); let i = near(calm ? 6 : 1); if (i < 0 && calm && cnt < lim) { i = rest(); if (i >= 0) cnt++; } if (i < 0) return; req[i] = 1; act++;   // (cât se așteaptă imaginea vederii sau cadrul mare al opririi, doar cadrul de aici și vecinii lui)
+        loadFrame(spinUrl(c, 0, i), sig).then(im => { act--; if (spin.key === key) { spin.im[i] = im; if (!hasBitmap) spin.bm[i] = im; wake(); next(); } },
+          () => { act--; if (spin.key === key) { fail(i); next(); } }); } };
+    // Pachetul mic: o singură cerere. Cadrele lui stau de la rare la dese (întâi câte unul din 16 de jur împrejur…) și se folosesc pe
+    // măsură ce sosesc: după primele ~200 KB rotirea are deja ce arăta la orice unghi. Fiecare cadru rămâne ca Blob (comprimat) până
+    // când e nevoie de el. („CPP2”, numărul de cadre, apoi mărimea și numărul fiecărui cadru, apoi cadrele: vezi farotire.py.)
+    const pack = () => { if (!c.p || !hasBitmap || typeof fetch !== 'function' || spin.pk) return; spin.pk = 1;
+      let buf = new Uint8Array(1 << 16), have = 0, m = -1, tab = null, k = 0, off = 0;
+      const feed = v => { if (spin.key !== key || !buf) return; if (have + v.length > buf.length) { const nb = new Uint8Array(Math.max(buf.length * 2, have + v.length)); nb.set(buf.subarray(0, have)); buf = nb; } buf.set(v, have); have += v.length;
+        if (m < 0 && have >= 8) { const dv = new DataView(buf.buffer, 0, 8); if (dv.getUint32(0) !== 0x43505032) throw new Error('format'); m = dv.getUint16(4, true); }
+        if (m >= 0 && !tab && have >= 8 + 6 * m) { const dv = new DataView(buf.buffer, 8, 6 * m); tab = []; for (let j = 0; j < m; j++) tab.push([dv.getUint32(6 * j, true), dv.getUint16(6 * j + 4, true)]); off = 8 + 6 * m; }
+        let got = 0; while (tab && k < m && have >= off + tab[k][0]) { const [sz, i] = tab[k]; if (i < n) spin.lo[i] = new Blob([buf.slice(off, off + sz)], { type: 'image/webp' }); off += sz; k++; got++; }
+        if (got && spin.key === key) { spin.pkn = k; wake(); } };
+      const done = ok => { if (spin.key !== key) return; buf = null; spin.pk = ok || k ? 2 : 3; wake(); next(); };
+      fetch('img/gd/rot/' + key + '/p.bin?v=' + c.p, sig ? { signal: sig } : undefined).then(r => { if (!r.ok) throw new Error('http');
+        const rd = r.body && r.body.getReader ? r.body.getReader() : null; if (!rd) return r.arrayBuffer().then(b => { feed(new Uint8Array(b)); });
+        const pump = () => rd.read().then(x => { if (spin.key !== key) { try { rd.cancel(); } catch (_) {} return; } if (x.value) feed(x.value); if (!x.done) return pump(); }); return pump(); })
+        .then(() => done(true), () => done(false)); };
+    spin.more = () => { if (spin.key === key && lim < n && !(navigator.connection && navigator.connection.saveData)) { lim = n; next(); } };   // (la prima rotire, tot turul; cine economisește date rămâne cu pachetul mic și cu pozele din jurul locului la care se oprește)
+    spin.next = next; spin.start = () => { pack(); next(); };
   }
-  // pregătește din timp cadrele mari din jurul poziției p (locul spre care merge rotirea; mai multe în direcția de mers) și le
+  // un cadru din pachetul mic, desfăcut în afara firului principal
+  function lowDec(i) { const key = spin.key, bl = spin.lo[i]; spin.pb[i] = 1; spin.np++;
+    createImageBitmap(bl).then(b => { if (spin.key !== key) { if (b.close) b.close(); return; } spin.np--; spin.pb[i] = 0; if (spin.px[i]) { if (b.close) b.close(); } else spin.px[i] = b; wake(); },
+      () => { if (spin.key === key) { spin.np--; spin.pb[i] = 0; spin.lo[i] = null; } }); }
+  // pregătește din timp cadrele din jurul poziției p (locul spre care merge rotirea; mai multe în direcția de mers) și le
   // eliberează pe cele rămase departe și de ea, și de locul arătat acum
   function spinFeed(p) {
-    const n = spin.cfg.n, ctr = Math.round(p); spin.want = wrap(ctr, n);
+    const n = spin.cfg.n, ctr = Math.round(p); spin.want = wrap(ctr, n); spin.rested = false;
     if (spin.vc && spin.vc.state !== 'off') { spin.vc.want(p, spin.vel, [spin.a, spin.b]); return; }   // filmul comprimat: grupurile de cadre din jurul locului arătat
     if (spin.next) spin.next();
     if (!hasBitmap) return;
-    const big = fine.matches, fwd = big ? 24 : 12, back = big ? 10 : 5, keep = fwd + 6;   // (pe telefoane și tablete mai puține: țin mai puțină memorie)
-    for (let d = 0; d <= fwd && spin.nb < 6; d++) for (let k = 0; k < 2 && spin.nb < 6; k++) {
+    const big = fine.matches, fwd = big ? 24 : 10, back = big ? 10 : 4, keep = fwd + 6, top = big ? 6 : 4;   // (pe telefoane și tablete mai puține: țin mai puțină memorie)
+    for (let d = 0; d <= fwd && spin.nb < top; d++) for (let k = 0; k < 2 && spin.nb < top; k++) {
       if (k && (!d || d > back)) continue; const i = wrap(ctr + (k ? -d : d) * spin.dir, n), im = spin.im[i];
       if (!im || spin.bm[i] || spin.busy[i]) continue;
       spin.busy[i] = 1; spin.nb++; const key = spin.key;
       createImageBitmap(im).then(b => { if (spin.key !== key) { if (b.close) b.close(); return; } spin.nb--; spin.busy[i] = 0; spin.bm[i] = b; spin.cnt++; wake(); },
         () => { if (spin.key === key) { spin.nb--; spin.busy[i] = 0; if (im instanceof Image) spin.bm[i] = im; else spin.im[i] = null; wake(); } });   // (un cadru stricat e sărit: se arată vecinii lui)
     }
+    // cadrele din pachetul mic: o fereastră mai largă în jurul locului și, de jur împrejur, câte unul din SPS (rămân mereu desfăcute)
+    const lf = big ? 48 : 30, lb = big ? 16 : 10, c2 = Math.round(p / SPL) * SPL;
+    if (spin.pkn) {
+      for (let d = 0; d <= lf && spin.np < 3; d += SPL) for (let k = 0; k < 2 && spin.np < 3; k++) {
+        if (k && (!d || d > lb)) continue; const i = wrap(c2 + (k ? -d : d) * spin.dir, n);
+        if (spin.lo[i] && !spin.px[i] && !spin.pb[i]) lowDec(i); }
+      for (let i = 0; i < n && spin.np < 2; i += SPS) if (spin.lo[i] && !spin.px[i] && !spin.pb[i]) lowDec(i);
+    }
     if (++spin.gc >= 20 || spin.cnt > keep * 2 + 6) { spin.gc = 0; const at = wrap(Math.round(spin.pos), n);
-      for (let i = 0; i < n; i++) { const b = spin.bm[i]; if (!b || !b.close || b === spin.ra || b === spin.rb) continue; let d = Math.abs(i - spin.want); d = Math.min(d, n - d); let e = Math.abs(i - at); e = Math.min(e, n - e); if (Math.min(d, e) > keep) { b.close(); spin.bm[i] = null; spin.cnt--; } } }
+      for (let i = 0; i < n; i++) { let d = Math.abs(i - spin.want); d = Math.min(d, n - d); let e = Math.abs(i - at); e = Math.min(e, n - e); const far = Math.min(d, e);
+        const b = spin.bm[i]; if (b && b.close && b !== spin.ra && b !== spin.rb && far > keep) { b.close(); spin.bm[i] = null; spin.cnt--; }
+        const q = spin.px[i]; if (q && q.close && q !== spin.ra && q !== spin.rb && i % SPS && far > lf + 8) { q.close(); spin.px[i] = null; } } }
+  }
+  // casa nu mai e pe ecran (vizitatorul a intrat în ea, a trecut la toată grădina sau a derulat mai departe): cadrele desfăcute se
+  // eliberează (rămân cele comprimate, din care se refac repede la întoarcere)
+  function spinRest() {
+    if (spin.rested || !spin.cfg) return; spin.rested = true;
+    for (let i = 0; i < spin.bm.length; i++) { const b = spin.bm[i]; if (b && b.close && b !== spin.ra && b !== spin.rb) { b.close(); spin.bm[i] = null; spin.cnt--; }
+      const q = spin.px[i]; if (q && q.close && q !== spin.ra && q !== spin.rb && i % SPS) { q.close(); spin.px[i] = null; } }
   }
   // cadrul mare (mai clar) al unghiului la care s-a oprit rotirea
   function spinBig(c, a) {
     const key = spin.key, url = spinUrl(c, 1, a * c.nl / c.n);
     const ok = img => { if (spin.key === key && spin.a === a && spin.lReq === a) { if (spin.lbm && spin.lbm.close) spin.lbm.close(); spin.lbm = img; setFrame(spin.texL, img); spin.lOk = true; wake(); } else if (img.close) img.close(); };
-    if (hasBitmap && typeof fetch === 'function') fetch(url).then(r => (r.ok ? r.blob() : Promise.reject(new Error('img')))).then(b => createImageBitmap(b)).then(ok, () => {});
+    if (hasBitmap && typeof fetch === 'function') fetch(url, { priority: 'high' }).then(r => (r.ok ? r.blob() : Promise.reject(new Error('img')))).then(b => createImageBitmap(b)).then(ok, () => {});
     else { const im = new Image(); im.onload = () => ok(im); im.src = url; }
   }
-  // Imaginile celorlalte vederi (și planurile) se aduc din timp în memoria navigatorului, una câte una, doar pe calculator:
-  // când vizitatorul trece la altă casă, imaginea ei e deja acolo și apare imediat.
+  // Imaginile celorlalte vederi (și planurile) se aduc din timp în memoria navigatorului, una câte una: când vizitatorul trece la
+  // altă casă, imaginea ei e deja acolo și apare imediat. Pe calculator și, din 17 nov 2026, pe ecran mic (acolo imaginile sunt cele
+  // la jumătate de mărime, ~2,5 MB cu totul); nu pe tablete (imagini mari, legătură de telefon) și nu când vizitatorul economisește date.
   let warmed = 0;
   function warm() {
-    if (warmed || !fine.matches || typeof fetch !== 'function' || (navigator.connection && navigator.connection.saveData)) return; warmed = 1;
-    const urls = []; [-1, ...H.map((h, i) => i)].forEach(i => { const e = extOf(i, pvOf(i < 0 ? 'all' : 'house', i, 1)); if (e) urls.push(panoUrl('ai:' + e[0])); });
+    if (warmed || !(fine.matches || lite()) || typeof fetch !== 'function' || slowNet()) return; warmed = 1;
+    const urls = []; [-1, ...H.map((h, i) => i)].forEach(i => { const e = extOf(i, pvIn(i < 0 ? 'all' : 'house', i)); if (e) urls.push(panoUrl('ai:' + e[0])); });
     if (W >= 900) H.forEach(h => (PLANURI[h.c.cod] || []).forEach(e => { if (e) urls.push(panoUrl('ai:' + e[0])); }));
     const step = () => { if (dead || !urls.length) return; if (hungry()) return setTimeout(step, 500); const u = urls.shift(); fetch(u).then(r => r.blob()).catch(() => {}).then(() => setTimeout(step, 150)); }; step();
   }
@@ -320,18 +378,19 @@ async function boot() {
   const day = () => { if (timeGoal > 15) { timeGoal = time = 10.6; lastN = -1; dnSync(); } };
 
   /* ---------- comenzi ---------- */
-  function select(i, keepAuto) { if (!keepAuto) stopAuto(); const w = walking(), kept = keep(); if (w && !kept) startBlend(1.7); day(); lvl = 1; if (i < 0) goTo('all', -1); else goTo('house', i); if (w) tr = 1; settle(kept); sync(); measure(); extLoad(); spinPrep();
-    if (i >= 0 && ((H[i].c.pano && window.VTN) || H[i].walk)) { const p = buildWalk(H[i]).pts[0]; if (p && p.k) pano.load(panoUrl(timeGoal > 15 && p.kn ? p.kn : p.k)); } }   // fotografia primei camere se cere din timp
+  function select(i, keepAuto) { if (!keepAuto) stopAuto(); const w = walking(), kept = keep(); if (w && !kept) startBlend(1.7); day(); lvl = 1; if (i < 0) goTo('all', -1); else goTo('house', i); if (w) tr = 1; settle(kept); sync(); measure(); extLoad(); spinPrep(); if (!spin.vc && !spinCfg()) spinStop();
+    roomPre = null;   // fotografia primei camere se cere din timp (în bucla de desen, după ce imaginea vederii e pe ecran): la „Intră în casă” e deja acolo
+    if (i >= 0) { const h = H[i]; if ((h.c.pano && window.VTN) || h.walk) { const p = buildWalk(h).pts[0]; if (p && p.k) roomPre = panoUrl(timeGoal > 15 && p.kn ? p.kn : p.k); } else if (h.c.ai && h.c.ai[0] && !slowNet()) roomPre = panoUrl('ai:' + h.c.ai[0]); } }
   function enter(keepAuto, view) {
-    if (sel < 0) return; if (!keepAuto) stopAuto(); const kept = keep(); lvl = 1; inView = view || 'walk';
+    if (sel < 0) return; if (!keepAuto) stopAuto(); const kept = keep(); lvl = 1; inView = view || 'walk'; roomPre = null;
     if (inView === 'walk' && !buildWalk(H[sel]).pts.length) inView = 'plan';
-    if (inView === 'walk') { if (!kept) startBlend(1.8); goTo('in', sel, 1.5); tr = 1; goRoom(0, true); } else goTo('in', sel, 1.5);
+    hungryT = performance.now(); if (inView === 'walk') { if (!kept) startBlend(1.8); goTo('in', sel, 1.5); tr = 1; goRoom(0, true); } else goTo('in', sel, 1.5);
     settle(kept); sync(); extLoad();
   }
-  function leave(keepAuto) { if (sel < 0) return; if (!keepAuto) stopAuto(); const w = walking(), kept = keep(); if (w && !kept) startBlend(1.5); day(); goTo('house', sel, 1.4); if (w) tr = 1; settle(kept); sync(); }
+  function leave(keepAuto) { if (sel < 0) return; if (!keepAuto) stopAuto(); hungryT = performance.now(); const w = walking(), kept = keep(); if (w && !kept) startBlend(1.5); day(); goTo('house', sel, 1.4); if (w) tr = 1; settle(kept); sync(); }
   function setLvl(l, keepAuto) { if (!keepAuto) stopAuto(); const kept = keep(); lvl = l; goTo('in', sel, 1.2); settle(kept); sync(); extLoad(); }
   function setView(v) { if (mode !== 'in' || v === inView || sel < 0) return; stopAuto(); if (v === 'walk' && !buildWalk(H[sel]).pts.length) return; const kept = keep(); if (!kept) startBlend(1.5); if (v !== 'walk') day(); inView = v; lvl = 1; if (v === 'walk') goRoom(H[sel].walk.i, true); tr = 1; needMeasure = 2; settle(kept); sync(); extLoad(); wake(); }
-  function room(i, keepAuto) { if (!walking()) return; if (!keepAuto) stopAuto(); const kept = keep(true); goRoom(i, kept, kept); settle(kept); sync(); }
+  function room(i, keepAuto) { if (!walking()) return; if (!keepAuto) stopAuto(); hungryT = performance.now(); const kept = keep(true); goRoom(i, kept, kept); settle(kept); sync(); }
   function setEvening(on) {
     const kept = keep(true); timeGoal = on ? 19.9 : 10.6; if (rm) time = timeGoal; spin.on = false; if (!on && !walking()) tuaz = tuel = 0;
     if (kept && destImg()) { time = timeGoal; lastN = -1; }   // de la o fotografie la alta (zi ↔ seară în X7): direct, fără machetă
@@ -462,26 +521,34 @@ async function boot() {
     }
     if (blend.k < 1) { blend.k = Math.min(1, blend.k + dt / blend.dur); busy = true; }
     // rotirea reală a casei: pe ecran e cadrul de la unghiul la care s-a ajuns (și vecinul lui, amestecate)
-    if (spin.vc && spin.vc.state === 'off') { spin.why = spin.vc.why; spin.vc = null; if (spin.next) spin.next(); }   // filmul comprimat nu merge în acest navigator: pozele separate
+    if (spin.vc && spin.vc.state === 'off') { spin.why = spin.vc.why; spin.vc = null; if (spin.start) spin.start(); }   // filmul comprimat nu merge în acest navigator: pachetul mic și pozele separate
     const sc = !wk && tr >= 1 && blend.k >= 1 && time === timeGoal ? spinCfg() : null; let sk = -1;
     if (sc && sc.dir === spin.key) {
       const n = sc.n, p0 = spinP(sc, cur.az), q = p0 + uaz / 360 * n, vc = spin.vc;
       if (Math.abs(tuaz - uaz) > .2) spin.dir = tuaz > uaz ? 1 : -1;
-      if (!spin.on && Math.abs(uaz) > .05 && (vc ? vc.has(Math.round(p0)) : spinSrc(Math.round(p0)))) { spin.on = true; spin.pos = Math.round(p0); spin.vel = 0; }
+      if (!spin.on && Math.abs(uaz) > .05 && (vc ? vc.has(Math.round(p0)) : spinSrc(Math.round(p0)) || spinSrc(Math.round(p0) + 1) || spinSrc(Math.round(p0) - 1))) { spin.on = true; spin.pos = Math.round(p0); spin.vel = 0; }
       if (spin.on) {
         const prev = spin.pos, pos = spin.pos = q, fl = Math.floor(pos), ce = Math.ceil(pos); let ia = null, ib = null, mix = 0, ra = null, rb = null, sharp = true;
         spin.vel += ((pos - prev) / Math.max(dt, .004) - spin.vel) * Math.min(1, dt * 14);   // viteza rotirii, în cadre pe secundă (netezită)
         const slow = Math.abs(spin.vel) < SLOWMIX;
         if (vc) { if (vc.pick(pos, PK)) { ia = PK.a; ib = PK.b; ra = PK.ra; rb = PK.rb; sharp = PK.hi; mix = ib !== ia ? (slow ? sm01((PK.t - .3) / .4) : PK.t < .5 ? 0 : 1) : 0; } }
         else {
-          for (let d = 0; d <= 64; d++) if (spinSrc(fl - d)) { ia = fl - d; break; }
-          for (let d = 0; d <= 64; d++) if (spinSrc(ce + d)) { ib = ce + d; break; }
-          if (ia === null) ia = ib; else if (ib === null) ib = ia;
-          if (ia !== null) { mix = ib > ia ? (pos - ia) / (ib - ia) : 0; mix = ib - ia > 1 || !slow ? (mix < .5 ? 0 : 1) : sm01((mix - .3) / .4); }   // un singur cadru, cel mai apropiat; doar la mișcare foarte lentă, între două cadre vecine, trecerea se topește o clipă
+          // pozele separate: cadrul clar (1024 px) sau cel din pachetul mic. La mișcare nu se amestecă la întâmplare (ar pâlpâi):
+          // se arată cadre din pachet până când cele clare sunt gata pe o bucată bună înainte, apoi doar clare (spin.tier).
+          const sp = Math.abs(spin.vel), dr = spin.dir, c0 = Math.round(pos), hiAt = i => spin.bm[wrap(i, n)], loAt = i => spin.px[wrap(i, n)];
+          const find = (at, tol, st) => { const c = Math.round(pos / st) * st; for (let k = 0; k <= tol; k += st) { if (at(c + k * dr)) return c + k * dr; if (k && at(c - k * dr)) return c - k * dr; } return null; };
+          const ih = find(hiAt, sp < 6 ? 1 : Math.ceil(1 + sp * .03), 1), il = find(loAt, SPL + Math.ceil(sp * .03), SPL);
+          if (sp < 6) { if (ih !== null) spin.tier = 1; else if (il !== null) spin.tier = 0; }   // încet sau oprit: cadrul clar, dacă e gata
+          else if (spin.tier) { if (ih === null && il !== null) spin.tier = 0; }
+          else { const K = clamp(Math.round(sp * .15), 3, 8); let ok = ih !== null; for (let k = 0; ok && k <= K; k++) if (!hiAt(c0 + k * dr)) ok = false; if (ok) spin.tier = 1; }
+          let use = spin.tier ? ih : il; if (use === null) use = ih !== null ? ih : il;
+          if (use === null) for (let d = 0; d <= 64 && use === null; d++) { if (spinSrc(c0 + d * dr)) use = c0 + d * dr; else if (spinSrc(c0 - d * dr)) use = c0 - d * dr; }   // nimic aproape: cel mai apropiat cadru care există
+          if (use !== null) { ia = ib = use; sharp = !!hiAt(use) && (spin.tier === 1 || use !== il);
+            if (sharp && slow && ce > fl && hiAt(fl) && hiAt(ce)) { ia = fl; ib = ce; mix = sm01((pos - fl - .3) / .4); } }   // doar la mișcare foarte lentă, între două cadre clare vecine, trecerea se topește o clipă
         }
         if (ia !== null) {
           if (mix > .98) { ia = ib; if (vc) ra = rb; mix = 0; } else if (mix < .02) { ib = ia; mix = 0; }
-          const a = wrap(ia, n), b = wrap(ib, n); if (!vc) { ra = spinSrc(a); rb = mix ? spinSrc(b) : null; sharp = ra === spin.bm[a]; } else if (!mix) rb = null;
+          const a = wrap(ia, n), b = wrap(ib, n); if (!vc) { ra = sharp ? spin.bm[a] : spin.px[a] || spin.bm[a]; rb = mix ? spin.bm[b] : null; sharp = ra === spin.bm[a]; } else if (!mix) rb = null;
           if (ra !== spin.ra) {
             if (ra === spin.rb) { const t = spin.texS; spin.texS = spin.texB; spin.texB = t; spin.rb = spin.ra; }   // imaginea e deja pe placa video: se schimbă doar rolurile
             else setFrame(spin.texS, ra);
@@ -489,19 +556,23 @@ async function boot() {
           if (rb && rb !== spin.rb) { setFrame(spin.texB, rb); spin.rb = rb; }
           if (a !== spin.a) { spin.a = a; spin.at = now; spin.lOk = false; spin.lReq = -1; }
           spin.b = b; spin.mix = mix; sk = a;
-          if (!mix && !drag && !spin.lOk && spin.lReq !== a && now - spin.at > 300 && Math.abs(tuaz - uaz) < .05 && Number.isInteger(a * sc.nl / n)) { spin.lReq = a; spinBig(sc, a); }   // rotirea s-a oprit: cadrul mare
+          if (!mix && !drag && !spin.lOk && spin.lReq !== a && now - spin.at > 300 && Math.abs(tuaz - uaz) < .05 && Number.isInteger(a * sc.nl / n)) { spin.lReq = a; spin.lT = now; spinBig(sc, a); }   // rotirea s-a oprit: cadrul mare
+          if (spin.lReq === a && !spin.lOk && now - spin.lT < 4000) hungryT = now;   // (cât vine cadrul mare, celelalte poze așteaptă)
           if (now - spin.at < 600 || !sharp) busy = true;   // (cât pe ecran e doar copia mică, se așteaptă cadrul mare)
         } else if (spin.a >= 0) sk = spin.a;
       }
       if (!spin.on) spin.vel = 0;
       spinFeed(spin.on ? (vc ? spin.pos : p0 + tuaz / 360 * n) : p0);
-    } else { if (spin.on && !sc) spin.on = false; if (spin.vc && mode !== 'house') spin.vc.rest(); }   // (în casă sau la toată grădina, cadrele mari ale rotirii se eliberează)
+    } else { if (spin.on && !sc) spin.on = false; if (mode !== 'house') { if (spin.vc) spin.vc.rest(); else spinRest(); } }   // (în casă sau la toată grădina, cadrele mari ale rotirii se eliberează)
     // fotografia reală a camerei (dacă există): apare după ce camera a ajuns; la mers și la schimbarea zi/seară se vede macheta
     let pt = null, ph = 180, pr = null, pai = 0, asked = false;   // pai: 1 = imagine făcută cu AI, 2 = fotografie reală în care doar grădina de la ferestre e adăugată cu AI
     if (wk) { if (W3.k >= 1) { const p = H[sel].walk.pts[H[sel].walk.i]; if (p && p.k && !(p.ai && timeGoal > 15)) { const night = timeGoal > 15 && p.kn, u = panoUrl(night ? p.kn : p.k); pt = pano.ready(u); if (!pt) { asked = true; pano.load(u).then(wake); } ph = (night ? p.Hn : p.H) + 180 + H[sel].c.rot; pai = p.ai ? 1 : p.g && !night ? 2 : 0; } } }
     else if (tr >= 1 && blend.k >= 1 && Math.abs(uaz) + Math.abs(uel) < .05) { const e = extKey(); if (e && (mode !== 'in' || H[sel].k === lvl)) { const u = panoUrl('ai:' + e[0]); pt = pano.ready(u); if (!pt) { asked = true; pano.load(u, true).then(wake); } pr = e.slice(1); pai = 1; } }   // din afară: imaginea realistă a vederii
-    if (spin.pend && (!asked || now - spin.pendT > 2000) && spin.pend.dir === spin.key) { spin.vc = openClip(clipOf(spin.pend), wake); spin.pend = null; }
+    if (spin.pend && mode === 'house' && spin.pend.dir === spin.key) {   // rotirea casei alese pornește când imaginea vederii e gata (sau vizitatorul a început deja să rotească)
+      const e = Math.abs(uaz) + Math.abs(uel) < .05 ? extKey() : null, ready = !e || !!pano.ready(panoUrl('ai:' + e[0]));
+      if (ready || now - spin.pendT > (fine.matches ? 2000 : 5000)) { const c = spin.pend; spin.pend = null; if (c.v && fine.matches) spin.vc = openClip(clipOf(c), wake); else if (spin.start) spin.start(); } }
     if (asked || spin.pend || (spin.vc && spin.vc.state === 'wait' && sc)) hungryT = now;   // (cât se încarcă imaginea de pe ecran, cele aduse „din timp” așteaptă)
+    if (roomPre && !asked && !wk && pOp >= 1 && now - hungryT > 300) { pano.load(roomPre); roomPre = null; }   // fotografia primei camere: după imaginea vederii
     if (pt && pt !== pA && pOp < .02) { pA = pt; pH = ph; pR = pr; pAI = pai; }
     const sg = sk >= 0 ? 1 : 0; if (spin.op !== sg) { spin.op += clamp(sg - spin.op, -dt * 5, dt * 7); busy = true; }
     const hold = sk >= 0 && spin.op < 1 && pA && pR && pOp > 0;   // imaginea vederii rămâne până când cadrul rotirii a apărut de tot (să nu se vadă macheta între ele)
@@ -567,12 +638,12 @@ async function boot() {
     if (!live) { if (pOp >= 1 || !extKey() || now - bootT > 9000) { live = true; sec.classList.add('gd--live'); } else awake = Math.max(awake, 12); }   // până apare scena, desenul nu adoarme (altfel, dacă imaginea nu vine, ar rămâne „Se pregătește”)
   }
   const kick = () => { if (!raf && visible && !dead && !document.hidden) { last = 0; raf = requestAnimationFrame(frame); } };
-  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; if (visible) awake = 40; else if (spin.vc) spin.vc.rest(); kick(); }, { rootMargin: '120px 0px' }).observe(stage);
+  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; if (visible) awake = 40; else if (spin.vc) spin.vc.rest(); else spinRest(); kick(); }, { rootMargin: '120px 0px' }).observe(stage);
   new IntersectionObserver(es => { document.body.classList.toggle('in-gd', es[es.length - 1].isIntersecting); }, { rootMargin: '-45% 0px -45% 0px' }).observe(stage);
   document.addEventListener('visibilitychange', () => { awake = 40; kick(); });
   addEventListener('resize', () => { needMeasure = 1; wake(); });
   sync();
-  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, views() { const o = []; [['all', -1], ...H.map((h, i) => [h.c.cod, i])].forEach(([k, i]) => [0, 1].forEach(pv => { const add = (k, q) => o.push({ k, pv, tx: +q.tx.toFixed(3), ty: +q.ty.toFixed(3), tz: +q.tz.toFixed(3), az: +q.az.toFixed(3), el: +q.el.toFixed(3), dist: +q.dist.toFixed(3), fw: +q.fw.toFixed(3), fh: +q.fh.toFixed(3) }); add(k, view(i < 0 ? 'all' : 'house', i, 1, pv)); if (i >= 0) for (let l = 1; l <= (H[i].api.levels || 1); l++) add(k + '#' + l, view('in', i, l, pv)); })); return o; }, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, mP, wk: +W3.k.toFixed(2), bl: +blend.k.toFixed(2), pa: !!pA, uaz: +uaz.toFixed(1), spin: { on: spin.on, cur: spin.a, pos: +spin.pos.toFixed(3), mix: +spin.mix.toFixed(2), op: +spin.op.toFixed(2), n: spin.im.filter(Boolean).length, nb: spin.bm.filter(Boolean).length, xf: !!xf, big: spin.lOk, vel: +spin.vel.toFixed(1), w: spin.ra ? spin.ra.width : 0, vc: spin.vc ? spin.vc.stat : null, why: spin.why || '' }, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
+  window.__gradina = { G, H, select, enter, leave, setLvl, setEvening, setView, room, views() { const o = []; [['all', -1], ...H.map((h, i) => [h.c.cod, i])].forEach(([k, i]) => [0, 1].forEach(pv => { const add = (k, q) => o.push({ k, pv, tx: +q.tx.toFixed(3), ty: +q.ty.toFixed(3), tz: +q.tz.toFixed(3), az: +q.az.toFixed(3), el: +q.el.toFixed(3), dist: +q.dist.toFixed(3), fw: +q.fw.toFixed(3), fh: +q.fh.toFixed(3) }); add(k, view(i < 0 ? 'all' : 'house', i, 1, pv)); if (i >= 0) for (let l = 1; l <= (H[i].api.levels || 1); l++) add(k + '#' + l, view('in', i, l, pv)); })); return o; }, pano(on) { noPano = !on; if (!on) pOp = 0; wake(); }, get state() { return { mode, sel, lvl, time, tr, awake, inView, mP, img: (() => { const e = extKey(); return !!(e && pano.ready(panoUrl('ai:' + e[0]))); })(), wk: +W3.k.toFixed(2), bl: +blend.k.toFixed(2), pa: !!pA, uaz: +uaz.toFixed(1), spin: { on: spin.on, cur: spin.a, pos: +spin.pos.toFixed(3), mix: +spin.mix.toFixed(2), op: +spin.op.toFixed(2), n: spin.im.filter(Boolean).length, nb: spin.bm.filter(Boolean).length, lo: spin.lo.filter(Boolean).length, nl: spin.px.filter(Boolean).length, pk: spin.pk, tier: spin.tier, pend: !!spin.pend, xf: !!xf, big: spin.lOk, vel: +spin.vel.toFixed(1), w: spin.ra ? spin.ra.width : 0, vc: spin.vc ? spin.vc.stat : null, why: spin.why || '' }, pOp: +pOp.toFixed(2), room: sel >= 0 && H[sel].walk ? H[sel].walk.i : -1 }; }, jump(t) { if (t !== undefined) timeGoal = t; time = timeGoal; lastN = -1; tr = 1; snap = 4; blend.k = 1; W3.k = 1; W3.pos.copy(W3.to); W3.yaw = W3.tyaw; W3.pitch = W3.tpitch; H.forEach((h, i) => { h.k = i === sel && mode === 'in' && inView === 'plan' ? lvl : 0; h.api.openRoof(h.k); }); G.renderer.shadowMap.needsUpdate = true; wake(); } };
 }
 
 /* Mai puține desene pe cadru (contează pe telefoane): piesele unei case care au același material și se mișcă împreună

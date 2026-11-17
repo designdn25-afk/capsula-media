@@ -3,7 +3,9 @@
    Capsula X7 e un model 3D adevărat (js/x7.js). Derularea mișcă ora zilei (06:50 → seara), camera și capitolele de text;
    la final capsula se desface pe straturi, ca un desen tehnic. Fără WebGL sau cu mișcare redusă: capitolele apar ca o listă cu imagini (.st--static). */
 :root{--serif:'Cormorant Garamond',Georgia,'Times New Roman',serif}
-#top.st{position:relative;padding:0;height:680vh;background:#0c1326;--st-ink:#0e1116;--st-mute:rgba(14,17,22,.68);--st-gold:#9a6c1c}
+/* (fundalul secțiunii ia culoarea de jos a părții fixe, --st-edge, pusă de js/story.js: pe telefon, când bara navigatorului se ascunde,
+   fereastra e mai înaltă decât partea fixă și sub ea se vede o fâșie din fundal; așa fâșia nu se deosebește de rest) */
+#top.st{position:relative;padding:0;height:680vh;background:var(--st-edge,#0c1326);--st-ink:#0e1116;--st-mute:rgba(14,17,22,.68);--st-gold:#9a6c1c}
 #top.st.st--dark{--st-ink:#fff;--st-mute:rgba(255,255,255,.76);--st-gold:#e3b866}
 .st-pin{position:sticky;top:0;height:100vh;height:100svh;min-height:480px;overflow:hidden;isolation:isolate;--st-top:#f0e9dd;--st-bot:#ddd3c3}
 .st-sky{position:absolute;inset:0;background:linear-gradient(var(--st-top),var(--st-bot))}

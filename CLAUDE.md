@@ -97,7 +97,10 @@ site/                    tot ce se publică
   img/                   imaginile; img/ext (exterior), img/int (interior), img/vid (clipuri .mp4 + postere .webp),
                          img/st și img/gd (deschiderea și grădina: img/gd/ai = imaginile reale ale vederilor și camerelor,
                          img/gd/rot = cadrele rotirilor, img/gd/x7 = fotografiile lui X7 cu grădina la ferestre);
-                         img/gd/rot/<casă>/v și img/st/film/v = filmele comprimate (h_NN.bin, lo.bin)
+                         img/gd/rot/<casă>/v și img/st/film/v = filmele comprimate (h_NN.bin, lo.bin);
+                         pentru telefoane: img/gd/ai/m = imaginile vederilor și planurilor la jumătate de mărime,
+                         img/gd/rot/<casă>/p.bin = „pachetul mic” al rotirii, img/st/film/t = cadrele deschiderii tăiate
+                         pentru telefon (f_NNNN.webp) și pachetele lor mici (p_NN.bin)
   p360/                  panoramele turului: <punct>_{s,m,l,x}.webp și miniaturile t_<punct>.jpg
 surse/final/home.base.html   SURSA paginii principale: tot în afară de părțile de mai jos (banda cu cifre, caracteristici,
                              model, tur, la comandă, galerie, contact, subsol, CSS/JS comun, Pannellum)
@@ -110,6 +113,7 @@ surse/final/pano_view.py     scoate o poză obișnuită dintr-o panoramă 360
 tools/asambleaza.py          construiește site/home.html + site/index.html din home.base.html + parts/
 tools/test_pagini.js         capturi la 5 dimensiuni + verificări automate (erori, 4xx, derulare orizontală, un singur clip)
 tools/css_mort.py            găsește și scoate CSS-ul nefolosit (verifică apoi stilurile calculate)
+tools/test_telefon_*.js      probe ca pe un telefon cu legătură de mobil: deschiderea, poza casei alese, rotirea (docs/DETALII-TEHNICE.md, §23)
 docs/DETALII-TEHNICE.md  cum funcționează fiecare secțiune; istoricul proiectului
 surse/                   scripturi și imagini sursă (doar referință, nu se publică)
 versiuni/                versiuni salvate la cererea clientului
@@ -161,6 +165,37 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
 - Showroom: Calea București nr. 41, 077055 Ciorogârla, Ilfov. Extindere regională: Trakia St. 12, Varna (BG).
 - TikTok: @multimester. X7: 36,5 m² utili, 39 m² construiți, 11,5 × 3,4 m, h 3,45 m, 39.500 € cu TVA, rate prin TBI Bank.
 - PDF-uri: https://casecapsula.ro/docs/oferta-capsula-x7-v2.pdf și https://casecapsula.ro/docs/prezentare-tehnica-x7.pdf
+
+## Cerut pe 17 noiembrie 2026, seara — telefonul (făcut și publicat)
+Clientul a filmat ecranul telefonului (Android, navigatorul Brave): „am deschis pe telefon, vezi și singur, nu merge deloc bine”.
+Ce se vedea în filmuleț și ce s-a făcut (pe larg: `docs/DETALII-TEHNICE.md`, §23; `surse/ai360/CITESTE.md`, partea a opta):
+- **Alegi o casă și poza rămâne cea veche** (C20 a apărut după 2 secunde; la M9, V3, E7, T7, apăsate pe rând, poza nu s-a mai
+  schimbat deloc). Cauza: pe telefon, fiecare casă cerea o poză de 4K (1–1,3 MB) și, în același timp, 44 de cadre ale rotirii și
+  fotografia primei camere; pe o legătură de mobil, poza stătea la coadă după ele. Acum: pe ecran mic se folosesc **copii la
+  jumătate de mărime** (`site/img/gd/ai/m/`, ~300 KB; `lite()` în `js/garden.js`), pozele celorlalte case se aduc **din timp**
+  (și pe telefon), iar din rotire nu se cere nimic până când poza casei nu e pe ecran; când alegi altă casă, cererile celei dinainte
+  se opresc. Măsurat pe un „telefon” de probă la 6 Mbps: poza casei sosea după 14 s, acum în ~1 s (sau pe loc, dacă era adusă din timp).
+- **Rotirea pornea în salturi și imaginea era ștearsă.** Acum vine întâi **„pachetul mic”** (`p.bin`: un cadru din două, 768 px,
+  un singur fișier, folosit pe măsură ce sosește), deci rotirea are aproape imediat ce arăta la orice unghi; apoi pozele de
+  1024 px (refăcute din filmările trecute prin Topaz: mai clare) și, la oprire, cadrul mare. Pe ecran nu se amestecă la întâmplare
+  cadre clare cu cadre din pachet (ar pâlpâi).
+- **La deschidere, cadrele erau adesea șterse și rămâneau în urma degetului.** Telefonul primește acum cadre **tăiate la partea care
+  se vede** (`site/img/st/film/t/`: de două ori mai puține date la aceeași claritate) și pachete mici cu toată povestea. Măsurat la
+  6 Mbps: înainte rămânea în urmă cu ~5 cadre și sărea de 20 de ori într-o derulare; acum ține pasul, fără salturi.
+- **Dunga închisă de jos, la deschidere** (apărea când se ascundea bara navigatorului): fundalul secțiunii ia acum culoarea părții
+  fixe (`--st-edge`).
+- Pozele întregi de rezervă ale deschiderii (`f_*.webp`, pentru tablete și Safari) au fost refăcute din cadrele mai clare.
+- Fără credite: totul s-a făcut din filmările și imaginile existente.
+Reguli care decurg de aici (nu le strica):
+- Când se schimbă o imagine `gr_*` sau `pl_*` din `site/img/gd/ai/`, se rulează din nou `python3 surse/ai360/vederi/famedii.py`
+  (altfel telefonul arată varianta veche). Când se reface o rotire: `farotire.py … --mici` (face și pozele mici, și pachetul mic) și
+  se mărește `p` în `ROTIRI`. Când se reface deschiderea: și `fafilmtel.py` (apoi se mărește `FILM.tel.v` în `js/story.js`).
+- Pe telefon, ce e pe ecran are întâietate: nu readuce cererea cadrelor rotirii în același timp cu poza casei și nu scoate
+  pachetele mici (ele țin rotirea și deschiderea lipite de deget când legătura e înceată).
+- La probe: calculatorul de probă nu are placă video și desenează foarte încet (o trecere de imagine durează acolo secunde), deci
+  timpii „până apare pe ecran” măsurați aici nu spun nimic despre un telefon adevărat; se măsoară sosirea din rețea și ce cadru e
+  arătat. Probele sunt descrise în `docs/DETALII-TEHNICE.md`, §23. **Nu am putut proba pe un telefon adevărat**: dacă clientul spune
+  că tot nu merge bine, cere-i din nou un filmuleț și spune-i pe ce telefon și cu ce internet (Wi-Fi sau date mobile) s-a uitat.
 
 ## Cerut pe 17 noiembrie 2026, după-amiază — făcut și publicat
 Clientul a filmat ecranul: „când dai în jos, de sus, când deschizi site-ul, nu se mișcă destul de lin… Și când vrei să miști capsula
@@ -220,6 +255,7 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
   pe site** (toată grădina + fiecare casă, pe ecran lat și pe telefon; `VEDERI` în `site/js/gradina-data.js`), cu mențiunea
   „Vizualizare realizată cu AI, orientativă” (**nu o scoate**). Dacă se mută o casă, se schimbă grădina sau locul camerei, imaginile
   trebuie refăcute. Rețeta care dă fotografie adevărată (nu machetă „lustruită”) și nodurile: `surse/ai360/CITESTE.md`, partea a doua.
+  După orice imagine `gr_*` / `pl_*` schimbată se refac și copiile pentru telefon: `python3 surse/ai360/vederi/famedii.py`.
 - **Rotire reală** (cerut pe 15 nov cu filmuleț: „când miști capsula 360 tot așa apare pătrățos”): la rotire pagina arată cadrele
   unei filmări reale (`ROTIRI`). **Gata la toate cele șapte case** (ecran lat; T6 din 16 nov, C20 din 17 nov), făcută cu Runway Aleph 2 din rotirea machetei
   (~13.600 de credite pe casă). 192 de cadre mici + 96 mari pe casă. Rotirea a fost rescrisă pe 16 nov (după trei filmulețe: „nu
@@ -230,7 +266,8 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
   toată rotirea se țin copii mici, „schița”; pe calculator se aduc din timp câteva cadre ale fiecărei case). **A treia oară, tot pe
   17 nov** („când o miști își pierde din calitate”, la toate casele): pe calculator, cadrele vin acum dintr-un **film comprimat**
   (`site/js/clip.js`; `v` în `ROTIRI`; fișierele din `img/gd/rot/<casă>/v/`): în mișcare se văd cadre de 1920 px (nu pozele de
-  1024 px), la oprire vine cadrul de 2560 px (`l_*.webp`, 96 pe casă); pozele mici `s_*.webp` rămân pentru Safari și tablete.
+  1024 px), la oprire vine cadrul de 2560 px (`l_*.webp`, 96 pe casă); pozele mici `s_*.webp` rămân pentru Safari, telefoane și
+  tablete, unde înaintea lor vine „pachetul mic” (`p.bin`, `p` în `ROTIRI`; vezi blocul din 17 nov seara).
   Filmările au fost făcute mai clare cu Topaz („Rhea”). **Rotirea lui X7 a fost refăcută** în aceeași zi, din locul vederii
   (`az0: -58`): nu mai are porțiunea lipsă din spatele casei, iar tot ce ținea de „gol” a fost scos din cod; **și a lui T7** (avea
   dungi maronii pe gazon). La V3 apare „V3” scris
@@ -273,6 +310,9 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
   (`FILM.v`, `img/st/film/v/`, `site/js/clip.js`): toate cele 648 de cadre la 1920 px, desfăcute pe un fir separat (pagina nu se
   mai blochează deloc); pozele `f_*.webp` rămân pentru telefoane și Safari, despachetate și ele în afara firului principal.
   Se reface cu `cadrepoveste.py` + `faclip.py` (apoi se mărește `FILM.v`). Copia dinainte: `versiuni/inainte-film-comprimat/`.
+  **A cincea oară (17 nov, seara, pe telefon: „nu merge deloc bine”):** telefoanele au acum cadrele lor, tăiate la partea care se
+  vede, și pachete mici cu toată povestea (`img/st/film/t/`, `FILM.tel`); vezi blocul din 17 nov seara. Copia dinainte:
+  `versiuni/inainte-telefon/`.
 - **Interior real în fiecare casă**: singurul mod ca interiorul să arate „pe bune” e cu fotografii 360° făcute în casa
   respectivă (ca la X7). Când clientul are casele, de făcut 4–5 poze 360° în fiecare; se leagă în `site/js/gradina-data.js` (rândul `pano`).
 

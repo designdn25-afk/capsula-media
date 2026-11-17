@@ -453,3 +453,40 @@ anunțate de client.
 - În rotirile caselor E7, V3 și M9 fundalul e tot grădina dinainte de mărire (T6 și C20 nu apar); X7 și T7 sunt acum la zi.
 - Filmările Runway au limitele lor, pe care mărirea nu le repară: copacii din fundal se deformează puțin în timpul ocolului.
 - Navigatoarele fără WebCodecs / AV1 (Safari) și telefoanele rămân pe pozele separate (mai line ca înainte, dar la aceeași mărime).
+
+# Partea a opta: telefonul — imagini la jumătate de mărime, pachete mici, cadre tăiate (17 nov 2026, seara)
+
+Clientul: „am deschis pe telefon, vezi și singur, nu merge deloc bine” (filmuleț al ecranului). Ce s-a găsit și ce s-a schimbat în
+pagină: `docs/DETALII-TEHNICE.md`, §23. Aici: fișierele noi și cum se refac. **Nu s-au folosit credite**: totul vine din filmările
+trecute prin Topaz și din imaginile deja făcute.
+
+## Fișierele pentru telefon
+| Ce | Unde | Cu ce se face |
+|---|---|---|
+| imaginile vederilor și planurilor la jumătate de mărime | `site/img/gd/ai/m/gr_*.webp`, `pl_*.webp` | `famedii.py` |
+| pachetul mic al unei rotiri (96 de cadre, 768 px, un fișier) | `site/img/gd/rot/<casă>/p.bin` | `farotire.py` (`--mici`, `--doar-telefon`, `--doar-pachet`) |
+| pozele mici ale unei rotiri (192, 1024 px) | `site/img/gd/rot/<casă>/s_*.webp` | `farotire.py` (`--mici`, `--doar-telefon`) |
+| cadrele deschiderii tăiate pentru telefon (un cadru din două, 726×600) | `site/img/st/film/t/f_NNNN.webp` | `fafilmtel.py` |
+| pachetele mici ale deschiderii (12 × 27 de cadre, 363×300) | `site/img/st/film/t/p_NN.bin` | `fafilmtel.py` |
+| pozele întregi de rezervă ale deschiderii (1280×720) | `site/img/st/film/f_NNNN.webp` | `fafilmtel.py --mari` |
+
+## Comenzile (din `surse/ai360/vederi/`)
+```
+python3 famedii.py                                        # după orice imagine gr_* / pl_* schimbată
+python3 farotire.py c20 <c20_rhea.mp4> --doar-telefon     # pozele mici + pachetul mic (filmul comprimat și cadrele mari rămân)
+python3 farotire.py c20 <c20_rhea.mp4> --doar-pachet      # doar pachetul mic
+python3 farotire.py c20 <c20_rhea.mp4> --mici             # tot, la o rotire nouă
+python3 fafilmtel.py <folderul cu cele 648 de cadre PNG de la cadrepoveste.py> [--mari]
+```
+Apoi: `p` din `ROTIRI` (`site/js/gradina-data.js`), respectiv `FILM.tel.v` din `site/js/story.js`, se măresc cu 1 (ca navigatorul
+să nu amestece fișiere vechi cu fișiere noi). Numerele din `fafilmtel.py` (tăietura de la x = 614, câte cadre pe pachet) trebuie
+să fie aceleași ca în `FILM.tel`.
+
+## De ținut minte
+- Sursele (filmările 4K de la Topaz și cele 648 de cadre PNG ale deschiderii) nu sunt în git: stau doar cât ține sesiunea de lucru.
+  Fără ele, filmările se iau din nou din ElevenLabs (nodurile sunt în partea a șaptea), iar cadrele deschiderii se refac cu
+  `cadrepoveste.py`.
+- Pachetul mic al unei rotiri pornește de la cadrul 0, adică de la locul vederii casei: toate rotirile sunt făcute așa. O rotire
+  care ar porni din alt loc ar merge, dar primele cadre sosite n-ar mai fi cele de lângă vedere.
+- Pe telefon se văd mai întâi cadrele din pachet (768 px), apoi cele de 1024 px. Dacă pachetul se face mai mic, prima rotire a
+  fiecărei case arată mai șters pe o legătură înceată; dacă se face mai mare, vine mai târziu.

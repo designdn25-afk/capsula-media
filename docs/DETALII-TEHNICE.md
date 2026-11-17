@@ -497,3 +497,77 @@ la cerere, pozele mici); pentru deschidere `cadrepoveste.py` apoi `faclip.py …
 - Pe mașina de probă (4 procesoare, fără placă video) un grup de cadre se desface în 110–180 ms (pe un calculator obișnuit, de
   câteva ori mai repede), deci la derulare rapidă imaginea rămâne în urmă acolo; la derulare normală urmărește la sub un cadru.
   Măsurat la aceeași derulare a poveștii: varianta veche 91 de blocări ale firului principal (6,3 s), cea nouă niciuna.
+
+## 23. Telefonul: poza casei întâi, pachete mici, cadre tăiate (17 noiembrie 2026, seara)
+
+Clientul (filmuleț al ecranului de pe un telefon Android, navigatorul Brave): „am deschis pe telefon, vezi și singur, nu merge
+deloc bine”. Ce se vedea, cadru cu cadru (filmulețul are un cadru la fiecare schimbare a ecranului, deci pauzele se pot măsura):
+- în grădină, după ce alegi o casă, fișa se schimbă, dar poza rămâne cea veche: 2 secunde la C20; la M9, V3, E7, T7, apăsate
+  una după alta, poza nu s-a mai schimbat deloc;
+- rotirea pornește în salturi (pauze de 100–340 ms în prima secundă), iar cadrele din mișcare sunt mai șterse decât imaginea de pe loc;
+- la deschidere, multe cadre sunt șterse (copia de 320 px întinsă pe tot ecranul) și filmarea rămâne în urma degetului;
+- după ce bara navigatorului se ascunde, sub partea fixă a deschiderii rămâne o dungă închisă.
+
+**De ce.** Pe telefon (ca pe orice ecran cu atingere) nu se folosește filmul comprimat, ci pozele separate. La alegerea unei case
+se cereau deodată: imaginea vederii la 4K (1–1,3 MB), 44 de cadre ale rotirii (16 în paralel, ~1,8 MB) și fotografia primei
+camere; la prima rotire, toate cele 192 de cadre. Cererile unei case nu se opreau când alegeai alta. La deschidere, fiecare cadru
+era poza întreagă de 1280 px (62 KB), din care pe telefon se vede jumătate și care era oricum micșorată la 960 px. Dunga: partea
+fixă are `100svh`, iar fereastra crește când se ascund barele; dedesubt se vedea fundalul secțiunii (`#0c1326`).
+
+**Ce s-a schimbat.**
+- *Imaginile vederilor.* `site/img/gd/ai/m/` ține copii la jumătate de mărime ale imaginilor `gr_*` și `pl_*` (le scrie
+  `surse/ai360/vederi/famedii.py`; 7,4 MB în loc de 29,5 MB). `panoUrl()` le alege când `lite()` (fereastră sub 800 px): pânza
+  grădinii are acolo cel mult ~1300 px. `warm()` (adusul din timp al imaginilor celorlalte case) merge acum și pe ecran mic; locul
+  din care se va vedea fiecare casă se socotește cu spațiul liber de atunci (`pvIn`), nu cu cel de acum.
+- *Ordinea.* `spin.pend` (deschiderea rotirii abia după ce imaginea vederii e gata) e acum pentru orice navigator, nu doar pentru
+  filmul comprimat; pe ecranele cu atingere așteaptă cel mult 5 secunde. `extLoad()`, `enter()`, `leave()` și `room()` pun `hungryT`
+  chiar în clipa apăsării (nu se mai bazează pe bucla de desen). Fotografia primei camere (`roomPre`) se cere după ce imaginea
+  vederii e pe ecran, acum pentru toate casele (înainte doar la X7). Cererile cadrelor au `AbortController` (`spin.ac`): la altă
+  casă se opresc. Cât vizitatorul e în casă sau la toată grădina, nu se mai cer cadre, iar cele desfăcute se eliberează (`spinRest`).
+- *Pachetul mic al rotirii.* `site/img/gd/rot/<casă>/p.bin` (`p` în `ROTIRI`): 96 de cadre (cele cu număr par) la 768×432, WebP,
+  într-un singur fișier de 1,6–2,2 MB. Formatul („CPP2”) e în capul lui `farotire.py`: fiecare cadru are numărul lui, iar cadrele
+  stau **de la rare la dese** (întâi câte unul din 16 de jur împrejur, apoi din 8, din 4, din 2; în fiecare treaptă, de la locul
+  vederii în ambele părți). Pagina îl citește pe măsură ce sosește (`fetch` + `getReader`): după primele ~200 KB are deja 12 cadre
+  de jur împrejur. Cadrele rămân ca `Blob` (comprimate) și se desfac doar într-o fereastră în jurul locului curent (`lowDec`,
+  `spin.px`); câte unul din 16 rămâne mereu desfăcut. Cât vine pachetul nu se cere nimic altceva; apoi pozele `s_*.webp` (1024 px),
+  cele mai apropiate de locul curent întâi, câte 6 deodată pe telefon (12 pe calculator); tot turul casei alese se aduce în fundal
+  (nu la „economisire date” sau pe 2G/3G: acolo doar câteva, iar restul la prima rotire).
+- *Ce se arată la rotire* (`spin.tier`): încet sau pe loc, cadrul clar de la unghiul curent, dacă e gata. În mișcare: cadre din
+  pachet până când cele clare sunt desfăcute pe o bucată în față (cât parcurge rotirea în ~0,15 s), apoi doar clare; dacă lipsește
+  cadrul clar, se trece înapoi la pachet. Așa nu alternează cadre clare cu cadre mai mici. La oprire vine, ca înainte, cadrul mare
+  (`l_*.webp`); cât e pe drum, se mai cer doar cadrul de aici și vecinii lui.
+- *Pozele mici.* `s_*.webp` ale caselor E7, V3, M9, T6 și C20 au fost refăcute din filmările trecute prin Topaz (X7 și T7 erau deja).
+- *Deschiderea pe telefon.* `site/img/st/film/t/` (le scrie `surse/ai360/vederi/fafilmtel.py`): `f_NNNN.webp`, un cadru din două,
+  **tăiat** la partea din jurul capsulei (de la x = 614 din 1920 până la marginea din dreapta), 726×600, ~29 KB; `p_NN.bin`, 12
+  pachete mici („CPP1”) cu toate cadrele cu număr par la 363×300 (27 pe pachet, ~220 KB). În `story.js`: `FILM.tel` și `SETS`
+  (0 = pozele întregi, 1 = cele pentru telefon); `telSet()` alege setul 1 pe ecran cu atingere, îngust (sub 700 px), când din
+  lățimea cadrului se vede cel mult `fmax = .7`; la desen, cadrul tăiat e pus la locul lui (`sx`, `sw_`). Dacă felul ecranului se
+  schimbă (telefon întors pe lat), `filmInit()` o ia de la capăt cu celălalt set. Pachetele au întâietate: cât lipsește cel de la
+  locul curent nu se cere niciun cadru clar (în afară de prima imagine a paginii), cât lipsește următorul, unul singur, cât lipsește
+  al treilea, cel mult trei; pachetele depărtate vin abia când nu mai e niciun cadru clar de adus. Cât povestea nu e pe ecran,
+  nu se mai cere nimic (`filmVis`). Aceeași regulă de afișare ca la rotire (`film.tier`).
+  Pe tablete și în navigatoarele de calculator fără film comprimat rămân pozele întregi (`f_*.webp`, refăcute și ele din cadrele
+  mai clare), cu schița ca înainte.
+- *Derularea.* `progress()` se măsoară față de înălțimea părții fixe (`pin.offsetHeight`), nu a ferestrei (care pe telefon se
+  schimbă când se ascunde bara). Pe ecranele cu atingere imaginea urmărește derularea mai strâns (`FOLLOW = .16` s; pe calculator
+  a rămas .34).
+- *Dunga de jos.* `#top.st{background:var(--st-edge,#0c1326)}`; `story.js` pune `--st-edge` = culoarea de jos a părții fixe.
+
+**Măsurat** (Chromium cu ecran de telefon 360×664, legătura limitată la 6 Mbps cu 80 ms întârziere; varianta veche → cea nouă):
+- poza casei alese, de la apăsare până la sosirea din rețea: 14 s → ~1 s (0 dacă fusese adusă din timp);
+- deschiderea, derulată cu 40 de cadre de film pe secundă: decalaj mediu față de deget 4,8 cadre → 0,6; salturi de peste 6 cadre:
+  20 → 0; date aduse: 16 MB → 12 MB. La 12 Mbps și peste, toate cadrele sunt cele clare; la 6 Mbps, cam o cincime sunt din pachete;
+- rotirea trasă la 0,3 s după ce apare casa, la 3 Mbps: înainte stătea pe primul cadru până sosea ceva; acum urmărește degetul de
+  la început (decalaj mediu ~1 cadru), cu cadre din pachet, apoi clare.
+
+**De știut la probe.**
+- Calculatorul de probă desenează în procesor: o trecere de imagine (care pe un telefon durează 0,4 s) ține acolo secunde, iar
+  la mărimea de tabletă un singur cadru poate dura zeci de secunde. Timpii „până apare pe ecran” nu se pot judeca aici; se
+  măsoară când sosește fișierul din rețea și ce cadru e arătat la fiecare desen.
+- `tools/test_telefon_deschidere.js [Mbps] [cadre de film pe secundă]`, `tools/test_telefon_poza.js [Mbps] [casă] [lățime] [înălțime]`
+  și `tools/test_telefon_rotire.js [Mbps] [casă] [px pe secundă]` (cu serverul local pornit; `PORT`, `PAGE` din mediu). Rotirea e
+  trasă cu evenimente de atingere trimise din pagină, după ceas (cele trimise din afară se pierd când navigatorul e ocupat).
+- Starea de probă: `__gradina.state.img` (imaginea vederii e gata), `.spin.pk` (1 = pachetul vine, 2 = a venit), `.spin.lo` /
+  `.spin.nl` (cadre din pachet sosite / desfăcute), `.spin.tier`; `__story.film.set`, `.tier`, `.lo`, `.nl`.
+- **Nu s-a putut proba pe un telefon adevărat.** Ce nu se vede în aceste probe: cât de repede desenează un telefon și câtă memorie
+  are. Dacă apar probleme acolo, primul lucru de cerut e un filmuleț nou și ce telefon / ce internet a folosit clientul.
