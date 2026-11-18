@@ -490,3 +490,42 @@ să fie aceleași ca în `FILM.tel`.
   care ar porni din alt loc ar merge, dar primele cadre sosite n-ar mai fi cele de lângă vedere.
 - Pe telefon se văd mai întâi cadrele din pachet (768 px), apoi cele de 1024 px. Dacă pachetul se face mai mic, prima rotire a
   fiecărei case arată mai șters pe o legătură înceată; dacă se face mai mare, vine mai târziu.
+
+# Partea a noua: terasa lui M9 (18 nov 2026)
+
+Clientul: „uite când te uiți de la terasă arată diferit, nu arată grădina” — imaginea panoramică a terasei (`site/img/gd/ai/m9_terasa.webp`)
+arăta un câmp cu copaci, fără casele din grădină. Refăcută în două generări (2 × 2.727 credite). Copia dinainte:
+`versiuni/inainte-terasa-m9/m9_terasa.webp`.
+
+## Ce s-a găsit
+- Sursa e o panoramă 360° a machetei, cu centrul spre −Z (halele) și marginile spre +Z (grădina). Intrarea pe terasă privește
+  spre +Z, deci marginile sursei sunt tocmai grădina din fața vizitatorului.
+- Generatorul (`gemini-3-pro-image`) ține bine poziția pe orizontală, dar întinde obiectele mari (baldachinul, camera cu sticlă)
+  spre marginile cadrului. Prima generare, din sursa cu marginile în centrul ei (`np.roll` cu W/2), a pus camera și baldachinul
+  până la marginea generării: după netezirea cusăturii, camera era tăiată în spatele vizitatorului.
+- A doua generare, din `surse/ai360/m9_terasa_src_r2.jpg` (sursa rotită cu `np.roll(src, 1228, axis=1)`: camera în centru,
+  marginile pe cer și câmp), a dat o cameră întreagă în spate, dar generatorul a mutat tot la dreapta, iar camera tot a ajuns
+  aproape de margine. Cusătura a rămas pe dreapta, la ~0,7 din lățime.
+
+## Pașii (cei folosiți)
+1. Sursa: `surse/ai360/m9_terasa_src.jpg` (capturată cu `cap360.js`, centrul spre −Z), rotită cu `np.roll(src, 1228, axis=1)` →
+   `m9_terasa_src_r2.jpg`. Se urcă temporar pe `gh-pages` (`img/gd/src/`), ca să o poată citi generatorul.
+2. În fluxul `yUzMp1srSOsKx9pUwTk2`: `creative_attach_reference_file` cu adresa de pe `gh-pages`, apoi un nod
+   `image-generation`, `gemini-3-pro-image`, `aspect_ratio: auto`, `resolution: 4K`, cu referințele (1) sursa și (2) `gr_all`
+   (`9Uu2gMiZ6PTYV5ulUJ9r`, ținta de calitate). Cererea: panoramă 2:1 refăcută ca fotografie, marginile se leagă pe cer și câmp,
+   iar camera, terasa, scaunele, mesele, grădina cu casele și halele rămân unde sunt (pe pozițiile din sursa rotită).
+   `creative_run_flow_nodes` cu `estimate_only: true` arată costul (2.727) fără să pornească nimic.
+3. Aliniere: `python3 -I surse/ai360/fix360.py --masoara <sursa_r2.jpg> <generat.png>`. A doua generare a ieșit cu deplasare
+   −172 (din 1024), deci nu s-a păstrat aranjamentul; a fost folosită oricum, după verificare cu ochii.
+4. Ieșirea: `python3 -I surse/ai360/fix360.py <generat.png> site/img/gd/ai/m9_terasa.webp -307`. Argumentul `-307` (din 1024 px)
+   = −1228 px la 4096: netezește marginile generării (pe marginile sursei rotite) și apoi readuce panorama în poziția sursei
+   originale. (Argumentul e deplasarea în unități de 1024 px, cu semn: `+` mută spre dreapta.)
+5. Verificare în pagină: intri în M9, „Terasă”, privești la intrare (trebuie să se vadă grădina cu casele) și te întorci cu
+   spatele (trebuie să se vadă camera și halele). Probe: `walk_m9.js` din scratchpad, sau manual.
+
+## Capcane
+- Obiectele mari (baldachin, cameră cu sticlă) care ating marginea sursei sau a generării sunt întinse de generator; pe
+  margini trebuie să fie cer sau câmp.
+- Compoziția nu se păstrează întotdeauna la panorame (a doua generare a mutat camera); de verificat fiecare imagine cu ochii.
+- O refacere cu cusătură mai curată ar cere fie o generare nouă cu marginea pusă pe cer mai larg, fie o retușare a colțului
+  camerei (cost ~300–900 credite cu `gemini-3.1-flash-image`, pe o bucată decupată).

@@ -166,6 +166,19 @@ Linkurile acestea se pot actualiza doar dintr-o conversație pe claude.ai. Din C
 - TikTok: @multimester. X7: 36,5 m² utili, 39 m² construiți, 11,5 × 3,4 m, h 3,45 m, 39.500 € cu TVA, rate prin TBI Bank.
 - PDF-uri: https://casecapsula.ro/docs/oferta-capsula-x7-v2.pdf și https://casecapsula.ro/docs/prezentare-tehnica-x7.pdf
 
+## Cerut pe 18 noiembrie 2026 — terasa lui M9 (făcut)
+Clientul a văzut terasa lui M9 în pagină: „uite când te uiți de la terasă arată diferit, nu arată grădina”. Imaginea veche
+(`site/img/gd/ai/m9_terasa.webp`) arăta un câmp cu copaci, fără casele din grădină. Acum, de la intrarea pe terasă (privirea
+spre grădină) se vede grădina cu casele capsulă, gardul viu, copacii și halele în fundal; privirea spre spate arată camera
+cu dormitorul și halele. Copia dinainte: `versiuni/inainte-terasa-m9/m9_terasa.webp`.
+- **Credite:** două generări a câte 2.727 (≈ 5.450 în total). Prima, cu sursa rotită la jumătate, a lăsat o cusătură la mijloc
+  (baldachinul și camera erau întinse până la margine); a doua, cu sursa `surse/ai360/m9_terasa_src_r2.jpg` (camera în centru,
+  marginile pe cer și câmp), e cea publicată.
+- **Ce rămâne:** privind mult spre dreapta, pe margine, marginea camerei și a baldachinului e ușor moale (cusătura panoramei,
+  în dreptul colțului de sticlă). Dacă clientul o vede și o supără: refacere după `surse/ai360/CITESTE.md`, partea a noua.
+- **Regulă:** la o panoramă, generatorul întinde obiectele mari spre marginile cadrului. Marginile generării trebuie puse pe
+  cer sau câmp, nu pe cameră; de verificat cu ochii fiecare generare, nu doar cu măsurătoarea de aliniere.
+
 ## Cerut pe 17 noiembrie 2026, seara — telefonul (făcut și publicat)
 Clientul a filmat ecranul telefonului (Android, navigatorul Brave): „am deschis pe telefon, vezi și singur, nu merge deloc bine”.
 Ce se vedea în filmuleț și ce s-a făcut (pe larg: `docs/DETALII-TEHNICE.md`, §23; `surse/ai360/CITESTE.md`, partea a opta):
