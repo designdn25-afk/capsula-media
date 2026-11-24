@@ -18,7 +18,11 @@ export function buildGarden(G, H) {
   // aceeași ordine ca înainte, iar tot ce e nou (aleea de la poarta nouă, straturile, tufele și copacii din față, aleile caselor noi)
   // le ia dintr-un șir separat: extra(() => …). VECHI = unde erau poarta și mijlocul grădinii vechi.
   let seedX = 4801; const extra = fn => { const s = seed; seed = seedX; fn(); seedX = seed; seed = s; }, VECHI = { ez: 28, gz: -8 };
-  const { latime: GW, adancime: GD, centruZ: GZ, intrareZ: EZ } = GRADINA, tp = R.triplanar;
+  // A doua mărire (24 nov 2026: de la 98 la 124 m, pentru casele K5 și YK5). La fel ca prima dată: tot ce exista (și partea făcută la
+  // prima mărire, în jurul lui T6 și C20) rămâne exact pe loc și își ia numerele din șirurile de dinainte; ce e nou acum (aleea de la
+  // poarta nouă, straturile și copacii de lângă ea, aleile caselor noi) are șirul lui: extra2(() => …). E2 = unde era poarta după prima mărire.
+  let seedY = 9203; const extra2 = fn => { const s = seed; seed = seedY; fn(); seedY = seed; seed = s; }, VECHI2 = { ez: 54 };
+  const { latime: GW, adancime: GD, centruZ: GZ, intrareZ: EZ } = GRADINA, tp = R.triplanar, E2 = Math.min(EZ, VECHI2.ez), NOU2 = EZ > VECHI2.ez + 8;
   const decal = (o) => new THREE.MeshBasicMaterial({ transparent: true, depthWrite: false, polygonOffset: true, polygonOffsetFactor: -2, polygonOffsetUnits: -2, ...o });
   const m = {
     pave: tp(S({ color: 0xffffff, roughness: .9 }), { map: T.pavers, scale: 2.4, gain: .9, rough: .3, bump: .012 }),                                    // dale mari, aliniate cu fiecare casă
@@ -128,25 +132,27 @@ export function buildGarden(G, H) {
     for (let i = 0; i <= n; i++) { const p = cv.getPointAt(i / n), t = cv.getTangentAt(i / n); if (Math.hypot(p.x, p.z) < 4.3) continue; const o = (i % 2 ? .1 : -.1) + rr(-.05, .05), k = rr(.86, 1.06);
       slab(p.x + t.z * o, p.z - t.x * o, rr(.4, .5), rr(.28, .34), Math.atan2(t.x, t.z) + rr(-.3, .3), .042, [k, k * rr(.97, 1.01), k * rr(.93, 1)]); } };
   path([[0, VECHI.ez + 6], [.5, VECHI.ez - 3], [-1.3, 19], [1.1, 10], [0, 4]]);
-  if (EZ > VECHI.ez + 8) extra(() => path([[0, EZ + 6], [-.5, EZ - 3], [.9, EZ - 9.5], [-.7, VECHI.ez + 11.5], [0, VECHI.ez + 6.8]]));
+  if (EZ > VECHI.ez + 8) extra(() => path([[0, E2 + 6], [-.5, E2 - 3], [.9, E2 - 9.5], [-.7, VECHI.ez + 11.5], [0, VECHI.ez + 6.8]]));
+  if (NOU2) extra2(() => path([[0, EZ + 6], [.5, EZ - 3], [-.9, EZ - 10], [.7, E2 + 12.5], [0, E2 + 6.8]]));
   let backEnd = [0, GZ - 8];
   H.forEach(h => { const dp = h.g.localToWorld(new THREE.Vector3(0, 0, (h.s.cz || 0) + h.s.d / 2 + 1.5)); h.door = dp; if (Math.abs(dp.x) < 3) backEnd = [dp.x, dp.z]; });
   path([[0, -4], [-1.1, backEnd[1] * .4], [.9, backEnd[1] * .75], backEnd]);
   H.forEach(h => { const d = h.door; if (Math.abs(d.x) < 3) return; const z0 = clamp(d.z + 3, backEnd[1] + 4, EZ - 6), sx = Math.sign(d.x), go = () => path([[sx * 1.2, z0], [d.x * .5, (z0 + d.z) / 2 + 1.2], [d.x, d.z]]);
-    h.c.z > VECHI.ez ? extra(go) : go(); lamps.push([d.x - sx * 2.2, d.z + 1.2, 4.5]); });   // casele din partea nouă: din șirul separat
+    h.c.z > VECHI2.ez ? extra2(go) : h.c.z > VECHI.ez ? extra(go) : go(); lamps.push([d.x - sx * 2.2, d.z + 1.2, 4.5]); });   // casele din partea nouă: din șirul separat
   g.add(sh(new THREE.Mesh(ST.geo(), m.stone), false, true));
 
   /* ---------- rondul din mijloc: dale, jardinieră de piatră cu un copac, două bănci ---------- */
   g.add(flat(new THREE.ShapeGeometry(new THREE.Shape().absarc(0, 0, 3.9, 0, TAU), 48), m.paveW, .035));
   const pot = sh(new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.62, .5, 40), M.stone)); pot.position.y = .25; g.add(pot);
   [[-3.1, 1.9, .5], [3.1, -1.9, .5 + Math.PI]].forEach(([x, z, a]) => { const b = new THREE.Group(); for (let i = 0; i < 4; i++) b.add(sh(box(1.7, .045, .1, M.wood, 0, .45, -.18 + i * .12))); b.add(sh(box(.09, .43, .44, M.stone, -.68, .215, 0)), sh(box(.09, .43, .44, M.stone, .68, .215, 0))); b.position.set(x, 0, z); b.rotation.y = a; fixed.add(b); blobs.push([x, z, 1.1]); });
-  lamps.push([-3.3, 9, 4.5], [3.2, 18, 4.5], [-2.6, VECHI.gz - 6, 4.5]); if (EZ > VECHI.ez + 8) lamps.push([-3.3, EZ - 11, 4.5]);
+  lamps.push([-3.3, 9, 4.5], [3.2, 18, 4.5], [-2.6, VECHI.gz - 6, 4.5]); if (EZ > VECHI.ez + 8) lamps.push([-3.3, E2 - 11, 4.5]); if (NOU2) lamps.push([3.3, EZ - 11, 4.5]);
 
   /* ---------- straturi cu flori: mulci, frunziș verde, flori mici și dese ---------- */
   const beds = [[-27.6, 19, 2.2, 6, 0], [-28.2, 1, 2, 6.5, 1], [-27.6, -24, 2.2, 8, 2], [27.6, 20, 2.2, 6, 1], [28.2, 0, 2, 6.5, 3], [27.6, -25, 2.2, 8, 0],
     [-14, GZ - GD / 2 + 3.4, 8, 1.9, 3], [14, GZ - GD / 2 + 3.4, 8, 1.9, 1], [-14.5, VECHI.ez - 3.2, 7, 1.8, 2], [14.5, VECHI.ez - 3.2, 7, 1.8, 0], [-4.6, 20, 1.3, 4.4, 1], [4.7, 15, 1.3, 4.4, 2], [-6.6, -1.2, 1.4, 3, 0], [6.6, 1.2, 1.4, 3, 3]];
   // straturile din partea nouă (lângă gardul din față, pe laturi și pe locul liber, păstrat pentru următoarea casă): GRADINA.straturiNoi
-  const bedsN = EZ > VECHI.ez + 8 ? [[-14.5, EZ - 3.2, 7, 1.8, 1], [14.5, EZ - 3.2, 7, 1.8, 3], [-27.6, EZ - 13, 2.2, 6, 2], [27.6, EZ - 13, 2.2, 6, 0], ...(GRADINA.straturiNoi || [])] : [];
+  const bedsN = EZ > VECHI.ez + 8 ? [[-14.5, E2 - 3.2, 7, 1.8, 1], [14.5, E2 - 3.2, 7, 1.8, 3], [-27.6, E2 - 13, 2.2, 6, 2], [27.6, E2 - 13, 2.2, 6, 0], ...(GRADINA.straturiNoi || [])] : [];
+  const bedsN2 = NOU2 ? [[-14.5, EZ - 3.2, 7, 1.8, 3], [14.5, EZ - 3.2, 7, 1.8, 2], [-27.6, EZ - 13, 2.2, 6, 1], [27.6, EZ - 13, 2.2, 6, 3]] : [];   // a doua mărire
   // k = felul florii din textură (0 margarete · 1 spice · 2 trandafiri · 3 mărunte), c = culoarea, h = înălțimea, s = mărimea, w = cât de des apare
   const hex = (x, w, k, h, s) => { const c = new THREE.Color(x); return { c: [c.r, c.g, c.b], w, k, h, s }; };
   const PAL = [
@@ -163,7 +169,7 @@ export function buildGarden(G, H) {
     for (let i = 0; i < ar * 5.2; i++) { const p = pt(.9); let e = P[0], q = rnd() * tw; for (const o of P) { q -= o.w; e = o; if (q <= 0) break; } const k = rr(.82, 1.08);
       fl[e.k].push({ x: p[0], y: rr(e.h[0], e.h[1]), z: p[1], ry: rnd() * TAU, rx: e.k === 1 ? rr(-.12, .12) : rr(-.3, .3), s: e.s * rr(.8, 1.25), c: [e.c[0] * k, e.c[1] * k, e.c[2] * k] }); }
   };
-  beds.forEach(bed); extra(() => bedsN.forEach(bed));
+  beds.forEach(bed); extra(() => bedsN.forEach(bed)); extra2(() => bedsN2.forEach(bed));
   BD.add(new THREE.CircleGeometry(1.36, 36), new THREE.Matrix4().makeRotationX(-Math.PI / 2).setPosition(0, .505, 0));   // pământul din jardiniera rondului
   g.add(sh(new THREE.Mesh(BD.geo(), m.mulch), false, true));
   g.add(R.instances(R.treeGeo(4, 13).crown, m.leafS, tufts, { cast: false }));
@@ -183,6 +189,7 @@ export function buildGarden(G, H) {
   for (let i = 0; i < 10; i++) bs.push([rr(-1, 1) * (GW / 2 - 4), GZ - GD / 2 + rr(2.2, 3.4), rr(.7, 1.15)]);
   const bush = R.treeGeo(3, 9), mkBush = b => { const k = rr(.8, 1.08); blobs.push([b[0], b[1], b[2] * 1.25]); return { x: b[0], y: 0, z: b[1], ry: rnd() * TAU, s: [b[2], b[2] * rr(.9, 1.15), b[2]], c: [k * rr(.8, 1), k, k * rr(.72, .95)] }; }, bl = bs.map(mkBush);
   extra(() => { bedsN.forEach(ends(bsN)); bsN.forEach(b => bl.push(mkBush(b))); });
+  extra2(() => { const b2 = []; bedsN2.forEach(ends(b2)); b2.forEach(b => bl.push(mkBush(b))); });
   g.add(sh(R.instances(bush.crown, m.leafS, bl)), sh(R.instances(bush.wood, m.wood, bl)));
   // copacii: [x, z, fel (0 foios, 1 conifer), mărime]; cei din afara gardului stau pe un arc, în spate și pe laturi (în față rămâne liber)
   const trees = [[-26.5, 24.5, 0, 1.25], [26.8, 25, 1, 1.3], [-28, -9.5, 1, 1.5], [28, -12, 0, 1.4], [27.5, -37, 0, 1.6], [-26.5, -38, 0, 1.7], [9.5, GZ - GD / 2 + 4, 1, 1.5], [-10.5, GZ - GD / 2 + 4, 1, 1.45], [28, 10, 1, 1.2], [-28.5, 10.5, 0, 1.25]];
@@ -193,7 +200,8 @@ export function buildGarden(G, H) {
   const plant = (x, z, f, s, y = 0) => { const q = tint[f], k = rr(.82, 1.08), w = s * rr(.92, 1.1); TL[f].push({ x, y, z, ry: rnd() * TAU, s: [w, s * rr(.92, 1.1), w], c: [q[0] * k * rr(.86, 1.06), q[1] * k, q[2] * k * rr(.8, 1.05)] }); blobs.push([x, z, s * (f === 1 ? 1.25 : 1.45)]); };
   plant(0, 0, 0, 1.42, .45);   // copacul din rond
   trees.forEach(([x, z, kind, s], i) => (kind ? plant(x, z, 1, s) : i % 3 === 1 ? plant(x, z, 2, s * .9) : plant(x, z, i % 2 ? 3 : 0, s * .95)));
-  if (EZ > VECHI.ez + 8) extra(() => { plant(-27.2, EZ - 3.6, 0, 1.2); plant(27.6, EZ - 3.2, 1, 1.25); plant(-44, EZ - 12, 3, 2.1); plant(45, EZ - 7, 1, 2.3); plant(-52, EZ + 2, 1, 2.6); plant(55, EZ - 20, 0, 2.2); });
+  if (EZ > VECHI.ez + 8) extra(() => { plant(-27.2, E2 - 3.6, 0, 1.2); plant(27.6, E2 - 3.2, 1, 1.25); plant(-44, E2 - 12, 3, 2.1); plant(45, E2 - 7, 1, 2.3); plant(-52, E2 + 2, 1, 2.6); plant(55, E2 - 20, 0, 2.2); });
+  if (NOU2) extra2(() => { plant(27.2, EZ - 3.6, 0, 1.2); plant(-27.6, EZ - 3.2, 1, 1.25); plant(44, EZ - 13, 3, 2.1); plant(-45, EZ - 6, 1, 2.3); plant(52, EZ + 3, 1, 2.6); plant(-55, EZ - 19, 0, 2.2); });
   TL.forEach((list, f) => { if (!list.length) return; const t = R.treeGeo(KIND[f], SEED[f]); g.add(sh(R.instances(t.crown, f === 1 ? m.spray : m.leaf, list)), sh(R.instances(t.wood, m.wood, list))); });
 
   /* ---------- lămpile de grădină, lumina lor pe iarbă (seara) și umbrele moi de la baza lucrurilor ---------- */
