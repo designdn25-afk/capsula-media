@@ -351,6 +351,9 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
 - **Ce s-a făcut:** `site/img/gd/ai/t6_living.webp` a fost retușată cu `gemini-3-pro-image` pornind chiar de la imaginea de pe site
   (nu de la machetă): s-au schimbat doar canapeaua și măsuța, restul camerei a rămas la loc (potrivire măsurată cu `fix360.py --masoara`:
   deplasare 0). Nod în flux: `snwvyjhF4BiuVaAIMjc2`. Cost: 2.272 de credite. Copia veche: `versiuni/inainte-canapea-t6/`.
+- **A doua cerere, aceeași zi („și patul și prosoapele trebuie să aranjăm aici”):** aceeași imagine a mai fost retușată o dată
+  (nod `tp3IuD1jl01wataMCRVm`, 2.272 de credite): pat făcut, cu pilotă și perne, noptiere și veioze reale, suport negru cu prosoape.
+  Imaginea a venit mutată cu 2 px (din 1024) și a fost adusă la loc cu `fix360.py … 2`.
 - **De știut:** și în livingurile E7, M9 și C20 canapelele sunt cam simple; se pot reface la fel, dacă cere clientul (~2.300 credite bucata).
 
 ## Pagina de probă AgroKart (alt proiect al clientului, pe aceeași adresă)
