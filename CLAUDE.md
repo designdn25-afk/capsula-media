@@ -367,7 +367,7 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
 - Stă la https://designdn25-afk.github.io/capsula-media/agrokart/ ; sursa e pe ramura `claude/agrokart-demo` (`agrokart/demo`, făcută cu
   `agrokart/tools/genereaza.py`). `tools/publica_pages.sh` o pune la loc la fiecare publicare a site-ului cu capsule.
 
-## Casele K5 și YK5 (24 nov 2026) — în grădină, publicate, FĂRĂ rotire
+## Casele K5 și YK5 (24 nov 2026) — în grădină, publicate; rotirea făcută în aceeași zi (vezi la sfârșitul blocului)
 Clientul a trimis o ofertă (PDF, nu se urcă în git: are prețuri de achiziție și date bancare) cu două case: „vreau și casele astea
 să le băgăm în grădina aia 3D, tot așa, să pară totul real”. A oprit o dată lucrul („oprește momentan”), apoi: „hai continuă cu grădina”.
 - **K5** (nume de lucru): căsuță extensibilă 4,0 × 5,0 × 2,55 m, ~20 m², lamele maro, ușă dublă de sticlă + geam îngust în față, scară
@@ -389,8 +389,13 @@ să le băgăm în grădina aia 3D, tot așa, să pară totul real”. A oprit o
   stânga la dreapta și fără a doua imagine de referință, a ieșit aliniată).
 - **Ce e mai slab:** vederile din afară ale celor două case și terasa lui K5 arată puțin „machetă lustruită” (gazon în dungi, copaci
   rotunzi), mai puțin reale decât T6. Dacă clientul observă: se refac cu o imagine reală ca țintă, ca la `gr_c20_p`.
-- **Rotirea NU e făcută** (≈ 13.600 de credite pe casă + ≈ 2.400 Topaz): casele noi stau pe loc la tragere (nu se vede macheta).
-  Clientul a fost întrebat de două ori dacă o vrea; de făcut doar cu acordul lui. La fel rotirile vechi nu arată casele noi în fundal.
+- **Rotirea e făcută** (clientul a ales „1” = amândouă; 24 nov): Runway Aleph 2 (noduri `WMZtY0FvRqY95tgmFtzV` K5, `f8bcQ0eTDhhjMfDynnfM` YK5;
+  13.573 fiecare) + Topaz Rhea (`KVE7d4V0Pz3BxFcVKkbf`, `PwWuD1i2gRNWw6Gd7dyo`; 2.424 fiecare), apoi `farotire.py … --mici`; rânduri în `ROTIRI`
+  (`az0` −60 / 60). Total ≈ 32.000 de credite; au rămas ≈ 26.800. **Promptul lui Aleph are cel mult 1000 de caractere** (altfel pică, fără cost).
+  **Ce e mai slab:** Aleph pornește de la imaginea de referință, iar vederile `gr_k5` / `gr_yk5` sunt „machetă lustruită”, deci și rotirile
+  arată mai puțin real decât la T6 / C20 (gazon neted, copaci rotunzi). Ca să arate real: întâi vederea refăcută cu o imagine reală ca
+  țintă (~2.730), apoi rotirea din nou (~16.000 pe casă); doar cu acordul clientului și cu credite. Pe ecran îngust YK5 nu se rotește
+  (vederea înaltă), ca la celelalte case. Rotirile caselor vechi nu arată casele noi în fundal.
 - **„Este pătrățos” (clientul, aceeași zi, captură din livingul lui YK5 cu macheta):** imaginile reale erau puse și publicate; la el
   macheta s-a văzut cât imaginea camerei încă se încărca (imaginea dinainte e ținută pe ecran cel mult 7 secunde, apoi apărea macheta).
   Acum, într-o cameră cu imagine reală, cât imaginea nu e pe ecran, pânza se ascunde („vălul”, `veil` în `garden.js` și în
