@@ -1,0 +1,474 @@
+<!doctype html>
+<html lang="ro">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>AgroKart TYE 404</title>
+<meta name="description" content="Tractor 40 CP TYE 404, 4x4, în stoc. Preț 8.490 EUR cu TVA inclus.">
+<link rel="icon" href="img/logo.png">
+<link rel="preload" as="image" href="img/tye-404-camp-m.webp" media="(max-width: 700px)">
+<style>
+:root{
+  --verde:#2f6b12; --verde-inchis:#1f4a0b; --verde-deschis:#eaf3df;
+  --galben:#f4b400; --fond:#faf8f3; --alb:#fff; --text:#1c1f18; --gri:#5d6457;
+  --linie:#e3e0d6; --wa:#128c4a; --rosu:#c8281e;
+  --raza:18px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--fond);color:var(--text);
+  font:18px/1.5 system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;
+  padding-bottom:84px}
+img{max-width:100%;display:block}
+a{color:var(--verde)}
+h1,h2,h3{line-height:1.15;margin:0;text-wrap:balance}
+h2{font-size:clamp(26px,5vw,36px);letter-spacing:-.01em}
+.wrap{max-width:1120px;margin:0 auto;padding:0 16px}
+section{padding:44px 0}
+.sub{color:var(--gri);margin:8px 0 22px;max-width:60ch}
+
+/* antet */
+header{position:sticky;top:0;z-index:20;background:rgba(250,248,243,.94);
+  backdrop-filter:blur(8px);border-bottom:1px solid var(--linie)}
+.antet{display:flex;align-items:center;justify-content:space-between;gap:12px;height:64px}
+.antet img{height:46px;width:auto}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:10px;
+  min-height:56px;padding:0 22px;border-radius:14px;border:2px solid transparent;
+  font-weight:700;font-size:19px;text-decoration:none;cursor:pointer;
+  font-family:inherit;line-height:1.1}
+.btn svg{width:24px;height:24px;flex:none}
+.btn-suna{background:var(--verde);color:#fff}
+.btn-suna:hover{background:var(--verde-inchis)}
+.btn-wa{background:#fff;color:var(--wa);border-color:var(--wa)}
+.btn-wa:hover{background:#eefaf2}
+.btn-mic{min-height:46px;font-size:17px;padding:0 16px}
+:focus-visible{outline:3px solid var(--galben);outline-offset:3px}
+
+/* prima parte */
+.erou{padding:18px 0 8px}
+.erou-grid{display:grid;gap:20px}
+.erou-poza{position:relative;border-radius:var(--raza);overflow:hidden;background:#d9e6cf;aspect-ratio:16/9}
+.erou-poza img{width:100%;height:100%;object-fit:cover}
+.nota-ai{position:absolute;right:8px;bottom:8px;background:rgba(0,0,0,.55);color:#fff;
+  font-size:12px;padding:3px 8px;border-radius:8px}
+.eticheta{display:inline-flex;align-items:center;gap:8px;background:var(--verde-deschis);
+  color:var(--verde-inchis);font-weight:700;font-size:16px;padding:6px 12px;border-radius:999px}
+.eticheta::before{content:"";width:10px;height:10px;border-radius:50%;background:#3aa20f}
+h1{font-size:clamp(32px,7vw,52px);letter-spacing:-.02em;margin:12px 0 6px}
+.descr{color:var(--gri);font-size:20px;margin:0 0 16px}
+.pret-cutie{background:var(--alb);border:1px solid var(--linie);border-radius:var(--raza);padding:18px}
+.pret-et{color:var(--rosu);font-weight:700;font-size:16px;text-transform:uppercase;letter-spacing:.04em}
+.pret{font-size:clamp(40px,9vw,56px);font-weight:800;letter-spacing:-.02em;line-height:1.05;font-variant-numeric:tabular-nums}
+.pret small{font-size:.45em;font-weight:700}
+.pret-nota{color:var(--gri);font-size:16px}
+.butoane{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:16px}
+.transport{margin:14px 0 0;font-size:16px;color:var(--gri)}
+
+/* pe scurt */
+.scurt{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.scurt div{background:var(--alb);border:1px solid var(--linie);border-radius:16px;padding:16px}
+.scurt b{display:block;font-size:26px;line-height:1.1;font-variant-numeric:tabular-nums}
+.scurt span{color:var(--gri);font-size:16px}
+
+/* rotire */
+.rot-fond{background:#eef1e8}
+.rot{position:relative;border-radius:var(--raza);overflow:hidden;background:#cfd8c4;
+  aspect-ratio:16/9;touch-action:pan-y;cursor:grab;user-select:none;-webkit-user-select:none}
+.rot.trage{cursor:grabbing}
+.rot canvas,.rot img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+.rot-indiciu{position:absolute;left:50%;top:12px;transform:translateX(-50%);
+  background:rgba(0,0,0,.6);color:#fff;font-size:16px;font-weight:600;padding:8px 14px;border-radius:999px;
+  white-space:nowrap;pointer-events:none;transition:opacity .4s}
+.rot-incarca{position:absolute;left:0;bottom:0;height:5px;background:var(--galben);width:0;transition:width .2s}
+.rot-ctrl{display:grid;grid-template-columns:64px 1fr 64px;gap:10px;align-items:center;margin-top:12px}
+.rot-ctrl button{height:60px;border-radius:14px;border:2px solid var(--verde);background:#fff;color:var(--verde);
+  font-size:28px;font-weight:800;cursor:pointer;font-family:inherit}
+.rot-ctrl button:active{background:var(--verde-deschis)}
+.rot-ctrl input{width:100%;height:44px;accent-color:var(--verde)}
+.mic{font-size:14px;color:var(--gri);margin-top:10px}
+
+/* garantie */
+.pachete{display:grid;gap:12px}
+.pachet{display:block;position:relative;background:var(--alb);border:2px solid var(--linie);
+  border-radius:var(--raza);padding:18px 18px 18px 58px;cursor:pointer}
+.pachet input{position:absolute;left:18px;top:22px;width:26px;height:26px;accent-color:var(--verde)}
+.pachet:has(input:checked){border-color:var(--verde);background:#f6faf1}
+.pachet h3{font-size:22px;display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;justify-content:space-between}
+.pachet h3 em{font-style:normal;font-size:17px;color:var(--verde-inchis);background:var(--verde-deschis);padding:2px 10px;border-radius:999px}
+.pachet ul{margin:10px 0 0;padding:0;list-style:none;font-size:17px}
+.pachet li{padding-left:26px;position:relative;margin:4px 0}
+.pachet li::before{content:"✓";position:absolute;left:0;color:var(--verde);font-weight:800}
+.total{margin-top:14px;background:var(--verde-inchis);color:#fff;border-radius:var(--raza);padding:18px;
+  display:flex;flex-wrap:wrap;gap:8px 20px;align-items:center;justify-content:space-between}
+.total b{font-size:34px;font-variant-numeric:tabular-nums;line-height:1.1}
+.total .et{opacity:.85;font-size:16px}
+
+/* inchiriere */
+.chirie{background:var(--alb);border:1px solid var(--linie);border-radius:var(--raza);padding:20px;
+  display:grid;gap:14px}
+.chirie b{font-size:34px;font-variant-numeric:tabular-nums}
+
+/* date tehnice */
+details{background:var(--alb);border:1px solid var(--linie);border-radius:var(--raza)}
+summary{cursor:pointer;padding:18px;font-weight:700;font-size:20px;list-style:none;display:flex;justify-content:space-between;gap:12px}
+summary::-webkit-details-marker{display:none}
+summary::after{content:"+";font-size:28px;line-height:.8;color:var(--verde)}
+details[open] summary::after{content:"–"}
+table{width:100%;border-collapse:collapse;font-size:17px}
+td{padding:12px 18px;border-top:1px solid var(--linie);vertical-align:top}
+td:first-child{color:var(--gri);width:42%}
+
+/* alte modele */
+.modele{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.model{background:var(--alb);border:1px solid var(--linie);border-radius:16px;padding:12px;
+  text-decoration:none;color:inherit;display:flex;flex-direction:column}
+.model:hover{border-color:var(--verde)}
+.model .im{aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;margin-bottom:8px}
+.model .im img{max-height:100%;width:auto;object-fit:contain;border-radius:8px}
+.model b{font-size:18px;line-height:1.2}
+.model span{color:var(--gri);font-size:15px}
+.model i{font-style:normal;font-weight:800;font-size:19px;margin-top:auto;padding-top:6px;font-variant-numeric:tabular-nums}
+.model.aici{border:2px solid var(--verde)}
+h3.grup{font-size:20px;margin:26px 0 12px;color:var(--gri);font-weight:700}
+
+/* contact */
+.contact{background:var(--verde-inchis);color:#fff}
+.contact .tel{color:#fff}
+.contact .sub{color:#d5e6c7}
+.contact-grid{display:grid;gap:14px}
+.contact .tel{font-size:clamp(34px,9vw,52px);font-weight:800;text-decoration:none;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+.contact .btn-suna{background:var(--galben);color:#1c1f18}
+.contact .btn-wa{border-color:#fff;color:var(--verde-inchis)}
+footer{padding:22px 0;font-size:14px;color:var(--gri)}
+
+/* bara de jos pe telefon */
+.jos{position:fixed;left:0;right:0;bottom:0;z-index:30;background:#fff;border-top:1px solid var(--linie);
+  padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:grid;grid-template-columns:1fr 1fr;gap:10px}
+
+@media (min-width:860px){
+  body{padding-bottom:0;font-size:19px}
+  .jos{display:none}
+  section{padding:64px 0}
+  .erou{padding:32px 0 16px}
+  .erou-grid{grid-template-columns:1.45fr 1fr;align-items:center;gap:36px}
+  .scurt{grid-template-columns:repeat(6,1fr)}
+  .pachete{grid-template-columns:repeat(3,1fr)}
+  .modele{grid-template-columns:repeat(5,1fr)}
+  .chirie{grid-template-columns:1fr auto;align-items:center}
+  .contact-grid{grid-template-columns:1fr 1fr;align-items:center}
+}
+@media (max-width:859px){.antet .btn span.lung{display:none}}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="wrap antet">
+    <a href="#sus" aria-label="AgroKart"><img src="img/logo.png" alt="AgroKart" width="333" height="266"></a>
+    <a class="btn btn-suna btn-mic" href="tel:+40729249362">
+      <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z"/></svg>
+      <span class="lung">Sună:&nbsp;</span>0729 249 362
+    </a>
+  </div>
+</header>
+
+<main id="sus">
+
+<section class="erou">
+  <div class="wrap erou-grid">
+    <div class="erou-poza">
+      <picture>
+        <source media="(max-width:700px)" srcset="img/tye-404-camp-m.webp">
+        <img src="img/tye-404-camp.webp" alt="Tractor roșu TYE 404 de 40 CP, la marginea unui câmp arat" width="2400" height="1340" fetchpriority="high">
+      </picture>
+      <span class="nota-ai">Imagine realizată cu AI · orientativă</span>
+    </div>
+    <div>
+      <span class="eticheta">În stoc</span>
+      <h1>Tractor 40 CP<br>TYE 404</h1>
+      <p class="descr">Tractor utilitar compact cu motor Laidong. Tracțiune 4×4.</p>
+      <div class="pret-cutie">
+        <div class="pret-et">Preț promoțional</div>
+        <div class="pret">8.490 <small>EUR</small></div>
+        <div class="pret-nota">cu TVA inclus · Neomologabil</div>
+        <div class="butoane">
+          <a class="btn btn-suna" href="tel:+40729249362">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z"/></svg>
+            Sună
+          </a>
+          <a class="btn btn-wa" href="https://wa.me/40729249362?text=Bun%C4%83%20ziua%2C%20m%C4%83%20intereseaz%C4%83%20tractorul%20TYE%20404." target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M12 2a10 10 0 0 0-8.6 15.1L2 22l5-1.3A10 10 0 1 0 12 2zm5.8 14.2c-.25.7-1.4 1.3-1.95 1.35-.5.05-1.15.25-3.85-.8-3.25-1.3-5.3-4.6-5.45-4.8-.15-.2-1.3-1.75-1.3-3.3s.8-2.35 1.1-2.65c.3-.3.65-.4.85-.4h.6c.2 0 .45-.05.7.55.25.65.9 2.2.95 2.35.1.15.15.35.05.55-.1.2-.15.35-.3.5l-.45.55c-.15.15-.3.3-.15.6.2.3.8 1.3 1.7 2.1 1.15 1.05 2.15 1.35 2.45 1.5.3.15.5.15.65-.05.2-.2.75-.9.95-1.2.2-.3.4-.25.7-.15.25.1 1.8.85 2.1 1 .3.15.5.25.6.35.05.15.05.75-.2 1.45z"/></svg>
+            WhatsApp
+          </a>
+        </div>
+        <p class="transport">Transport gratuit pentru tractoare în România, la destinațiile eligibile confirmate în oferta scrisă înainte de comandă.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:20px">
+  <div class="wrap">
+    <div class="scurt">
+      <div><b>40 CP</b><span>putere (29.4 kW)</span></div>
+      <div><b>4×4</b><span>tracțiune 4WD</span></div>
+      <div><b>8 + 8</b><span>viteze înainte și înapoi</span></div>
+      <div><b>540 / 720</b><span>rotații priză de putere</span></div>
+      <div><b>1.580 kg</b><span>greutate</span></div>
+      <div><b>3 puncte</b><span>ridicător spate</span></div>
+    </div>
+  </div>
+</section>
+
+<section class="rot-fond" id="rotire">
+  <div class="wrap">
+    <h2>Uită-te la el din toate părțile</h2>
+    <p class="sub">Trage cu degetul peste imagine, la stânga sau la dreapta. Sau apasă pe săgeți.</p>
+    <div class="rot" id="rot" role="img" aria-label="Tractorul TYE 404 văzut de jur împrejur">
+      <img id="rot-prima" src="img/rot/000.webp" alt="" draggable="false">
+      <canvas id="rot-c" width="1024" height="570"></canvas>
+      <div class="rot-indiciu" id="rot-ind">◀ Trage ca să rotești ▶</div>
+      <div class="rot-incarca" id="rot-bar"></div>
+      <span class="nota-ai">Rotire realizată cu AI · orientativă</span>
+    </div>
+    <div class="rot-ctrl">
+      <button type="button" id="rot-st" aria-label="Rotește la stânga">◀</button>
+      <input type="range" id="rot-sl" min="0" max="100" value="0" aria-label="Rotește tractorul">
+      <button type="button" id="rot-dr" aria-label="Rotește la dreapta">▶</button>
+    </div>
+    <p class="mic">Rotirea este făcută pe calculator pornind de la fotografia tractorului. Detaliile din spate pot fi diferite de tractorul real — vino să-l vezi în showroom.</p>
+  </div>
+</section>
+
+<section id="garantie">
+  <div class="wrap">
+    <h2>Alege garanția</h2>
+    <p class="sub">Toate pachetele: 1 an sau 1.000 ore de funcționare, prima limită atinsă, de la livrare. Standard este inclus în preț.</p>
+    <div class="pachete">
+      <label class="pachet">
+        <input type="radio" name="g" value="0" checked>
+        <h3>Standard <em>Inclus</em></h3>
+        <ul>
+          <li>Piese și manoperă pentru defecțiunile acoperite</li>
+          <li>Revizii și consumabile plătite separat</li>
+        </ul>
+      </label>
+      <label class="pachet">
+        <input type="radio" name="g" value="849">
+        <h3>Extra <em>+ 849 EUR</em></h3>
+        <ul>
+          <li>Piese și manoperă pentru defecțiunile acoperite</li>
+          <li>Prima revizie completă inclusă</li>
+          <li>Verificare anuală în atelier</li>
+          <li>Transferabil la revânzare</li>
+        </ul>
+      </label>
+      <label class="pachet">
+        <input type="radio" name="g" value="1698">
+        <h3>Premium <em>+ 1.698 EUR</em></h3>
+        <ul>
+          <li>Piese și manoperă pentru defecțiunile acoperite</li>
+          <li>Primele 3 revizii complete incluse</li>
+          <li>Verificare anuală în atelier</li>
+          <li>Asistență tehnică prioritară</li>
+          <li>Utilaj temporar sau sprijin pentru închiriere</li>
+          <li>Sprijin pentru transportul rezervei</li>
+          <li>Transferabil la revânzare</li>
+        </ul>
+      </label>
+    </div>
+    <div class="total" aria-live="polite">
+      <div><span class="et">Tractor + pachet <span id="g-nume">Standard</span></span><br><b><span id="g-total">8.490</span> EUR</b> <span class="et">cu TVA inclus</span></div>
+      <a class="btn btn-wa" id="g-wa" href="#" target="_blank" rel="noopener">Cere oferta pe WhatsApp</a>
+    </div>
+    <p class="mic">Pachetele Extra și Premium sunt alternative, nu se cumulează. Pachetul și prețul final sunt înscrise în oferta acceptată. <a href="https://agrokart.ro/politica-de-garantie/">Vezi toate condițiile garanției</a>.</p>
+  </div>
+</section>
+
+<section style="padding-top:0" id="inchiriere">
+  <div class="wrap">
+    <h2>Sau închiriază-l</h2>
+    <p class="sub">Ai nevoie de el doar câteva zile? Îl poți închiria.</p>
+    <div class="chirie">
+      <div><b>360 RON</b> / zi<br><span class="mic" style="font-size:16px">TVA inclus · maximum 8 ore de motor pe zi · transport separat · disponibilitate la cerere</span></div>
+      <a class="btn btn-suna" href="tel:+40729249362">Sună pentru închiriere</a>
+    </div>
+  </div>
+</section>
+
+<section style="padding-top:0" id="date">
+  <div class="wrap">
+    <details>
+      <summary>Toate datele tehnice</summary>
+      <table>
+        <tr><td>Configurație</td><td>Platformă deschisă</td></tr>
+        <tr><td>Motor</td><td>Diesel Laidong, alimentare mecanică</td></tr>
+        <tr><td>Putere</td><td>29.4 kW / 40 CP</td></tr>
+        <tr><td>Turație / pornire</td><td>2.400 rpm / electrică</td></tr>
+        <tr><td>Tracțiune</td><td>4WD</td></tr>
+        <tr><td>Direcție</td><td>Asistată hidraulic</td></tr>
+        <tr><td>Transmisie</td><td>8F + 8R mecanică</td></tr>
+        <tr><td>Priză de putere spate</td><td>540 / 720 rpm</td></tr>
+        <tr><td>Hidraulică / ridicător spate</td><td>4 cuple rapide / 3 puncte, poziție flotantă</td></tr>
+        <tr><td>Anvelope</td><td>6.50-16 / 11.2-24; opțional 7.50-16 / 11.2-28 (preț la cerere)</td></tr>
+        <tr><td>Greutate</td><td>1.580 kg</td></tr>
+        <tr><td>Dimensiuni</td><td>3.10 × 1.50 × 1.96 m</td></tr>
+        <tr><td>An fabricație</td><td>2026</td></tr>
+        <tr><td>Culori</td><td>Roșu, Negru</td></tr>
+        <tr><td>Omologare rutieră</td><td>Neomologabil</td></tr>
+      </table>
+    </details>
+  </div>
+</section>
+
+<section style="padding-top:0" id="modele">
+  <div class="wrap">
+    <h2>Toate utilajele</h2>
+    <p class="sub">Prețuri cu TVA inclus. Apasă pe un model ca să-l vezi.</p>
+    <h3 class="grup">Tractoare</h3>
+    <div class="modele" id="lista-tractoare"></div>
+    <h3 class="grup">Mini excavatoare</h3>
+    <div class="modele" id="lista-excavatoare"></div>
+  </div>
+</section>
+
+<section class="contact" id="contact">
+  <div class="wrap contact-grid">
+    <div>
+      <h2>Vino să-l vezi</h2>
+      <p class="sub">Showroom: Calea București nr. 41, Ciorogârla, Ilfov.<br>Vizionarea se face pe bază de programare.</p>
+      <a class="tel" href="tel:+40729249362">0729 249 362</a>
+    </div>
+    <div class="butoane" style="margin:0">
+      <a class="btn btn-suna" href="tel:+40729249362">Sună acum</a>
+      <a class="btn btn-wa" href="https://wa.me/40729249362?text=Bun%C4%83%20ziua%2C%20vreau%20s%C4%83%20programez%20o%20vizionare%20pentru%20TYE%20404." target="_blank" rel="noopener">WhatsApp</a>
+      <a class="btn btn-wa" style="grid-column:1/-1" href="https://www.google.com/maps/search/?api=1&query=Calea+Bucure%C8%99ti+41+Ciorog%C3%A2rla+Ilfov" target="_blank" rel="noopener">Arată-mi drumul pe hartă</a>
+    </div>
+  </div>
+</section>
+
+</main>
+
+<footer>
+  <div class="wrap">Pagină de probă pentru AgroKart · nu este site-ul oficial. Imaginile din câmp și rotirea sunt realizate cu AI și sunt orientative. Prețurile și datele sunt cele afișate pe agrokart.ro.</div>
+</footer>
+
+<div class="jos">
+  <a class="btn btn-suna" href="tel:+40729249362">
+    <svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z"/></svg>
+    Sună
+  </a>
+  <a class="btn btn-wa" href="https://wa.me/40729249362?text=Bun%C4%83%20ziua%2C%20m%C4%83%20intereseaz%C4%83%20tractorul%20TYE%20404." target="_blank" rel="noopener">WhatsApp</a>
+</div>
+
+<script>
+/* ---------- lista de utilaje (date de pe agrokart.ro) ---------- */
+var TR=[
+ ["tye-254","TYE 254","25 CP","7.490","tractoare/tye-254"],
+ ["tye-404","TYE 404","40 CP","8.490",""],
+ ["tye-504","TYE 504","50 CP","9.990","tractoare/tye-504"],
+ ["tye-604","TYE 604","60 CP","9.990","tractoare/tye-604"],
+ ["te-704","TE 704 cu cabină","70 CP","13.490","tractoare/te-704-cabina"],
+ ["te-1004","TE 1004","100 CP","17.490","tractoare/te-1004-platforma"],
+ ["te-1004-cabina","TE 1004 cu cabină","100 CP","18.990","tractoare/te-1004-cabina"],
+ ["tb-1004","TB 1004 cu cabină","100 CP","19.490","tractoare/tb-1004"],
+ ["tb-1404","TB 1404","140 CP","27.900","tractoare/tb-1404"],
+ ["tdf-1604","TDF 1604","160 CP","37.990","tractoare/tdf-1604"]
+];
+var EX=[
+ ["kn-15","KN-15","Mini excavator","4.761","mini-excavatoare/kn-15"],
+ ["kn-20","KN-20 cu cabină","Mini excavator","12.800","mini-excavatoare/kn-20"],
+ ["kn-25","KN-25 cu cabină","Mini excavator","20.918","mini-excavatoare/kn-25"]
+];
+function lista(id,arr){
+  var h="";
+  arr.forEach(function(m){
+    var aici=!m[4];
+    h+='<a class="model'+(aici?' aici':'')+'" href="'+(aici?'#sus':'https://agrokart.ro/'+m[4]+'/')+'">'+
+       '<div class="im"><img loading="lazy" src="img/modele/'+m[0]+'.webp" alt=""></div>'+
+       '<b>'+m[1]+'</b><span>'+m[2]+(aici?' · ești aici':'')+'</span><i>'+m[3]+' EUR</i></a>';
+  });
+  document.getElementById(id).innerHTML=h;
+}
+lista("lista-tractoare",TR); lista("lista-excavatoare",EX);
+
+/* ---------- garantie ---------- */
+(function(){
+  var baza=8490, nume={0:"Standard",849:"Extra",1698:"Premium"};
+  function fmt(n){return String(n).replace(/\B(?=(\d{3})+(?!\d))/g,".");}
+  function upd(){
+    var v=+document.querySelector('input[name=g]:checked').value;
+    document.getElementById("g-total").textContent=fmt(baza+v);
+    document.getElementById("g-nume").textContent=nume[v];
+    document.getElementById("g-wa").href="https://wa.me/40729249362?text="+encodeURIComponent(
+      "Bună ziua, vreau ofertă pentru tractorul TYE 404 cu garanție "+nume[v]+" ("+fmt(baza+v)+" EUR).");
+  }
+  document.querySelectorAll('input[name=g]').forEach(function(i){i.addEventListener("change",upd);});
+  upd();
+})();
+
+/* ---------- rotire ---------- */
+(function(){
+  var N=96, cutie=document.getElementById("rot"), c=document.getElementById("rot-c"),
+      ctx=c.getContext("2d"), sl=document.getElementById("rot-sl"), bar=document.getElementById("rot-bar"),
+      ind=document.getElementById("rot-ind"), prima=document.getElementById("rot-prima");
+  var mic=Math.min(window.innerWidth,window.innerHeight)<700;
+  var dir=mic?"img/rot/m/":"img/rot/", pas=mic?2:1;
+  var cadre=new Array(N), gata=0, total=0, cur=0, pornit=false;
+  sl.max=N-1;
+  function nume(i){return dir+("00"+i).slice(-3)+".webp";}
+  function arata(i){
+    i=((Math.round(i)%N)+N)%N; cur=i;
+    var k=i; if(!cadre[k]||!cadre[k].ok){ // cel mai apropiat cadru incarcat
+      for(var d=1;d<N;d++){var a=(i+d)%N,b=(i-d+N)%N;
+        if(cadre[a]&&cadre[a].ok){k=a;break;} if(cadre[b]&&cadre[b].ok){k=b;break;}}
+    }
+    var im=cadre[k]; if(im&&im.ok){
+      if(c.width!==im.naturalWidth){c.width=im.naturalWidth;c.height=im.naturalHeight;}
+      ctx.drawImage(im,0,0); prima.style.visibility="hidden";
+    }
+    sl.value=i;
+  }
+  function incarca(){
+    if(pornit)return; pornit=true;
+    var ordine=[]; for(var i=0;i<N;i+=pas)ordine.push(i);
+    // intai rar (tot cercul repede), apoi restul
+    ordine.sort(function(a,b){return (a%8===0?0:a%4===0?1:2)-(b%8===0?0:b%4===0?1:2)||a-b;});
+    total=ordine.length; var q=0;
+    function urm(){
+      if(q>=ordine.length)return; var i=ordine[q++], im=new Image();
+      im.onload=function(){im.ok=true;cadre[i]=im;gata++;bar.style.width=(100*gata/total)+"%";
+        if(gata===total)bar.style.opacity=0; if(i===cur)arata(cur); urm();};
+      im.onerror=urm; im.src=nume(i);
+    }
+    for(var p=0;p<4;p++)urm();
+  }
+  if("IntersectionObserver" in window){
+    new IntersectionObserver(function(e,o){if(e[0].isIntersecting){incarca();o.disconnect();}},{rootMargin:"600px"}).observe(cutie);
+  } else incarca();
+
+  var x0=null, c0=0;
+  cutie.addEventListener("pointerdown",function(e){x0=e.clientX;c0=cur;cutie.classList.add("trage");
+    cutie.setPointerCapture(e.pointerId);ind.style.opacity=0;incarca();});
+  cutie.addEventListener("pointermove",function(e){if(x0===null)return;
+    var w=cutie.clientWidth; arata(c0+(e.clientX-x0)/w*N*0.9);});
+  function sus(){x0=null;cutie.classList.remove("trage");}
+  cutie.addEventListener("pointerup",sus); cutie.addEventListener("pointercancel",sus);
+  sl.addEventListener("input",function(){ind.style.opacity=0;incarca();arata(+sl.value);});
+
+  function tine(btn,semn){
+    var t=null;
+    function pasul(){arata(cur+semn*2);}
+    function start(e){e.preventDefault();ind.style.opacity=0;incarca();pasul();t=setInterval(pasul,45);}
+    function stop(){clearInterval(t);t=null;}
+    btn.addEventListener("pointerdown",start);
+    ["pointerup","pointerleave","pointercancel"].forEach(function(n){btn.addEventListener(n,stop);});
+    btn.addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===" "){e.preventDefault();arata(cur+semn*4);}});
+  }
+  tine(document.getElementById("rot-st"),-1); tine(document.getElementById("rot-dr"),1);
+})();
+</script>
+</body>
+</html>
