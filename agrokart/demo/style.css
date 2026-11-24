@@ -202,3 +202,30 @@ footer{padding:22px 0;font-size:14px;color:var(--gri)}
   .card .im img{max-height:200px}
   .card .d{display:block}
 }
+
+/* ---------- antet peste poza (doar pe prima pagina, ecran mare) ---------- */
+@media (min-width:860px){
+  header.peste{position:fixed;left:0;right:0;top:0;background:transparent;border-bottom-color:transparent;
+    backdrop-filter:none;transition:background .25s,border-color .25s}
+  header.peste .antet{height:84px;max-width:none;padding:0 max(16px,5vw)}
+  header.peste .antet>a:first-child{background:#fff;border-radius:14px;padding:6px 12px;display:block}
+  header.peste .antet img{height:54px}
+  header.peste .nav a{color:#fff;font-size:20px;text-shadow:0 1px 8px rgba(0,0,0,.45)}
+  header.peste .nav a:hover{color:var(--galben)}
+  header.peste .btn-suna{background:var(--galben);color:#1c1f18}
+  header.peste.jos-pagina{background:rgba(250,248,243,.96);border-bottom-color:var(--linie);backdrop-filter:blur(8px)}
+  header.peste.jos-pagina .antet{height:64px;max-width:1120px;padding:0 16px}
+  header.peste.jos-pagina .antet>a:first-child{padding:0;background:none}
+  header.peste.jos-pagina .antet img{height:46px}
+  header.peste.jos-pagina .nav a{color:var(--text);text-shadow:none;font-size:inherit}
+  header.peste.jos-pagina .btn-suna{background:var(--verde);color:#fff}
+  .deschidere picture img{height:min(92vh,900px);object-position:100% 70%}
+  .deschidere::before{background:
+    linear-gradient(180deg,rgba(20,16,12,.38) 0,rgba(20,16,12,0) 22%),
+    linear-gradient(90deg,rgba(20,16,12,.55) 0%,rgba(20,16,12,.30) 30%,rgba(20,16,12,0) 52%)}
+  .deschidere .txt{top:56%}
+  .deschidere .txt .wrap{max-width:none;padding-left:max(16px,5vw)}
+  .deschidere .txt .wrap>*{max-width:min(470px,36vw)}
+  .deschidere h1{font-size:clamp(36px,3.9vw,60px);text-shadow:0 2px 18px rgba(0,0,0,.35)}
+  .deschidere p{text-shadow:0 1px 10px rgba(0,0,0,.5)}
+}

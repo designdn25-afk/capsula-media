@@ -44,7 +44,7 @@ def nume(u):
     return t.replace('Mini excavator ', '')
 
 
-def cap(titlu, descriere, extra=''):
+def cap(titlu, descriere, extra='', peste=False):
     return f'''<!doctype html>
 <html lang="ro">
 <head>
@@ -57,7 +57,7 @@ def cap(titlu, descriere, extra=''):
 <link rel="stylesheet" href="style.css">
 {extra}</head>
 <body>
-<header>
+<header{' class="peste"' if peste else ''}>
   <div class="wrap antet">
     <a href="index.html" aria-label="AgroKart, prima pagină"><img src="img/logo.png" alt="AgroKart" width="333" height="266"></a>
     <nav class="nav" aria-label="Meniu">
@@ -123,7 +123,7 @@ def pagina_prima():
     tr = [u for u in U if u['tip'] == 'tractor']
     ex = [u for u in U if u['tip'] == 'excavator']
     h = cap('AgroKart · tractoare și mini excavatoare', 'Tractoare de la 25 la 160 CP și mini excavatoare. Prețuri cu TVA inclus.',
-            '<link rel="preload" as="image" href="img/deschidere-m.webp" media="(max-width: 859px)">\n')
+            '<link rel="preload" as="image" href="img/deschidere-m.webp" media="(max-width: 859px)">\n', peste=True)
     h += f'''<main>
 <section class="deschidere" style="padding:0">
   <picture>
@@ -169,7 +169,12 @@ def pagina_prima():
 {contact('Vino să le vezi', 'Bună ziua, vreau să programez o vizionare.')}
 </main>
 '''
-    h += coada('Bună ziua, mă interesează un utilaj AgroKart.')
+    h += coada('Bună ziua, mă interesează un utilaj AgroKart.', '''<script>
+(function(){var h=document.querySelector("header.peste"),d=document.querySelector(".deschidere");
+function f(){h.classList.toggle("jos-pagina",window.scrollY>d.offsetHeight-90);}
+window.addEventListener("scroll",f,{passive:true});f();})();
+</script>
+''')
     open(D + '/index.html', 'w', encoding='utf8').write(h)
 
 
