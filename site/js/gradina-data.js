@@ -25,7 +25,7 @@ export const CASE = [
   { cod: 'M9', mod: 'h_m9', x: 0, z: -31, rot: 0, ai: ['m9_dormitor', 'm9_terasa', 'm9_living', 'm9_bucatarie', 'm9_baie', 'm9_dormitor2'] },
   // T6: prima casă comandată de client (16 nov 2026), în partea nouă a grădinii. Datele sunt din fișa furnizorului; prețul de vânzare
   // nu se știe încă (nu-l inventa). Camerele din model: Living, Bucătărie, Baie, Dormitor.
-  { cod: 'T6', mod: 'h_t6', x: 15.5, z: 40, rot: -30, ai: ['t6_living', 't6_bucatarie', 't6_baie', 't6_dormitor'],
+  { cod: 'T6', mod: 'h_t6', x: 15.5, z: 40, rot: -30, ai: ['t6_living_v3', 't6_bucatarie', 't6_baie', 't6_dormitor'],
     date: { s: 'T', sn: 'Extensibilă', d: '5,85 × 4,17 × 2,55 m', a: 24, l: '1 dormitor · 1 living cu chicinetă · 1 baie',
       t: 'Casă care se extinde: se transportă îngustă (2,27 m) și se desface pe loc la 4,17 m. Living cu chicinetă, baie și dormitor.', p: null } },
   // C20: casa extensibilă de 20 ft (17 nov 2026), pe locul din stânga al părții noi. Datele sunt din oferta furnizorului; prețul de

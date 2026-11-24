@@ -354,6 +354,9 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
 - **A doua cerere, aceeași zi („și patul și prosoapele trebuie să aranjăm aici”):** aceeași imagine a mai fost retușată o dată
   (nod `tp3IuD1jl01wataMCRVm`, 2.272 de credite): pat făcut, cu pilotă și perne, noptiere și veioze reale, suport negru cu prosoape.
   Imaginea a venit mutată cu 2 px (din 1024) și a fost adusă la loc cu `fix360.py … 2`.
+- **Fișierul se numește acum `t6_living_v3.webp`** (schimbat și în `gradina-data.js`): clientul vedea în continuare imaginea veche
+  după reîncărcare, fiindcă navigatorul ține minute bune fișierul cu același nume. **Regulă: când înlocuiești o imagine de pe site,
+  dă-i nume nou** (`_v2`, `_v3`…) și schimbă numele în date; altfel clientul vede varianta veche și crede că nu s-a făcut nimic.
 - **De știut:** și în livingurile E7, M9 și C20 canapelele sunt cam simple; se pot reface la fel, dacă cere clientul (~2.300 credite bucata).
 
 ## Pagina de probă AgroKart (alt proiect al clientului, pe aceeași adresă)
