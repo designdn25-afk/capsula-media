@@ -65,7 +65,10 @@ def cap(titlu, descriere, extra='', peste=False):
       <a href="index.html#excavatoare">Mini excavatoare</a>
       <a href="index.html#contact">Contact</a>
     </nav>
-    <a class="btn btn-suna btn-mic" href="tel:{TEL}">{IC_TEL}<span class="lung">Sună:&nbsp;</span>{TEL_A}</a>
+    <div class="antet-dr">
+      <a class="btn btn-oferta btn-mic" href="{wa('Bună ziua, vreau o ofertă pentru un utilaj AgroKart.')}" target="_blank" rel="noopener">Cere o ofertă</a>
+      <a class="btn btn-suna btn-mic" href="tel:{TEL}">{IC_TEL}<span class="lung">Sună:&nbsp;</span>{TEL_A}</a>
+    </div>
   </div>
 </header>
 '''
@@ -136,7 +139,7 @@ def pagina_prima():
     <p>De la 25 la 160 CP. Prețuri cu TVA inclus, garanție 1 an sau 1.000 de ore.</p>
     <div class="butoane">
       <a class="btn btn-suna" href="#tractoare">Vezi tractoarele</a>
-      <a class="btn btn-wa" href="tel:{TEL}">{IC_TEL}Sună</a>
+      <a class="btn btn-wa" href="{wa('Bună ziua, vreau o ofertă pentru un utilaj AgroKart.')}" target="_blank" rel="noopener">Cere o ofertă</a>
     </div>
   </div></div>
 </section>

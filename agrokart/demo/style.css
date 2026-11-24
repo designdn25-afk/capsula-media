@@ -229,3 +229,17 @@ footer{padding:22px 0;font-size:14px;color:var(--gri)}
   .deschidere h1{font-size:clamp(36px,3.9vw,60px);text-shadow:0 2px 18px rgba(0,0,0,.35)}
   .deschidere p{text-shadow:0 1px 10px rgba(0,0,0,.5)}
 }
+
+/* ---------- buton "Cere o oferta" in antet ---------- */
+.antet-dr{display:flex;align-items:center;gap:10px}
+.btn-oferta{display:none;background:#fff;color:var(--verde-inchis);border-color:var(--verde)}
+.btn-oferta:hover{background:var(--verde-deschis)}
+@media (min-width:860px){
+  .btn-oferta{display:inline-flex}
+  .nav{margin-left:auto;margin-right:auto}
+  header.peste .antet{padding:0 max(16px,2.2vw)}
+  header.peste .btn-oferta{background:transparent;color:#fff;border-color:#fff}
+  header.peste .btn-oferta:hover{background:rgba(255,255,255,.15)}
+  header.peste.jos-pagina .btn-oferta{background:#fff;color:var(--verde-inchis);border-color:var(--verde)}
+  .deschidere .txt .wrap{padding-left:max(16px,2.2vw)}
+}
