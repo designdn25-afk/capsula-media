@@ -207,7 +207,7 @@ footer{padding:22px 0;font-size:14px;color:var(--gri)}
 @media (min-width:860px){
   header.peste{position:fixed;left:0;right:0;top:0;background:transparent;border-bottom-color:transparent;
     backdrop-filter:none;transition:background .25s,border-color .25s}
-  header.peste .antet{height:84px;max-width:none;padding:0 max(16px,5vw)}
+  header.peste .antet{height:96px;max-width:none;padding:0 max(16px,5vw)}
   header.peste .antet>a:first-child{background:#fff;border-radius:14px;padding:6px 12px;display:block}
   header.peste .antet img{height:54px}
   header.peste .nav a{color:#fff;font-size:20px;text-shadow:0 1px 8px rgba(0,0,0,.45)}
@@ -242,4 +242,14 @@ footer{padding:22px 0;font-size:14px;color:var(--gri)}
   header.peste .btn-oferta:hover{background:rgba(255,255,255,.15)}
   header.peste.jos-pagina .btn-oferta{background:#fff;color:var(--verde-inchis);border-color:var(--verde)}
   .deschidere .txt .wrap{padding-left:max(16px,2.2vw)}
+}
+
+/* ---------- sigla fara fond alb peste poza ---------- */
+.logo-a{display:none}
+@media (min-width:860px){
+  header.peste .antet>a:first-child{background:none;padding:0}
+  header.peste .antet img{height:76px;filter:drop-shadow(0 1px 6px rgba(0,0,0,.45))}
+  header.peste:not(.jos-pagina) .logo-n{display:none}
+  header.peste:not(.jos-pagina) .logo-a{display:block}
+  header.peste.jos-pagina .antet img{filter:none}
 }
