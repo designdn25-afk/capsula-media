@@ -64,7 +64,7 @@ async function boot() {
   const blocked = (h, azDeg, dist) => { const a = azDeg * DEG, dx = Math.sin(a) * dist, dz = Math.cos(a) * dist; let pen = 0;
     [...H, { center: { x: 0, z: 0 }, s: { h: 2.5 } }].forEach(o => { if (o === h) return; const ox = o.center.x - h.center.x, oz = o.center.z - h.center.z, t = clamp((ox * dx + oz * dz) / (dist * dist)), d = Math.hypot(ox - dx * t, oz - dz * t); if (d < 10) pen += (10 - d) * o.s.h; });   // ultimul = copacul din rond
     return pen + Math.abs(h.center.x + dx) * .01; };   // la egalitate: partea dinspre aleea din mijloc
-  H.forEach(h => { const r = h.c.rot, lg = isLong(h.s); h.side = blocked(h, r - 30, 30) <= blocked(h, r + 30, 30) ? -1 : 1; h.sideP = blocked(h, r - (lg ? 56 : 26), 52) <= blocked(h, r + (lg ? 56 : 26), 52) ? -1 : 1; });
+  H.forEach(h => { const r = h.c.rot, lg = isLong(h.s); h.side = h.c.side || (blocked(h, r - 30, 30) <= blocked(h, r + 30, 30) ? -1 : 1); h.sideP = h.c.sideP || (blocked(h, r - (lg ? 56 : 26), 52) <= blocked(h, r + (lg ? 56 : 26), 52) ? -1 : 1); });   // side / sideP din gradina-data.js țin pe loc o vedere deja fotografiată
 
   /* ---------- elementele din pagină ---------- */
   const cSer = $('.gd-c-ser'), cName = $('.gd-c-name'), cNota = $('.gd-c-nota'), cDesc = $('.gd-c-desc'), cA = $('.gd-c-a'), cD = $('.gd-c-d'), cL = $('.gd-c-l'), cP = $('.gd-c-p'),

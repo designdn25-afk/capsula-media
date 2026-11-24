@@ -5,6 +5,8 @@
 //   x, z = locul casei în grădină, în metri (x = stânga/dreapta, z = spre intrare)
 //   rot  = spre ce parte se uită fațada, în grade (0 = spre intrare, plus = spre dreapta)
 //   nota = un rând scurt, afișat sub nume (opțional)
+//   side, sideP = (opțional, −1 sau 1) partea din care e privită casa pe ecran lat / pe ecran înalt; se pun doar ca să țină pe loc o vedere
+//          deja fotografiată, când o casă nouă din apropiere ar muta-o (T6 și C20, după a doua mărire a grădinii)
 //   pano = fotografii reale 360° din interior (opțional); fără ele, în casă se vede macheta 3D
 //   ai   = vizualizări 360° făcute cu AI pornind de la machetă, câte una pentru fiecare cameră, în ordinea camerelor din model
 //          (fișierele sunt în img/gd/ai/<nume>.webp; sursele și felul în care se fac: surse/ai360/)
@@ -25,12 +27,12 @@ export const CASE = [
   { cod: 'M9', mod: 'h_m9', x: 0, z: -31, rot: 0, ai: ['m9_dormitor', 'm9_terasa', 'm9_living', 'm9_bucatarie', 'm9_baie', 'm9_dormitor2'] },
   // T6: prima casă comandată de client (16 nov 2026), în partea nouă a grădinii. Datele sunt din fișa furnizorului; prețul de vânzare
   // nu se știe încă (nu-l inventa). Camerele din model: Living, Bucătărie, Baie, Dormitor.
-  { cod: 'T6', mod: 'h_t6', x: 15.5, z: 40, rot: -30, ai: ['t6_living_v3', 't6_bucatarie', 't6_baie', 't6_dormitor'],
+  { cod: 'T6', mod: 'h_t6', x: 15.5, z: 40, rot: -30, sideP: 1, ai: ['t6_living_v3', 't6_bucatarie', 't6_baie', 't6_dormitor'],
     date: { s: 'T', sn: 'Extensibilă', d: '5,85 × 4,17 × 2,55 m', a: 24, l: '1 dormitor · 1 living cu chicinetă · 1 baie',
       t: 'Casă care se extinde: se transportă îngustă (2,27 m) și se desface pe loc la 4,17 m. Living cu chicinetă, baie și dormitor.', p: null } },
   // C20: casa extensibilă de 20 ft (17 nov 2026), pe locul din stânga al părții noi. Datele sunt din oferta furnizorului; prețul de
   // vânzare nu se știe încă (nu-l inventa). Camerele din model: Living, Bucătărie, Baie, Dormitor 1, Dormitor 2.
-  { cod: 'C20', mod: 'h_c20', x: -15.5, z: 40, rot: 30, ai: ['c20_living', 'c20_bucatarie', 'c20_baie', 'c20_dormitor1', 'c20_dormitor2'],
+  { cod: 'C20', mod: 'h_c20', x: -15.5, z: 40, rot: 30, sideP: -1, ai: ['c20_living', 'c20_bucatarie', 'c20_baie', 'c20_dormitor1', 'c20_dormitor2'],
     date: { s: 'C', sn: 'Extensibilă', d: '5,9 × 6,2 × 2,48 m', a: 36.6, l: '2 dormitoare · 1 living cu bucătărie · 1 baie',
       t: 'Casă extensibilă de 20 ft: vine strânsă, cât un container, și se desface pe loc în ambele părți. Două dormitoare, living cu bucătărie și baie.', p: null } },
 ];

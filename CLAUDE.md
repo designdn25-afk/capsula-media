@@ -366,3 +366,24 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
 ## Pagina de probă AgroKart (alt proiect al clientului, pe aceeași adresă)
 - Stă la https://designdn25-afk.github.io/capsula-media/agrokart/ ; sursa e pe ramura `claude/agrokart-demo` (`agrokart/demo`, făcută cu
   `agrokart/tools/genereaza.py`). `tools/publica_pages.sh` o pune la loc la fiecare publicare a site-ului cu capsule.
+
+## Casele K5 și YK5 (cerute pe 24 nov 2026; ÎN LUCRU, oprite de client: „oprește momentan”)
+Clientul a trimis o ofertă (PDF, nu se urcă în git: are prețuri de achiziție și date bancare) cu două case și a cerut: „vreau și casele
+astea să le băgăm în grădina aia 3D, tot așa, să pară totul real”.
+- **K5** (nume de lucru): căsuță extensibilă 4,0 × 5,0 × 2,55 m, ~20 m², lamele maro, ușă dublă de sticlă + geam îngust în față, scară
+  exterioară pe stânga, terasă pe tot acoperișul cu balustradă de sticlă; înăuntru canapea, pat, televizor (după desenul tehnic; în
+  ofertă apare și ca „cafenea”: clientul a fost întrebat). Model gata: `site/js/h_k5.js` (camere: Cameră, Terasă).
+- **YK5** (nume de lucru, „YK-5 modular house”): 9,6 × 3,3 × 3,0 m, 32 m², ramă albă, lamele de lemn, ușă glisantă mare, colț acoperit de
+  terasă în stânga; living cu bucătărie, dormitor, baie (baia nu apare în ofertă: presupunere, clientul a fost întrebat). Model gata:
+  `site/js/h_yk5.js` (camere: Living, Bucătărie, Baie, Dormitor).
+- **Grădina** se mărește a doua oară, tot spre intrare (98 → 124 m): `site/js/genv.js` are deja etapa a doua (`extra2`, `VECHI2`), care
+  lasă pe loc tot ce există. Casele se pun cu `python3 surse/ai360/k5yk5/pune.py` (K5 la x 15,5 · z 66 · rot −30; YK5 la −15,5 · 66 · 30)
+  și se scot cu `--scoate`. **Acum sunt scoase**: fără imaginile lor reale nu se publică (s-ar vedea macheta).
+- Verificat cu casele puse: vederile caselor vechi ies neschimbate. T6 și C20 au primit `sideP` în `gradina-data.js`, ca vederea lor
+  de telefon să nu se mute (casele noi le-ar fi „blocat” partea aleasă). Se schimbă doar cele două vederi „toată grădina” (centrul
+  urcă la z 28): de verificat dacă toată grădina de 124 m mai încape în cadru (`view('all')` în `garden.js`).
+- **Ce urmează** (pașii din `surse/ai360/CITESTE.md`, partea a cincea): sursele (`capflat.js`, `cap360.js`), imaginile reale (2 × toată
+  grădina, câte 2 vederi + plan + camere pe casă), rotirile. Cost estimat ≈ 70.000–75.000 de credite (fără rotiri ≈ 45.000); pe 24 nov
+  clientul mai avea ≈ 99.000. **Clientul n-a aprobat încă creditele**: de întrebat din nou înainte de a porni imaginile.
+- Punctele camerelor (lume, cu casele puse): K5 Cameră 14,704 · 1,85 · 66,579; Terasă 16,06 · 4,45 · 65,63. YK5 Living −15,991 · 1,99 · 67,15;
+  Bucătărie −15,199 · 1,99 · 65,422; Baie −13,021 · 1,99 · 65,694; Dormitor −13,736 · 1,99 · 64,635.
