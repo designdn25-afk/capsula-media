@@ -35,6 +35,14 @@ export const CASE = [
   { cod: 'C20', mod: 'h_c20', x: -15.5, z: 40, rot: 30, sideP: -1, ai: ['c20_living', 'c20_bucatarie', 'c20_baie', 'c20_dormitor1', 'c20_dormitor2'],
     date: { s: 'C', sn: 'Extensibilă', d: '5,9 × 6,2 × 2,48 m', a: 36.6, l: '2 dormitoare · 1 living cu bucătărie · 1 baie',
       t: 'Casă extensibilă de 20 ft: vine strânsă, cât un container, și se desface pe loc în ambele părți. Două dormitoare, living cu bucătărie și baie.', p: null } },
+  // K5 și YK5: casele din oferta din 24 nov 2026, în partea adăugată la a doua mărire a grădinii. Datele sunt din fișa furnizorului;
+  // prețul de vânzare nu se știe încă (nu-l inventa). Camerele din model: K5 = Cameră, Terasă; YK5 = Living, Bucătărie, Baie, Dormitor.
+  { cod: 'K5', mod: 'h_k5', x: 15.5, z: 66, rot: -30, ai: ['k5_camera', 'k5_terasa'],
+    date: { s: 'K', sn: 'Extensibilă cu terasă', d: '4,0 × 5,0 × 2,55 m', a: 20, l: '1 cameră · terasă pe acoperiș',
+      t: 'Căsuță care se desface pe loc la 4 × 5 m, cu scară exterioară și terasă pe tot acoperișul, cu balustradă de sticlă.', p: null } },
+  { cod: 'YK5', mod: 'h_yk5', x: -15.5, z: 66, rot: 30, ai: ['yk5_living', 'yk5_bucatarie', 'yk5_baie', 'yk5_dormitor'],
+    date: { s: 'YK', sn: 'Modulară', d: '9,6 × 3,3 × 3,0 m', a: 32, l: '1 dormitor · 1 living cu bucătărie · 1 baie',
+      t: 'Casă modulară cu ramă albă și fațadă din lamele de lemn: living cu bucătărie în spatele unei uși glisante mari, dormitor, baie și un colț acoperit de terasă.', p: null } },
 ];
 
 // Grădina: mărimea gardului viu și locul intrării (metri). Pe 16 nov 2026 a fost mărită spre intrare (înainte: adancime 72, centruZ −8,
@@ -42,7 +50,7 @@ export const CASE = [
 // x = ±15,5, z = 40. straturiNoi = straturi cu flori puse pe locurile încă libere: [x, z, jumătate de lățime, jumătate de adâncime, culori 0–3];
 // când vine o casă pe un loc liber, stratul de acolo se scoate din listă. Dacă mai trebuie loc: se mărește iar adancime (și centruZ,
 // intrareZ cu jumătate / cu totul), apoi se refac imaginile cu toată grădina.
-export const GRADINA = { latime: 64, adancime: 98, centruZ: 5, intrareZ: 54, straturiNoi: [] };
+export const GRADINA = { latime: 64, adancime: 124, centruZ: 18, intrareZ: 80, straturiNoi: [] };
 
 // Imagini realiste (făcute cu AI pornind de la machetă) pentru vederile de zi din afară: toată grădina și fiecare casă.
 // Pentru fiecare vedere (all = toată grădina, apoi codul casei): [imaginea pentru ecran lat, imaginea pentru ecran înalt]; unde lipsește
@@ -52,7 +60,7 @@ export const GRADINA = { latime: 64, adancime: 98, centruZ: 5, intrareZ: 54, str
 // exact din locul în care stă camera în acea vedere (locurile se citesc din pagină cu __gradina.views()), deci, dacă muți o casă,
 // schimbi grădina sau locul camerei, imaginile trebuie refăcute (surse/ai360/CITESTE.md). Seara se vede macheta 3D.
 export const VEDERI = {
-  all: [['gr_all', -0.762, 0.762, -0.558, 0.458], ['gr_all_p', -0.34, 0.34, -0.492, 0.413]],   // grădina mărită, cu T6 și C20 (17 nov 2026)
+  all: [['gr_all_v2', -0.762, 0.762, -0.558, 0.458], ['gr_all_p_v2', -0.34, 0.34, -0.492, 0.413]],   // grădina mărită a doua oară, cu K5 și YK5 (24 nov 2026)
   X7: [['gr_x7', -1.068, 0.686, -0.514, 0.473], ['gr_x7_p', -0.494, 0.309, -0.282, 0.321]],
   T7: [['gr_t7', -1.065, 0.59, -0.51, 0.421], ['gr_t7_p', -0.491, 0.284, -0.271, 0.31]],
   E7: [['gr_e7', -1.069, 0.712, -0.521, 0.481], ['gr_e7_p', -0.55, 0.337, -0.281, 0.311]],
@@ -60,6 +68,8 @@ export const VEDERI = {
   M9: [['gr_m9', -0.997, 0.795, -0.525, 0.483], ['gr_m9_p', -0.302, 0.302, -0.349, 0.407]],
   T6: [['gr_t6', -1.149, 0.805, -0.597, 0.503], ['gr_t6_p', -0.296, 0.296, -0.27, 0.321]],
   C20: [['gr_c20', -1.164, 0.79, -0.597, 0.503], ['gr_c20_p', -0.253, 0.253, -0.296, 0.335]],
+  K5: [['gr_k5', -1.023, 0.838, -0.492, 0.555], ['gr_k5_p', -0.285, 0.285, -0.331, 0.382]],
+  YK5: [['gr_yk5', -1.069, 0.708, -0.52, 0.48], ['gr_yk5_p', -0.498, 0.297, -0.279, 0.318]],
 };
 
 // Rotirea realistă a unei case: cadrele unei filmări (făcute cu AI pornind de la rotirea machetei) care ocolește casa complet, pe
@@ -96,4 +106,6 @@ export const PLANURI = {
   M9: [['pl_m9_1', -1.129, 0.561, -0.614, 0.513], ['pl_m9_2', -1.129, 0.561, -0.614, 0.513]],
   T6: [['pl_t6_1', -1.059, 0.67, -0.408, 0.333]],
   C20: [['pl_c20_1', -1.059, 0.67, -0.408, 0.333]],
+  K5: [['pl_k5_1', -1.059, 0.67, -0.408, 0.333]],
+  YK5: [['pl_yk5_1', -1.061, 0.648, -0.525, 0.436]],
 };

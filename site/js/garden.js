@@ -7,7 +7,7 @@ import { THREE, clamp, lerp, ease, webglOK, fit } from './kit.js';
 import { createGScene } from './gscene.js';
 import { buildGarden } from './genv.js';
 import { createPano } from './pano.js';
-import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js?v=20261124';   // ?v= se schimbă când se schimbă datele sau imaginile (altfel navigatorul ține fișierul vechi)
+import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js?v=20261124b';   // ?v= se schimbă când se schimbă datele sau imaginile (altfel navigatorul ține fișierul vechi)
 import { openClip, warmClip, canClip } from './clip.js';
 
 window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel pagina arată imaginea de rezervă)
@@ -143,7 +143,8 @@ async function boot() {
   function view(m, i, l, pv) {
     let L, P;
     if (m === 'all' || i < 0) {
-      L = { tx: 0, ty: 1, tz: GZ + 10, az: 0, el: 31, fw: 82, fh: 58 }; P = { tx: 0, ty: 1, tz: GZ + 10, az: 0, el: 50, fw: 50, fh: 84 };   // grădina mărită (98 m adâncime)
+      const GD = GRADINA.adancime, fL = GD > 98 ? GD * .515 + 7.5 : 58, fP = GD > 98 ? GD * .766 + 9 : 84;   // la 98 m: cadrele cu care au fost făcute imaginile; mai adâncă: cadrul crește cu ea
+      L = { tx: 0, ty: 1, tz: GZ + 10, az: 0, el: 31, fw: fL * 82 / 58, fh: fL }; P = { tx: 0, ty: 1, tz: GZ + 10, az: 0, el: 50, fw: fP * 50 / 84, fh: fP };
     } else {
       const h = H[i], s = h.s, r = h.c.rot, c = h.center, long = isLong(s), two = h.api.levels > 1;
       if (m === 'house') {
