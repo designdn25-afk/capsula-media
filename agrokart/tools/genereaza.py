@@ -13,7 +13,8 @@ ORDINE = ['tye-254', 'tye-404', 'tye-504', 'tye-604', 'te-704', 'te-1004', 'te-1
           'tb-1004', 'tb-1404', 'tdf-1604', 'kn-15', 'kn-20', 'kn-25']
 U.sort(key=lambda u: ORDINE.index(u['id']))
 # imagine "in camp" (facuta cu AI) pentru prima parte a paginii, acolo unde exista
-CAMP = {'tye-404': 'img/tye-404-camp'}
+CAMP = {os.path.basename(f)[:-5]: 'img/camp/' + os.path.basename(f)[:-5]
+        for f in glob.glob(D + '/img/camp/*.webp') if not f.endswith('-m.webp')}
 e = html.escape
 
 IC_TEL = '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M6.6 10.8a15.1 15.1 0 0 0 6.6 6.6l2.2-2.2a1 1 0 0 1 1-.25 11.4 11.4 0 0 0 3.6.57 1 1 0 0 1 1 1V20a1 1 0 0 1-1 1A17 17 0 0 1 3 4a1 1 0 0 1 1-1h3.5a1 1 0 0 1 1 1c0 1.25.2 2.45.57 3.57a1 1 0 0 1-.25 1L6.6 10.8z"/></svg>'
@@ -110,7 +111,7 @@ def contact(titlu, mesaj):
 def card(u):
     promo = '<span class="promo">Promoție</span>' if u['promo'] else ''
     return f'''      <a class="card" href="{u['id']}.html">
-        <div class="im">{promo}<img loading="lazy" src="img/modele/{u['id']}.webp" alt="{e(u['titlu'])}"></div>
+        <div class="im{' foto' if u['id'] in CAMP else ''}">{promo}<img loading="lazy" src="{(CAMP[u['id']] + '-m.webp') if u['id'] in CAMP else 'img/modele/' + u['id'] + '.webp'}" alt="{e(u['titlu'])}"></div>
         <div class="tx">
           <span class="cp">{cp(u)}</span>
           <b>{e(nume(u))}</b>
@@ -209,7 +210,7 @@ def pagina_utilaj(u):
     are_rot = len(cadre) > 0
     titlu1 = e(u['titlu']).replace(' - ', '<br>', 1)
     if uid in CAMP:
-        poza = f'''<div class="erou-poza">
+        poza = f'''<div class="erou-poza camp">
       <picture>
         <source media="(max-width:700px)" srcset="{CAMP[uid]}-m.webp">
         <img src="{CAMP[uid]}.webp" alt="{e(u['titlu'])}" fetchpriority="high">

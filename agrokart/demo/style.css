@@ -253,3 +253,9 @@ footer{padding:22px 0;font-size:14px;color:var(--gri)}
   header.peste:not(.jos-pagina) .logo-a{display:block}
   header.peste.jos-pagina .antet img{filter:none}
 }
+
+/* ---------- poze in camp (fara fundal alb) ---------- */
+.card .im.foto{padding:0}
+.card .im.foto img{width:100%;height:100%;max-height:none;object-fit:cover}
+.erou-poza.camp{aspect-ratio:4/3}
+@media (max-width:859px){.card .im.foto{min-height:150px}}
