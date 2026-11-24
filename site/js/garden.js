@@ -7,7 +7,7 @@ import { THREE, clamp, lerp, ease, webglOK, fit } from './kit.js';
 import { createGScene } from './gscene.js';
 import { buildGarden } from './genv.js';
 import { createPano } from './pano.js';
-import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js?v=20261124c';   // ?v= se schimbă când se schimbă datele sau imaginile (altfel navigatorul ține fișierul vechi)
+import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js?v=20261124d';   // ?v= se schimbă când se schimbă datele sau imaginile (altfel navigatorul ține fișierul vechi)
 import { openClip, warmClip, canClip } from './clip.js';
 
 window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel pagina arată imaginea de rezervă)

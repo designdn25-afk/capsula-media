@@ -94,6 +94,8 @@ export const ROTIRI = {
   M9: [{ zi: 'm9', n: 192, nl: 96, az0: -30, r: [-0.997, 0.795, -0.525, 0.483], v: 1, p: 1 }, null],
   T6: [{ zi: 't6', n: 192, nl: 96, az0: -60, r: [-1.149, 0.805, -0.597, 0.503], v: 1, p: 1 }, null],
   C20: [{ zi: 'c20', n: 192, nl: 96, az0: 60, r: [-1.164, 0.79, -0.597, 0.503], v: 1, p: 1 }, null],
+  K5: [{ zi: 'k5', n: 192, nl: 96, az0: -60, r: [-1.023, 0.838, -0.492, 0.555], v: 1, p: 1 }, null],
+  YK5: [{ zi: 'yk5', n: 192, nl: 96, az0: 60, r: [-1.069, 0.708, -0.52, 0.48], v: 1, p: 1 }, null],
 };
 
 /* Planul fiecărei case (vederea „Plan”, cu acoperișul ridicat) ca imagine realistă, pe ecran lat, ziua: câte un rând pe nivel,
