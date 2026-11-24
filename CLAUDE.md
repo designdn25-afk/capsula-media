@@ -357,6 +357,10 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
 - **Fișierul se numește acum `t6_living_v3.webp`** (schimbat și în `gradina-data.js`): clientul vedea în continuare imaginea veche
   după reîncărcare, fiindcă navigatorul ține minute bune fișierul cu același nume. **Regulă: când înlocuiești o imagine de pe site,
   dă-i nume nou** (`_v2`, `_v3`…) și schimbă numele în date; altfel clientul vede varianta veche și crede că nu s-a făcut nimic.
+- Nici numele nou n-a ajuns: Chrome, la reîncărcare, verifică doar pagina, nu și fișierele `.js` (GitHub le dă cu păstrare 10 minute),
+  deci ținea `gradina-data.js` vechi. De aceea pagina cere acum `js/garden.js?v=…` (în `surse/final/parts/gradina.html`), iar
+  `garden.js` cere `./gradina-data.js?v=…`. **Regulă: când schimbi `gradina-data.js` sau `garden.js`, mărește `?v=` în ambele locuri**
+  și rulează `tools/asambleaza.py`.
 - **De știut:** și în livingurile E7, M9 și C20 canapelele sunt cam simple; se pot reface la fel, dacă cere clientul (~2.300 credite bucata).
 
 ## Pagina de probă AgroKart (alt proiect al clientului, pe aceeași adresă)
