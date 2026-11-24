@@ -1299,7 +1299,7 @@ body.at-top .wa{opacity:0;transform:translateY(16px);pointer-events:none}
 .gd-stage{position:relative;width:min(1640px,100% - 32px);margin-inline:auto;height:clamp(480px,84svh,880px);border-radius:28px;overflow:hidden;background:linear-gradient(#dfe8ee,#d5e4c4 46%,#b9d39a);isolation:isolate;box-shadow:var(--shadow);outline:0}
 .gd-gl{position:absolute;inset:0;width:100%;height:100%;display:block;touch-action:pan-y;cursor:grab;opacity:0;transition:opacity .9s}
 .gd--live .gd-gl{opacity:1}
-.gd-gl.fix{cursor:default}.gd-gl.can{cursor:pointer}.gd-gl.drag{cursor:grabbing}
+.gd--live .gd-gl.veil{opacity:0;transition:opacity .12s}.gd-gl.fix{cursor:default}.gd-gl.can{cursor:pointer}.gd-gl.drag{cursor:grabbing}
 .gd-pins,.gd-labels{position:absolute;inset:0;z-index:2;pointer-events:none;overflow:hidden}
 .gd-pin{position:absolute;left:0;top:0;translate:-50% calc(-100% - 14px);display:flex;align-items:baseline;gap:7px;padding:8px 14px;border:0;border-radius:999px;background:rgba(255,255,255,.95);color:var(--ink);font:600 11.5px/1 var(--body);letter-spacing:.03em;white-space:nowrap;cursor:pointer;pointer-events:auto;box-shadow:0 10px 26px rgba(15,20,30,.2);opacity:0;transition:opacity .4s,background .25s,color .25s,scale .25s;will-change:transform}
 .gd--live .gd-pin{opacity:1}
@@ -2837,7 +2837,7 @@ if(document.fonts&&document.fonts.ready)document.fonts.ready.then(()=>{measure()
 place();measure();update();
 })();
 </script>
-<script type="module" src="js/garden.js?v=20261124b"></script>
+<script type="module" src="js/garden.js?v=20261124c"></script>
 <script>/* dacă modulul grădinii nu s-a putut încărca: rămâne imaginea grădinii */
 addEventListener('load',()=>setTimeout(()=>{const s=document.getElementById('gradina');if(!s||window.__gdMod)return;s.classList.add('gd--static');const i=s.querySelector('.gd-still[data-src]');if(i){i.src=i.dataset.src;i.removeAttribute('data-src')}},400));</script>
 </body>

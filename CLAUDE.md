@@ -391,4 +391,8 @@ să le băgăm în grădina aia 3D, tot așa, să pară totul real”. A oprit o
   rotunzi), mai puțin reale decât T6. Dacă clientul observă: se refac cu o imagine reală ca țintă, ca la `gr_c20_p`.
 - **Rotirea NU e făcută** (≈ 13.600 de credite pe casă + ≈ 2.400 Topaz): casele noi stau pe loc la tragere (nu se vede macheta).
   Clientul a fost întrebat de două ori dacă o vrea; de făcut doar cu acordul lui. La fel rotirile vechi nu arată casele noi în fundal.
+- **„Este pătrățos” (clientul, aceeași zi, captură din livingul lui YK5 cu macheta):** imaginile reale erau puse și publicate; la el
+  macheta s-a văzut cât imaginea camerei încă se încărca (imaginea dinainte e ținută pe ecran cel mult 7 secunde, apoi apărea macheta).
+  Acum, într-o cameră cu imagine reală, cât imaginea nu e pe ecran, pânza se ascunde („vălul”, `veil` în `garden.js` și în
+  `parts/gradina.html`, cel mult 25 s): se vede fundalul deschis al scenei, nu macheta. Nu scoate vălul.
 - `surse/ai360/k5yk5/pune.py` a fost folosit la punere; acum rândurile au și `ai: [...]`, deci `--scoate` nu mai merge (se scot de mână).

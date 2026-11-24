@@ -7,7 +7,7 @@ import { THREE, clamp, lerp, ease, webglOK, fit } from './kit.js';
 import { createGScene } from './gscene.js';
 import { buildGarden } from './genv.js';
 import { createPano } from './pano.js';
-import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js?v=20261124b';   // ?v= se schimbă când se schimbă datele sau imaginile (altfel navigatorul ține fișierul vechi)
+import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js?v=20261124c';   // ?v= se schimbă când se schimbă datele sau imaginile (altfel navigatorul ține fișierul vechi)
 import { openClip, warmClip, canClip } from './clip.js';
 
 window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel pagina arată imaginea de rezervă)
@@ -178,7 +178,7 @@ async function boot() {
 
   /* Trecerea „reală” dintre două vederi din afară: imaginea de pe ecran rămâne pe loc, camera sare direct la vederea nouă, iar
      imaginea ei apare peste cea veche (fără drumul prin macheta 3D). xf = imaginea veche, așa cum era desenată. */
-  let xf = null, lastFov = 40, roofSnap = false, glide = 0, fixCls = false, spun = false, lastPY = 0, lastPP = 0, live = false, bootT = 0, roomPre = null;
+  let xf = null, lastFov = 40, roofSnap = false, glide = 0, fixCls = false, veilCls = false, veilT = 0, spun = false, lastPY = 0, lastPP = 0, live = false, bootT = 0, roomPre = null;
   const GLIDE = .3;   // cât mai alunecă rotirea după ce dai drumul (constanta de timp, în secunde)
   /* Rotirea reală a unei case (ROTIRI din gradina-data.js): cadrele unei filmări care ocolește casa pe cercul vederii ei.
      Ca mișcarea să fie lină pe orice calculator și la orice viteză a netului:
@@ -582,6 +582,11 @@ async function boot() {
     if (pOp !== pg) { pOp += clamp(pg - pOp, -dt * (pR && pg < pOp ? 5 : 2.4), dt * 2.4); busy = true; }
     if (xf) { busy = true; if (pOp >= 1 || now - xf.t0 > 7000) { xf.op -= dt * (pOp >= 1 ? 1e3 : 2); if (xf.op <= 0) { if (xf.own) xf.tex.dispose(); xf = null; } } }
     { const fx = !wk && !drag && rotLocked(); if (fx !== fixCls) { fixCls = fx; canvas.classList.toggle('fix', fx); } }
+    // „vălul”: într-o cameră care are imagine reală, cât imaginea nu e încă pe ecran și nu e ținută nici cea dinainte (xf), pânza se
+    // ascunde (se vede fundalul deschis al scenei), ca macheta să nu apară nici măcar o clipă (24 nov 2026: clientul a prins-o într-o
+    // captură, în YK5). Cel mult 25 de secunde: dacă imaginea nu vine deloc, tot macheta e mai bună decât nimic.
+    { const need = wk && !noPano && !xf && pOp < .98 && time === timeGoal && destImg(); if (!need) veilT = 0; else if (!veilT) veilT = now;
+      const vl = need && now - veilT < 25000; if (vl !== veilCls) { veilCls = vl; canvas.classList.toggle('veil', vl); } if (vl) busy = true; }
     if (!warmed && pOp >= 1 && !wk) { warmed = -1; setTimeout(() => { warmed = 0; warm(); }, 1800); setTimeout(warmSpin, 4200); }
     if (aiOn !== ((pAI && pOp > .5) || spin.op > .5 || !!xf)) { aiOn = !aiOn; sec.classList.toggle('gd--ai', aiOn); }
     if (aiOn && aiEl) { const k = pAI === 2 && pOp > .5 && spin.op < .5 && !xf ? 2 : 1; if (k !== aiTxt) { aiTxt = k; aiEl.textContent = k === 2 ? AI_TXT[1] : AI_TXT[0]; } }   // mențiunea mică de pe imagine spune ce anume e făcut cu AI
