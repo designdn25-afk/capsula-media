@@ -345,3 +345,14 @@ partea a șasea. Credite folosite: ≈ 57.100 (din care ≈ 10.900 pe o încerca
 4. ~~V1 pe calculator~~ (V1 nu mai există pe prima pagină).
 5. Site-ul e doar în română. EN și BG din meniu duc la casecapsula.ro/en și casecapsula.ro/bg.
 6. Hosting și domeniu pentru varianta finală.
+
+## Canapeaua din livingul lui T6 (24 nov 2026)
+- **Ce a cerut clientul:** în livingul lui T6 canapeaua (și măsuța) arătau „pătrățos”, ca din cuburi.
+- **Ce s-a făcut:** `site/img/gd/ai/t6_living.webp` a fost retușată cu `gemini-3-pro-image` pornind chiar de la imaginea de pe site
+  (nu de la machetă): s-au schimbat doar canapeaua și măsuța, restul camerei a rămas la loc (potrivire măsurată cu `fix360.py --masoara`:
+  deplasare 0). Nod în flux: `snwvyjhF4BiuVaAIMjc2`. Cost: 2.272 de credite. Copia veche: `versiuni/inainte-canapea-t6/`.
+- **De știut:** și în livingurile E7, M9 și C20 canapelele sunt cam simple; se pot reface la fel, dacă cere clientul (~2.300 credite bucata).
+
+## Pagina de probă AgroKart (alt proiect al clientului, pe aceeași adresă)
+- Stă la https://designdn25-afk.github.io/capsula-media/agrokart/ ; sursa e pe ramura `claude/agrokart-demo` (`agrokart/demo`, făcută cu
+  `agrokart/tools/genereaza.py`). `tools/publica_pages.sh` o pune la loc la fiecare publicare a site-ului cu capsule.

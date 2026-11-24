@@ -11,6 +11,11 @@ cd "$TMP"
 rm -f home_v1.html img/hero_far_* img/hero_near_* img/hero_glass.png img/x7s_frame.webp img/x7s_lot.webp _t_*.html
 find . -name __pycache__ -prune -exec rm -rf {} +
 touch .nojekyll
+# Pagina de probă AgroKart stă pe aceeași adresă, în folderul agrokart/ (sursa: ramura claude/agrokart-demo, agrokart/demo).
+# Se pune la loc la fiecare publicare, altfel dispare de pe link.
+if git -C "$ROOT" fetch -q origin claude/agrokart-demo 2>/dev/null; then
+  git -C "$ROOT" archive FETCH_HEAD agrokart/demo | tar -x && mv agrokart/demo _ak && rm -rf agrokart && mv _ak agrokart
+fi
 git init -q -b gh-pages
 git add -A
 git -c user.name="$(git -C "$ROOT" log -1 --format=%an)" -c user.email="$(git -C "$ROOT" log -1 --format=%ae)" \
