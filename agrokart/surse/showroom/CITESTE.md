@@ -20,3 +20,6 @@ motor = specificațiile)… în capăt sigla AgroKart”, apoi „tractoarele se
   și nu se vede peretele cu ușă; în camera excavatoarelor apare un al patrulea excavator, fără nume (inventat de generator).
   Se repară refăcând s2 și s4 (~4.000 de credite fiecare). Nu există oprire la intrare (schița `src_0` există, nod pregătit „oprire 0”).
 - Imaginile sunt făcute cu AI: mențiunea de jos („Showroom virtual · imagini realizate cu AI, orientative”) rămâne.
+- **Prin ușa camerei excavatoarelor** generatorul lăsase tractoarele „pătrățoase” (clientul a trimis captură). Reparat fără credite
+  cu `tools/fixusa.py`: în golul ușii din s4 e pusă vederea reală a halei, luată din s3 privind înapoi. Se rulează o singură dată,
+  pe imaginea proaspăt generată (după `fixsemne.py`); rezultatul se publică sub nume nou (`IMG` în `showroom.py`, acum `s4_v2`).

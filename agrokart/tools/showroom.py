@@ -23,6 +23,7 @@ GRUPE = {'T': [('motor', 'Motor', (0, 1.5, 1.0), r'^(motor|cilindree|putere|cai 
                ('brat', 'Braț', (.35, 1.9, 1.5), r'^(braț)'),
                ('senile', 'Deplasare', (.62, .3, 0), r'^(deplasare)')]}
 
+IMG = {'s4': 's4_v2'}   # o imagine înlocuită primește nume nou (altfel navigatorul o ține pe cea veche)
 DE_MANA = {'s4': [('kn-25', 'nume', 1265, 722), ('kn-25', 'cabina', 1265, 947), ('kn-25', 'motor', 1367, 1120), ('kn-25', 'brat', 959, 865), ('kn-25', 'senile', 1306, 1212),
                   ('kn-15', 'nume', 2836, 824), ('kn-15', 'cabina', 2836, 988), ('kn-15', 'motor', 2897, 1141),
                   ('kn-20', 'nume', 3468, 855), ('kn-20', 'cabina', 3468, 1008), ('kn-20', 'motor', 3448, 1151), ('kn-20', 'brat', 3672, 1090)]}
@@ -65,7 +66,7 @@ for i, (sid, snume, sx, sz) in enumerate(OPRIRI):
     for j, (tid, tn, tx, tz) in enumerate(OPRIRI):
         if j == i: continue
         yw, pt, d = unghi(o, (tx, 0, tz)); nav.append({'la': tid, 'nume': tn, 'yaw': yw, 'pitch': round(pt, 1), 'm': round(max(.42, min(1, 7 / d)), 2)})
-    scene.append({'id': sid, 'nume': snume, 'img': f'img/showroom/{sid}.jpg', 'pct': pct, 'nav': nav})
+    scene.append({'id': sid, 'nume': snume, 'img': f'img/showroom/{IMG.get(sid, sid)}.jpg', 'pct': pct, 'nav': nav})
 for f in fise.values():
     for g in f['gr']: del g['p']
     del f['top'], f['c']
