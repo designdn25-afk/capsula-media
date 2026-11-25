@@ -72,8 +72,8 @@ function stoneTex() {
   return (TEX.stone = canvasTex(S, S, g => { g.fillStyle = '#d8d5cf'; g.fillRect(0, 0, S, S); for (let k = 0; k < 9000; k++) { const v = 190 + Math.floor(r() * 50); g.fillStyle = `rgba(${v},${v},${v - 4},.5)`; g.fillRect(r() * S, r() * S, 3, 3); } g.strokeStyle = 'rgba(90,88,82,.7)'; g.lineWidth = 3; for (let i = 0; i <= 2; i++) { g.beginPath(); g.moveTo(i * S / 2, 0); g.lineTo(i * S / 2, S); g.stroke(); g.beginPath(); g.moveTo(0, i * S / 2); g.lineTo(S, i * S / 2); g.stroke(); } }));
 }
 function skyTex() {
-  return canvasTex(1024, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#3f7fcb'); gr.addColorStop(.36, '#8fbbe6'); gr.addColorStop(.5, '#e6eef2'); gr.addColorStop(.52, '#b9c4a0'); gr.addColorStop(1, '#6a8450'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
-    const r = rng(2026); g.filter = 'blur(9px)'; for (let k = 0; k < 26; k++) { const x = r() * w, y = h * (.2 + r() * .24), n = 4 + Math.floor(r() * 5); for (let j = 0; j < n; j++) { g.fillStyle = `rgba(255,255,255,${.35 + r() * .4})`; const cx = x + (r() - .5) * 110, rx = 26 + r() * 46; for (const dx of [0, w, -w]) { g.beginPath(); g.ellipse(cx + dx, y + (r() - .5) * 12, rx, rx * .32, 0, 0, 7); g.fill(); } } } g.filter = 'none'; }, { repeat: false });
+  return canvasTex(1024, 512, (g, w, h) => { const gr = g.createLinearGradient(0, 0, 0, h); gr.addColorStop(0, '#3f7fcb'); gr.addColorStop(.3, '#6ea5e6'); gr.addColorStop(.44, '#8fb8eb'); gr.addColorStop(.5, '#a4c4ee'); gr.addColorStop(.515, '#9a9a6a'); gr.addColorStop(1, '#73712e'); g.fillStyle = gr; g.fillRect(0, 0, w, h);
+    const r = rng(2026); g.filter = 'blur(9px)'; for (let k = 0; k < 16; k++) { const x = r() * w, y = h * (.12 + r() * .2), n = 4 + Math.floor(r() * 5); for (let j = 0; j < n; j++) { g.fillStyle = `rgba(255,255,255,${.35 + r() * .4})`; const cx = x + (r() - .5) * 110, rx = 26 + r() * 46; for (const dx of [0, w, -w]) { g.beginPath(); g.ellipse(cx + dx, y + (r() - .5) * 12, rx, rx * .32, 0, 0, 7); g.fill(); } } } g.filter = 'none'; }, { repeat: false });
 }
 function treesTex() {   // șirul de copaci din depărtare, șters (ca într-o fotografie cu fundalul neclar)
   return canvasTex(2048, 256, (g, w, h) => { const r = rng(404); g.clearRect(0, 0, w, h); g.filter = 'blur(5px)';
@@ -184,7 +184,7 @@ function buildCapsule(config) {
 export function createViewer(canvas, opts = {}) {
   const { onViewChange, onWallSelect } = opts;
   let flat = null, gl = null, R = null, scene = null, cam = null, house = null, key = null, latest = null, useGL = false, closing = false, frame = 0, tween = 0;
-  let yaw = CAM['3d'][0], pitch = CAM['3d'][1], zoomAmount = 1, view = '3d', dims = false, dimGroup = null, sun = null, wasCapsule = false;
+  let yaw = CAM['3d'][0], pitch = CAM['3d'][1], zoomAmount = 1, view = '3d', dims = false, dimGroup = null, sun = null, wasCapsule = false, siteG = null;
   const camOf = name => (name === '3d' && wasCapsule ? [-.58, .1] : CAM[name] || CAM['3d']);
   const flatViewer = () => (flat ??= createFlat(canvas, opts));
   const announce = name => { if (name !== view) { view = name; onViewChange?.(name); } };
@@ -198,17 +198,20 @@ export function createViewer(canvas, opts = {}) {
     gl = document.createElement('canvas'); gl.className = canvas.className; gl.tabIndex = 0; gl.style.touchAction = 'none'; gl.style.cursor = 'grab'; canvas.after(gl);
     R = new THREE.WebGLRenderer({ canvas: gl, antialias: true, preserveDrawingBuffer: true, powerPreference: 'high-performance' });
     R.outputColorSpace = THREE.SRGBColorSpace; R.toneMapping = THREE.ACESFilmicToneMapping; R.toneMappingExposure = .98; R.shadowMap.enabled = true; R.shadowMap.type = THREE.PCFSoftShadowMap;
-    scene = new THREE.Scene(); scene.fog = new THREE.Fog(0xdde6e6, 45, 130);
+    scene = new THREE.Scene(); scene.fog = new THREE.Fog(0x9a946a, 55, 118);
     const sky = skyTex(); sky.mapping = THREE.EquirectangularReflectionMapping; scene.background = sky;
-    const pm = new THREE.PMREMGenerator(R); scene.environment = pm.fromEquirectangular(sky).texture; pm.dispose(); scene.environmentIntensity = .75;
+    const pm = new THREE.PMREMGenerator(R); scene.environment = pm.fromEquirectangular(sky).texture; pm.dispose(); scene.environmentIntensity = .9;
     cam = new THREE.PerspectiveCamera(26, 1, .3, 400);
     scene.add(new THREE.HemisphereLight(0xcfe2ff, 0x7c8a5c, .55));
-    sun = new THREE.DirectionalLight(0xfff2dc, 3.1); sun.position.set(-10, 13, 9); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0004; sun.shadow.normalBias = .03; sun.shadow.radius = 4;
-    Object.assign(sun.shadow.camera, { left: -11, right: 11, top: 11, bottom: -11, near: 1, far: 50 }); scene.add(sun);
-    const gt = grassTex(); gt.repeat.set(55, 55); const ground = new THREE.Mesh(new THREE.PlaneGeometry(360, 360), new THREE.MeshStandardMaterial({ color: 0xffffff, map: gt, roughness: 1 })); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
-    const tt = treesTex(); tt.repeat.set(4, 1); const trees = new THREE.Mesh(new THREE.CylinderGeometry(70, 70, 9.5, 64, 1, true), new THREE.MeshBasicMaterial({ map: tt, transparent: true, side: THREE.BackSide, fog: true, depthWrite: false })); trees.position.y = 4.6; scene.add(trees);
+    sun = new THREE.DirectionalLight(0xffeccf, 3.3); sun.position.set(-12, 11, 10); sun.castShadow = true; sun.shadow.mapSize.set(2048, 2048); sun.shadow.bias = -.0004; sun.shadow.normalBias = .03; sun.shadow.radius = 4;
+    Object.assign(sun.shadow.camera, { left: -13, right: 13, top: 13, bottom: -13, near: 1, far: 55 }); scene.add(sun);
+    // iarba și fundalul sunt fotografii (din imaginile grădinii de pe site-ul cu capsule): gazon tuns, hale, copaci, cer
+    const tl = new THREE.TextureLoader(), groundM = new THREE.MeshStandardMaterial({ color: 0x8f8d44, roughness: 1 }), ground = new THREE.Mesh(new THREE.PlaneGeometry(420, 420), groundM); ground.rotation.x = -Math.PI / 2; ground.receiveShadow = true; scene.add(ground);
+    tl.load('./assets/iarba.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = t.wrapT = THREE.RepeatWrapping; t.repeat.set(30, 30); t.anisotropy = 8; groundM.map = t; groundM.color.set(0xffffff); groundM.needsUpdate = true; schedule(); });
+    const backM = new THREE.MeshBasicMaterial({ transparent: true, opacity: 0, side: THREE.BackSide, fog: false, depthWrite: false }), back = new THREE.Mesh(new THREE.CylinderGeometry(112, 112, 31, 96, 1, true), backM); back.position.y = 31 / 2 - 4.25; back.renderOrder = -1; scene.add(back);
+    tl.load('./assets/fundal.webp', t => { t.colorSpace = THREE.SRGBColorSpace; t.wrapS = THREE.RepeatWrapping; t.repeat.x = 2; t.anisotropy = 8; backM.map = t; backM.opacity = 1; backM.needsUpdate = true; schedule(); });
     // o alee de dale până la treaptă
-    const st = stoneTex().clone(); st.needsUpdate = true; st.repeat.set(1, 4); const path = new THREE.Mesh(new THREE.PlaneGeometry(1.4, 9), new THREE.MeshStandardMaterial({ color: 0xcfcbc3, map: st, roughness: .85 })); path.rotation.x = -Math.PI / 2; path.position.set(0, .012, 9); path.receiveShadow = true; path.userData.path = 1; scene.add(path);
+    siteG = new THREE.Group(); scene.add(siteG);
     for (const [t, f, o] of [['pointerdown', down], ['pointermove', move], ['pointerup', end], ['pointercancel', end], ['lostpointercapture', end], ['wheel', wheel, { passive: false }], ['dblclick', () => goTo('3d', true)], ['keydown', keydown]]) gl.addEventListener(t, f, o);
     ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null; ro?.observe(gl); window.addEventListener('resize', schedule);
   }
@@ -223,8 +226,20 @@ export function createViewer(canvas, opts = {}) {
     sync();
     const k = JSON.stringify([settings.model, settings.roof, settings.walls, settings.openings, settings.interior, settings.extras]); if (k === key) { schedule(); return; } key = k;
     disposeHouse(); house = capsule ? buildCapsule(settings) : buildHouse(settings); scene.add(house.group);
-    scene.traverse(o => { if (o.userData.path) o.position.z = house.d / 2 + 1.25 + 4.5; });
+    buildSite();
     buildDims(); schedule();
+  }
+  // ce e în jurul casei, ca într-o grădină adevărată: platformă de dale cu colțuri rotunde, pietre de călcat, un felinar, umbra de contact
+  function buildSite() {
+    siteG.traverse(o => { o.geometry?.dispose(); }); siteG.clear(); const { w, d } = house, r = rng(31), stone = new THREE.MeshStandardMaterial({ color: 0xcbc6bc, map: (() => { const t = stoneTex().clone(); t.needsUpdate = true; t.repeat.set(.9, .9); return t; })(), roughness: .82 });
+    const px = w / 2 + 1.5, pzb = -d / 2 - 1.2, pzf = d / 2 + 2.6, rad = 1.1, sh = new THREE.Shape(); sh.moveTo(-px + rad, pzb); sh.lineTo(px - rad, pzb); sh.quadraticCurveTo(px, pzb, px, pzb + rad); sh.lineTo(px, pzf - rad); sh.quadraticCurveTo(px, pzf, px - rad, pzf); sh.lineTo(-px + rad, pzf); sh.quadraticCurveTo(-px, pzf, -px, pzf - rad); sh.lineTo(-px, pzb + rad); sh.quadraticCurveTo(-px, pzb, -px + rad, pzb);
+    const pad = new THREE.Mesh(new THREE.ExtrudeGeometry(sh, { depth: .05, bevelEnabled: false }), stone); pad.rotation.x = Math.PI / 2; pad.position.y = .05; pad.receiveShadow = true; siteG.add(pad);
+    const stM = new THREE.MeshStandardMaterial({ color: 0xbdb6a8, roughness: .9 }); for (let k = 0; k < 7; k++) { const s = new THREE.Mesh(new THREE.CylinderGeometry(.42 + r() * .1, .45, .05, 20), stM); s.scale.z = .68 + r() * .12; s.rotation.y = r() * 3; s.position.set((house.capsule ? 1.2 : 0) + Math.sin(k * .9) * .28, .028, pzf + .75 + k * .92); s.receiveShadow = true; siteG.add(s); }
+    const lx = house.capsule ? px - .6 : -px + .6;
+    const dark = new THREE.MeshStandardMaterial({ color: 0x1b1d20, roughness: .5, metalness: .6 }), post = new THREE.Mesh(new THREE.CylinderGeometry(.035, .045, 2.3, 12), dark); post.position.set(lx, 1.15, pzf - .4); post.castShadow = true; siteG.add(post);
+    const head = new THREE.Mesh(new THREE.CylinderGeometry(.16, .13, .2, 16), new THREE.MeshStandardMaterial({ color: 0xfff6e2, emissive: 0xffe2a8, emissiveIntensity: .7, roughness: .4 })); head.position.set(lx, 2.38, pzf - .4); siteG.add(head); const hat = new THREE.Mesh(new THREE.CylinderGeometry(.2, .2, .03, 16), dark); hat.position.set(lx, 2.5, pzf - .4); hat.castShadow = true; siteG.add(hat);
+    const c = document.createElement('canvas'); c.width = c.height = 128; const g = c.getContext('2d'), gr = g.createRadialGradient(64, 64, 20, 64, 64, 64); gr.addColorStop(0, 'rgba(0,0,0,.5)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
+    const ao = new THREE.Mesh(new THREE.PlaneGeometry(w + 2.2, d + 2.6), new THREE.MeshBasicMaterial({ map: new THREE.CanvasTexture(c), transparent: true, depthWrite: false })); ao.rotation.x = -Math.PI / 2; ao.position.set(0, .105, .3); ao.renderOrder = 1; siteG.add(ao);
   }
   function textSprite(text) { const c = document.createElement('canvas'); c.width = 256; c.height = 96; const g = c.getContext('2d'); g.fillStyle = 'rgba(255,255,255,.94)'; g.beginPath(); g.roundRect(8, 14, 240, 68, 18); g.fill(); g.fillStyle = '#2b2622'; g.font = '600 40px system-ui,sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(text, 128, 50); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: t, depthTest: false })); s.scale.set(1.6, .6, 1); s.renderOrder = 9; return s; }
   function buildDims() {

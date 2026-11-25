@@ -4,7 +4,7 @@ import { icon } from './icon.js';
 import { mountQuote } from './quote.js';
 import { showBundles } from './bundles.js';
 import { showModelComparison } from './model-comparison.js';
-import { mountStudioPreview } from './studio-preview.js?v=3';
+import { mountStudioPreview } from './studio-preview.js?v=4';
 import { mountConfigurator } from './studio-configurator.js';
 
 const select = selector => document.querySelector(selector);

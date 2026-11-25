@@ -12,3 +12,6 @@ doar vederea „Sub finisaje” a rămas pe `viewer.js`. La orice schimbare se m
 - **Nu merge în copie:** trimiterea cererii de ofertă (`/api/quotes` există doar la ChatGPT). Restul merge.
 - Ca să ajungă schimbarea în site-ul din ChatGPT: clientul îi dă lui ChatGPT fișierele `viewer-real.js` și `vendor/three.module.min.js`
   și îi cere să schimbe importul din `studio-preview.js`.
+- **A treia trecere („mai real, să nu fie așa de pătrățos, dar clientul să poată schimba configurările”):** fundalul și iarba sunt acum
+  fotografii (`assets/fundal.webp`, `assets/iarba.webp`, tăiate din imaginile grădinii de pe site-ul cu capsule: hale, copaci, cer, gazon),
+  iar în jurul casei sunt dale cu colțuri rotunde, pietre de călcat, un felinar și umbră de contact (`buildSite` în `viewer-real.js`).

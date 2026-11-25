@@ -436,6 +436,9 @@ fluidă, fără întreruperi”. O pagină nu poate cere mai multă memorie plă
   (`modularis/viewer-real.js`, three.js local), cu aceleași opțiuni. Clientul: „la casa capsulă nu s-a schimbat nimic” → și Capsula X7
   e acum 3D adevărat (modelul `site/js/x7.js`, copiat în `modularis/x7/`), cu culoarea exterioară, bordura, pardoseala și luminile din
   opțiuni; „Sub finisaje” a rămas desenul vechi. Detalii: `modularis/CITESTE.md`.
+- A treia cerere („fă-le pe amândouă mai reale… să nu fie așa de pătrățos, dar configurările să le poată schimba clientul”): fundal și
+  iarbă din fotografii (tăiate din imaginile grădinii), dale rotunjite, pietre de călcat, felinar, umbră de contact. La orice schimbare
+  se mărește `?v=` în `modularis/index.html`, `app.js`, `studio-preview.js`.
 - Fără credite (totul e făcut în cod). Gazda `modularis-configurator-case.appwithchat.chatgpt.site` a fost adăugată la mediul de lucru.
 - De știut: în copie nu merge trimiterea cererii de ofertă (serverul e la ChatGPT). Dacă clientul vrea schimbarea în site-ul lui din
   ChatGPT, primește fișierele + un text de dat lui ChatGPT.
