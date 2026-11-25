@@ -442,3 +442,6 @@ fluidă, fără întreruperi”. O pagină nu poate cere mai multă memorie plă
 - Fără credite (totul e făcut în cod). Gazda `modularis-configurator-case.appwithchat.chatgpt.site` a fost adăugată la mediul de lucru.
 - De știut: în copie nu merge trimiterea cererii de ofertă (serverul e la ChatGPT). Dacă clientul vrea schimbarea în site-ul lui din
   ChatGPT, primește fișierele + un text de dat lui ChatGPT.
+- **25 nov, seara:** clientul i-a dat lui ChatGPT arhiva showroomului și e pus pe site-ul lui: https://agrokart-karl-utilaje.appwithchat.chatgpt.site/showroom/ .
+  Apoi a cerut: fără excavator la oprirea a doua (făcut fără credite, `fixhala2.py` → `s2_v2.jpg`) și un buton X de ieșire (făcut).
+  La fiecare schimbare a showroomului îi trebuie o arhivă mică de actualizare (fișierele schimbate din `showroom/`) + textul pentru ChatGPT.
