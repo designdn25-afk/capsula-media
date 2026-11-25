@@ -104,6 +104,12 @@ select.bt{appearance:none;-webkit-appearance:none;padding-right:34px;background:
 .opriri{display:flex;gap:8px;max-width:100%;overflow-x:auto;pointer-events:auto;padding:2px}
 .opriri button{flex:none;min-height:42px;padding:0 14px;border-radius:999px;border:2px solid #ffffff80;background:#0008;color:#fff;font:inherit;font-size:15px;font-weight:600;cursor:pointer;backdrop-filter:blur(6px)}
 .opriri button[aria-current=true]{background:#fff;color:var(--verde-inchis);border-color:#fff}
+.banda{display:flex;gap:8px;max-width:100%;overflow-x:auto;pointer-events:auto;padding:2px 2px 4px;scrollbar-width:thin}
+.banda button{flex:none;width:104px;padding:0;border:2px solid #ffffff66;border-radius:10px;background:#0d0f0c;color:#fff;font:inherit;font-size:12px;font-weight:700;cursor:pointer;overflow:hidden;line-height:1.2}
+.banda button img{display:block;width:100%;height:58px;object-fit:contain;background:#0d0f0c}
+.banda button span{display:block;padding:3px 4px 4px;background:#000a;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.banda button:hover,.banda button.on{border-color:#f4b400}
+@media (max-width:700px){.banda button{width:84px}.banda button img{height:46px}}
 .nota{color:#ffffffb3;font-size:12px;text-shadow:0 1px 3px #000}
 .ajutor{position:fixed;left:50%;top:50%;z-index:6;transform:translate(-50%,-50%);background:#000c;color:#fff;border-radius:18px;padding:18px 22px;max-width:min(440px,88vw);text-align:center;backdrop-filter:blur(8px);transition:opacity .4s}
 .ajutor b{display:block;font-size:20px;margin-bottom:6px}.ajutor.gata{opacity:0;pointer-events:none}
@@ -126,7 +132,7 @@ select.bt{appearance:none;-webkit-appearance:none;padding-right:34px;background:
 .hs-nav>span{position:absolute;left:0;top:calc(-34px * var(--m) - 18px);transform:translateX(-50%);white-space:nowrap;background:#000b;color:#fff;font-size:13px;font-weight:600;padding:4px 9px;border-radius:8px;pointer-events:none;opacity:0;transition:opacity .15s}
 .hs-nav:hover>span{opacity:1}
 /* fișa */
-.fisa{position:fixed;z-index:8;right:14px;top:74px;bottom:86px;width:min(400px,calc(100vw - 28px));background:#fffffff5;border-radius:18px;box-shadow:0 10px 40px #0008;display:flex;flex-direction:column;overflow:hidden;transform:translateX(calc(100% + 30px));transition:transform .28s ease;backdrop-filter:blur(8px)}
+.fisa{position:fixed;z-index:8;right:14px;top:74px;bottom:176px;width:min(400px,calc(100vw - 28px));background:#fffffff5;border-radius:18px;box-shadow:0 10px 40px #0008;display:flex;flex-direction:column;overflow:hidden;transform:translateX(calc(100% + 30px));transition:transform .28s ease;backdrop-filter:blur(8px)}
 .fisa.des{transform:none}
 .fisa header{display:flex;align-items:flex-start;gap:10px;padding:16px 16px 10px}
 .fisa header div{flex:1;min-width:0}
@@ -164,7 +170,7 @@ select.bt{appearance:none;-webkit-appearance:none;padding-right:34px;background:
 </div>
 <div class="ajutor" id="ajutor"><b>Bun venit în showroomul AgroKart</b>Trage cu degetul sau cu mausul ca să te uiți în jur. Apasă pe cercurile de pe jos ca să mergi mai departe și pe punctele verzi ca să vezi specificațiile.<br><button class="bt bt-a" type="button">Am înțeles</button></div>
 <aside class="fisa" id="fisa" aria-live="polite" hidden></aside>
-<div class="jos"><div class="opriri" id="opriri" role="tablist" aria-label="Zonele showroomului"></div><div class="nota">Showroom virtual · imagini realizate cu AI, orientative · specificațiile și prețurile sunt cele din catalog</div></div>
+<div class="jos"><div class="banda" id="banda" aria-label="Utilajele din showroom"></div><div class="opriri" id="opriri" role="tablist" aria-label="Zonele showroomului"></div><div class="nota">Showroom virtual · imagini realizate cu AI, orientative · specificațiile și prețurile sunt cele din catalog</div></div>
 <script src="vendor/pannellum.js"></script>
 <script>
 (function(){
@@ -183,7 +189,7 @@ function deschide(u,g){var f=F[u];sel={u:u,g:g||null};
   h+='</div><footer><div class="pret">Preț cu TVA inclus: <b>'+esc(f.pret)+' €</b>'+(f.promo?'<em>Promoție</em>':'')+'</div><div class="but"><a class="bt bt-a" href="'+f.pagina+'">Pagina modelului</a><a class="bt bt-v" target="_blank" rel="noopener" href="'+wa("Bună ziua, am văzut "+f.nume+" în showroomul virtual și vreau o ofertă.")+'">Cere o ofertă</a></div></footer>';
   fisa.innerHTML=h;fisa.hidden=false;requestAnimationFrame(function(){fisa.classList.add("des")});
   fisa.querySelector(".x").onclick=inchide;var on=fisa.querySelector(".gr.on");if(on)on.scrollIntoView({block:"nearest"});marcheaza()}
-function marcheaza(){document.querySelectorAll(".hs-info").forEach(function(e){e.classList.toggle("on",!!sel&&e.dataset.u===sel.u&&e.dataset.g===sel.g)})}
+function marcheaza(){document.querySelectorAll(".banda button").forEach(function(b){var on=!!sel&&b.dataset.u===sel.u;b.classList.toggle("on",on);if(on)b.scrollIntoView({block:"nearest",inline:"nearest"})});document.querySelectorAll(".hs-info").forEach(function(e){e.classList.toggle("on",!!sel&&e.dataset.u===sel.u&&e.dataset.g===sel.g)})}
 function mk(div,a){div.classList.add("hs");
   if(a.t==="info"){var gg=F[a.u].gr.filter(function(x){return x.cod===a.g})[0];div.classList.add("hs-info");div.dataset.u=a.u;div.dataset.g=a.g;div.innerHTML='<i role="button" tabindex="0" aria-label="'+esc(F[a.u].nume+": "+gg.titlu)+'"></i><span>'+esc(gg.titlu)+'</span>';
     var go=function(e){e.stopPropagation();deschide(a.u,a.g)};div.firstChild.addEventListener("click",go);div.firstChild.addEventListener("keydown",function(e){if(e.key==="Enter")go(e)})}
@@ -201,8 +207,10 @@ D.scene.forEach(function(s,i){var b=document.createElement("button");b.type="but
 v.on("scenechange",function(id){cur=id;op.querySelectorAll("button").forEach(function(b){b.setAttribute("aria-current",b.dataset.id===id)});setTimeout(marcheaza,60)});
 cur=D.scene[0].id;op.firstChild.setAttribute("aria-current","true");
 var sl=document.getElementById("mergi");Object.keys(F).forEach(function(u){var o=document.createElement("option");o.value=u;o.textContent=F[u].nume+" · "+F[u].pret+" €";sl.appendChild(o)});
-sl.onchange=function(){var u=sl.value;if(!u)return;var best=null;D.scene.forEach(function(s){s.pct.forEach(function(p){if(p.t==="nume"&&p.u===u&&!p.departe&&!best)best={s:s.id,yaw:p.yaw}})});
-  if(best){mergi(best.s,best.yaw,-2)}deschide(u);sl.value=""};
+function laUtilaj(u){var best=null;D.scene.forEach(function(s){s.pct.forEach(function(p){if(p.t==="nume"&&p.u===u&&!best)best={s:s.id,yaw:p.yaw}})});
+  if(best){mergi(best.s,best.yaw,-2)}deschide(u)}
+sl.onchange=function(){var u=sl.value;if(!u)return;laUtilaj(u);sl.value=""};
+var bd=document.getElementById("banda");Object.keys(F).forEach(function(u){var b=document.createElement("button");b.type="button";b.dataset.u=u;b.innerHTML='<img src="'+F[u].poza+'" alt="" loading="lazy"><span>'+esc(F[u].nume)+'</span>';b.onclick=function(){laUtilaj(u)};bd.appendChild(b)});
 var aj=document.getElementById("ajutor"),gata=function(){aj.classList.add("gata")};aj.querySelector("button").onclick=gata;document.getElementById("pano").addEventListener("pointerdown",gata,{once:true});setTimeout(gata,9000);
 document.addEventListener("keydown",function(e){if(e.key==="Escape")inchide()});
 window.__sr={v:v,mergi:mergi,deschide:deschide};
