@@ -6,6 +6,8 @@
 import * as THREE from './vendor/three.module.min.js';
 import { createViewer as createFlat } from './viewer.js';
 import { MODELS, defaultConfig } from './config.js';
+import { materials as x7Kit } from './x7/kit.js';
+import { buildX7, x7Materials } from './x7/x7.js';
 
 const SIDES = ['front', 'right', 'back', 'left'];
 const CAM = { '3d': [.6, .115], front: [0, .045], back: [Math.PI, .045], side: [Math.PI / 2, .045], right: [Math.PI / 2, .045], left: [-Math.PI / 2, .045], top: [0, Math.PI / 2 - .001] };
@@ -165,11 +167,25 @@ function buildHouse(config, env) {
   return { group: G, walls, w, d, height: base + nominal + (roof.style === 'gable' ? high : .2) + cap };
 }
 
+/* ---------- Capsula X7: modelul 3D adevărat (același ca pe site-ul cu capsule), colorat după opțiuni ---------- */
+function buildCapsule(config) {
+  const M = x7Materials(x7Kit()), shell = config.walls?.front?.color || '#e9eeed', trim = config.roof?.trimColor || '#273940', it = config.interior || {};
+  M.shell.color.set(shell); M.roof.color.set(config.roof?.color || shell); M.seam.color.set(shell).multiplyScalar(.82); M.frame.color.set(trim); M.dark.color.set(trim);
+  const dark = M.shell.color.getHSL({}).l < .45; M.shell.roughness = dark ? .34 : .42; M.shell.metalness = dark ? .35 : .12; M.roof.roughness = M.shell.roughness; M.roof.metalness = M.shell.metalness;
+  M.glass.opacity = .5; M.glass.metalness = .55; M.glass.color.set(0x24384a);
+  M.floor.color.set(it.floor === 'oak' ? 0xc79a62 : it.floor === 'stone' ? 0xcfcbc3 : 0xc8b79c); M.floor.roughness = it.floor === 'stone' ? .5 : .65;
+  const api = buildX7(M, { lamps: true }); api.night(it.lights === 'warm' ? .62 : it.lights === 'smart' ? .5 : .3);
+  if (it.lights === 'smart') { M.led.emissive.set(0x9fd0ff); M.ledIn.emissive.set(0xcfe4ff); }
+  const G = new THREE.Group(); G.add(api.root); api.root.traverse(o => { if (o.isMesh) { o.castShadow = o.material !== M.glass && o.material !== M.skyglass; o.receiveShadow = true; } if (o.isLineSegments) o.visible = false; });
+  return { group: G, walls: [], w: 11.5, d: 3.4, height: 3.45, capsule: true };
+}
+
 /* ---------- vizualizatorul ---------- */
 export function createViewer(canvas, opts = {}) {
   const { onViewChange, onWallSelect } = opts;
   let flat = null, gl = null, R = null, scene = null, cam = null, house = null, key = null, latest = null, useGL = false, closing = false, frame = 0, tween = 0;
-  let yaw = CAM['3d'][0], pitch = CAM['3d'][1], zoomAmount = 1, view = '3d', dims = false, dimGroup = null, sun = null;
+  let yaw = CAM['3d'][0], pitch = CAM['3d'][1], zoomAmount = 1, view = '3d', dims = false, dimGroup = null, sun = null, wasCapsule = false;
+  const camOf = name => (name === '3d' && wasCapsule ? [-.58, .1] : CAM[name] || CAM['3d']);
   const flatViewer = () => (flat ??= createFlat(canvas, opts));
   const announce = name => { if (name !== view) { view = name; onViewChange?.(name); } };
   const schedule = () => { if (!frame && !closing && useGL) frame = requestAnimationFrame(draw); };
@@ -197,16 +213,16 @@ export function createViewer(canvas, opts = {}) {
     ro = typeof ResizeObserver !== 'undefined' ? new ResizeObserver(schedule) : null; ro?.observe(gl); window.addEventListener('resize', schedule);
   }
   let ro = null;
-  function disposeHouse() { if (!house) return; scene.remove(house.group); house.group.traverse(o => { o.geometry?.dispose(); for (const m of [].concat(o.material || [])) { for (const k of ['map', 'bumpMap']) m[k]?.dispose(); m.dispose(); } }); house = null; }
+  function disposeHouse() { if (!house) return; scene.remove(house.group); house.group.traverse(o => { o.geometry?.dispose(); for (const m of [].concat(o.material || [])) { for (const k of ['map', 'bumpMap']) m[k]?.dispose?.(); m.dispose(); } }); house = null; }
   function update(config, layer = null) {
     if (closing) return; const settings = config || defaultConfig(); latest = settings;
-    const want = settings.model !== 'x7' && !layer;
+    const want = !layer, capsule = settings.model === 'x7';
     if (!want) { useGL = false; sync(); flatViewer().update(settings, layer); return; }
     if (!gl) { try { init(); } catch (e) { console.warn('3D indisponibil, rămâne desenul simplu', e); gl = null; flatViewer().update(settings, layer); return; } }
-    if (!useGL) { useGL = true; yaw = CAM['3d'][0]; pitch = CAM['3d'][1]; }
+    if (!useGL || capsule !== wasCapsule) { useGL = true; wasCapsule = capsule; [yaw, pitch] = camOf('3d'); zoomAmount = 1; }
     sync();
-    const k = JSON.stringify([settings.model, settings.roof, settings.walls, settings.openings, settings.interior]); if (k === key) { schedule(); return; } key = k;
-    disposeHouse(); house = buildHouse(settings); scene.add(house.group);
+    const k = JSON.stringify([settings.model, settings.roof, settings.walls, settings.openings, settings.interior, settings.extras]); if (k === key) { schedule(); return; } key = k;
+    disposeHouse(); house = capsule ? buildCapsule(settings) : buildHouse(settings); scene.add(house.group);
     scene.traverse(o => { if (o.userData.path) o.position.z = house.d / 2 + 1.25 + 4.5; });
     buildDims(); schedule();
   }
@@ -219,14 +235,14 @@ export function createViewer(canvas, opts = {}) {
   function draw() {
     frame = 0; if (!gl || !house || closing) return; const rect = gl.getBoundingClientRect(), W = rect.width, H = rect.height; if (!W || !H) return;
     const dpr = Math.min(window.devicePixelRatio || 1, 2); if (R.getPixelRatio() !== dpr) R.setPixelRatio(dpr); const sz = R.getSize(new THREE.Vector2()); if (sz.x !== Math.round(W) || sz.y !== Math.round(H)) R.setSize(Math.round(W), Math.round(H), false);
-    cam.aspect = W / H; const { w, d, height } = house, rad = Math.hypot(w + .4, d + 1.6, height) / 2, vf = cam.fov * Math.PI / 360, hf = Math.atan(Math.tan(vf) * cam.aspect), dist = rad / Math.sin(Math.min(vf, hf)) * .86 / zoomAmount;
+    cam.aspect = W / H; const { w, d, height } = house, rad = Math.hypot(w + .4, d + 1.6, height) / 2, vf = cam.fov * Math.PI / 360, hf = Math.atan(Math.tan(vf) * cam.aspect), dist = rad / Math.sin(Math.min(vf, hf)) * (house.capsule ? .7 : .86) / zoomAmount;
     const ty = height * .5, tz = .35; cam.position.set(Math.sin(yaw) * Math.cos(pitch) * dist, ty + Math.sin(pitch) * dist, tz + Math.cos(yaw) * Math.cos(pitch) * dist); cam.up.set(0, 1, 0); if (pitch > 1.45) cam.up.set(-Math.sin(yaw), 0, -Math.cos(yaw)); cam.lookAt(0, ty, tz); cam.updateProjectionMatrix();
     R.render(scene, cam);
   }
   function stopTween() { if (tween) cancelAnimationFrame(tween); tween = 0; }
   function goTo(name, restoreZoom = false) {
     if (!useGL) { flatViewer().setView(name); return; }
-    const c = CAM[name] || CAM['3d']; stopTween(); let [ty, tp] = c; const y0 = yaw, p0 = pitch, z0 = zoomAmount, t0 = performance.now(); ty = y0 + ((ty - y0 + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
+    const c = camOf(name); stopTween(); let [ty, tp] = c; const y0 = yaw, p0 = pitch, z0 = zoomAmount, t0 = performance.now(); ty = y0 + ((ty - y0 + Math.PI) % (2 * Math.PI) + 2 * Math.PI) % (2 * Math.PI) - Math.PI;
     const step = now => { const k = Math.min(1, (now - t0) / 420), e = k * k * (3 - 2 * k); yaw = y0 + (ty - y0) * e; pitch = p0 + (tp - p0) * e; if (restoreZoom) zoomAmount = z0 + (1 - z0) * e; draw(); tween = k < 1 ? requestAnimationFrame(step) : 0; };
     announce(name === 'right' || name === 'left' ? name : name); tween = requestAnimationFrame(step);
   }

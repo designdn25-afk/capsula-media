@@ -2,7 +2,7 @@ import { MODELS, X7_OPTIONS, defaultConfig, normalizeConfig } from './config.js'
 import { icon } from './icon.js';
 import { shots } from './photos.js';
 import { formatEuro, getEstimate } from './pricing.js';
-import { createViewer } from './viewer-real.js';
+import { createViewer } from './viewer-real.js?v=3';
 
 const cutawayLayers = {
   underfloorHeating: { tab: 'Pardoseală', description: 'Zona portocalie arată încălzirea electrică de sub pardoseală.' },

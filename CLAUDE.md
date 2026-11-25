@@ -433,7 +433,9 @@ fluidă, fără întreruperi”. O pagină nu poate cere mai multă memorie plă
   la casa modulară se schimbă fațada pe fiecare parte, materialul, culoarea, acoperișul, ușile).
 - De aici nu se poate schimba site-ul din ChatGPT. S-a făcut o **copie** în `modularis/` (rădăcina proiectului), publicată la
   https://designdn25-afk.github.io/capsula-media/modularis/ . Singura schimbare: casa modulară e acum o scenă 3D adevărată
-  (`modularis/viewer-real.js`, three.js local), cu aceleași opțiuni. Capsula X7 a rămas cum era. Detalii: `modularis/CITESTE.md`.
+  (`modularis/viewer-real.js`, three.js local), cu aceleași opțiuni. Clientul: „la casa capsulă nu s-a schimbat nimic” → și Capsula X7
+  e acum 3D adevărat (modelul `site/js/x7.js`, copiat în `modularis/x7/`), cu culoarea exterioară, bordura, pardoseala și luminile din
+  opțiuni; „Sub finisaje” a rămas desenul vechi. Detalii: `modularis/CITESTE.md`.
 - Fără credite (totul e făcut în cod). Gazda `modularis-configurator-case.appwithchat.chatgpt.site` a fost adăugată la mediul de lucru.
 - De știut: în copie nu merge trimiterea cererii de ofertă (serverul e la ChatGPT). Dacă clientul vrea schimbarea în site-ul lui din
   ChatGPT, primește fișierele + un text de dat lui ChatGPT.
