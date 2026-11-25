@@ -1,0 +1,68 @@
+<!doctype html><meta charset="utf-8"><style>html,body{margin:0;background:#000}canvas{display:block}</style><canvas id="c"></canvas>
+<script type="module">
+import * as THREE from './three.module.min.js';
+const q = new URLSearchParams(location.search), S = +(q.get('s') || 1024);
+const r = new THREE.WebGLRenderer({ canvas: document.getElementById('c'), antialias: true, preserveDrawingBuffer: true }); r.setPixelRatio(1); r.setSize(S, S);
+r.shadowMap.enabled = true; r.shadowMap.type = THREE.PCFSoftShadowMap; r.toneMapping = THREE.ACESFilmicToneMapping; r.outputColorSpace = THREE.SRGBColorSpace;
+const sc = new THREE.Scene(); sc.background = new THREE.Color(0xdfe3e6);
+const W = 16, L = 46, Hh = 6.5;
+const blk0 = new THREE.MeshStandardMaterial({ color: 0x16171a, roughness: .7 });
+const M = (c, o = {}) => new THREE.MeshStandardMaterial({ color: c, roughness: .6, ...o });
+const box = (w, h, d, m, x, y, z, p = sc) => { const b = new THREE.Mesh(new THREE.BoxGeometry(w, h, d), m); b.position.set(x, y, z); b.castShadow = b.receiveShadow = true; p.add(b); return b; };
+const cyl = (rad, len, m, x, y, z, p, ax = 'x') => { const b = new THREE.Mesh(new THREE.CylinderGeometry(rad, rad, len, 28), m); if (ax === 'x') b.rotation.z = Math.PI / 2; if (ax === 'z') b.rotation.x = Math.PI / 2; b.position.set(x, y, z); b.castShadow = true; p.add(b); return b; };
+// hala
+box(W, .1, L, M(0x8d9094, { roughness: .25, metalness: .1 }), 0, -.05, L / 2);
+box(W, .2, L, M(0x202326), 0, Hh + .1, L / 2);
+box(.2, Hh, L, M(0xf1f1ee), -W / 2 - .1, Hh / 2, L / 2); box(.2, Hh, L, M(0xf1f1ee), W / 2 + .1, Hh / 2, L / 2);
+box(W, Hh, .2, M(0x1d2a1f), 0, Hh / 2, L + .1);                      // peretele din capăt (verde închis)
+box(W, Hh, .2, M(0xf1f1ee), 0, Hh / 2, -.1);                          // intrarea
+box(7, 3.4, .1, M(0x9fc6dd, { roughness: .1, metalness: .3 }), 0, 1.7, .02);   // uși de sticlă
+for (let z = 3; z < L; z += 4) { const m = new THREE.MeshBasicMaterial({ color: 0xffffff }); box(.25, .06, 3, m, -3, Hh - .05, z); box(.25, .06, 3, m, 3, Hh - .05, z); }
+for (let z = 6; z < L - 4; z += 12) for (const sx of [-1, 1]) box(.06, 2.6, 5, M(0xa9cfe6, { roughness: .1 }), sx * (W / 2 - .02), 3.6, z);   // ferestre sus pe laterale
+box(1.6, .02, 30, M(0x2f8f3a, { roughness: .5 }), 0, .012, 17); box(W - .1, .02, 13.7, M(0xf2b619, { roughness: .55 }), 0, .011, 39.15);
+// peretele dintre hala tractoarelor și camera mini excavatoarelor, cu ușă largă
+for (const sx of [-1, 1]) box(4.5, Hh, .3, M(0xf1f1ee), sx * 5.75, Hh / 2, 32); box(7, Hh - 4.2, .3, M(0xf1f1ee), 0, 4.2 + (Hh - 4.2) / 2, 32); for (const sx of [-1, 1]) box(.14, 4.2, .36, blk0, sx * 3.5, 2.1, 32); box(7.14, .14, .36, blk0, 0, 4.2, 32);   // covor verde pe culoar
+// sigla + numele pe peretele din capăt
+new THREE.TextureLoader().load('logo.png', t => { t.colorSpace = THREE.SRGBColorSpace; const pan = box(4.6, 3.9, .08, M(0xffffff), 0, 2.55, L - .06); const lg = new THREE.Mesh(new THREE.PlaneGeometry(3.8, 3.8 * 266 / 333), new THREE.MeshBasicMaterial({ map: t, transparent: true })); lg.position.set(0, 2.55, L - .12); lg.rotation.y = Math.PI; sc.add(lg); window.ok = 1; });
+const label = (txt, w, h, col = '#111', bg = '#fff') => { const c = document.createElement('canvas'); c.width = 1024; c.height = Math.round(1024 * h / w); const g = c.getContext('2d'); g.fillStyle = bg; g.fillRect(0, 0, c.width, c.height); g.fillStyle = col; g.font = 'bold ' + Math.round(c.height * .62) + 'px Arial'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(txt, c.width / 2, c.height / 2); const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ map: t })); };
+{ const t = label('AGROKART', 7.2, 1.1, '#ffffff', '#1d2a1f'); t.position.set(0, 5.45, L - .02); t.rotation.y = Math.PI; sc.add(t); }
+// utilaje (schițe)
+const blk = M(0x16171a, { roughness: .8 }), gry = M(0xc9ccd0, { metalness: .5, roughness: .35 }), gls = M(0x9ec4d8, { roughness: .08, metalness: .2, transparent: true, opacity: .55 });
+function tractor(o) { const g = new THREE.Group(), s = o.s, c = M(o.col, { roughness: .35 }), R = .72 * s, rf = .43 * s, tw = .82 * s;
+  for (const sx of [-1, 1]) { cyl(R, .42 * s, blk, sx * tw, R, -.75 * s, g); cyl(R * .5, .44 * s, gry, sx * tw, R, -.75 * s, g); cyl(rf, .3 * s, blk, sx * tw * .92, rf, 1.25 * s, g); cyl(rf * .5, .32 * s, gry, sx * tw * .92, rf, 1.25 * s, g); box(.5 * s, .1 * s, 1.5 * s, c, sx * tw, R * 2 + .08 * s, -.75 * s, g); }
+  box(.75 * s, .62 * s, 1.75 * s, c, 0, 1.25 * s, .95 * s, g); box(.6 * s, .5 * s, 2.6 * s, blk, 0, .75 * s, .2 * s, g); box(.78 * s, .4 * s, .06, blk, 0, 1.15 * s, 1.84 * s, g);
+  cyl(.045 * s, 1.0 * s, blk, .3 * s, 2.0 * s, .5 * s, g, 'y'); box(.55 * s, .5 * s, .5 * s, blk, 0, 1.45 * s, -.75 * s, g);
+  if (o.cab) { box(1.25 * s, 1.35 * s, 1.45 * s, gls, 0, 2.2 * s, -.55 * s, g); box(1.33 * s, .12 * s, 1.55 * s, c, 0, 2.93 * s, -.55 * s, g); for (const sx of [-1, 1]) for (const z of [-1.27, .17]) box(.07 * s, 1.35 * s, .07 * s, blk, sx * .62 * s, 2.2 * s, z * s, g); }
+  else { for (const sx of [-1, 1]) box(.06 * s, 1.5 * s, .06 * s, blk, sx * .55 * s, 2.3 * s, -1.2 * s, g); box(1.16 * s, .06 * s, .06 * s, blk, 0, 3.05 * s, -1.2 * s, g); }
+  if (o.loader) { for (const sx of [-1, 1]) { const a = box(.1 * s, .12 * s, 2.6 * s, blk, sx * .6 * s, 2.0 * s, 1.6 * s, g); a.rotation.x = -.45; } box(1.7 * s, .6 * s, .6 * s, blk, 0, 2.75 * s, 2.9 * s, g); }
+  return g; }
+function excav(o) { const g = new THREE.Group(), s = o.s, c = M(o.col, { roughness: .35 });
+  for (const sx of [-1, 1]) box(.3 * s, .42 * s, 2.0 * s, blk, sx * .62 * s, .21 * s, 0, g); box(1.1 * s, .25 * s, 1.2 * s, blk, 0, .5 * s, 0, g);
+  box(1.35 * s, .6 * s, 1.5 * s, c, 0, .95 * s, -.25 * s, g);
+  if (o.cab) { box(.9 * s, 1.4 * s, 1.1 * s, gls, -.15 * s, 1.95 * s, -.2 * s, g); box(.96 * s, .08 * s, 1.16 * s, blk, -.15 * s, 2.68 * s, -.2 * s, g); } else { for (const sx of [-1, 1]) for (const z of [-.7, .3]) box(.05 * s, 1.4 * s, .05 * s, blk, (sx * .42 - .15) * s, 1.95 * s, z * s, g); box(.96 * s, .08 * s, 1.16 * s, blk, -.15 * s, 2.68 * s, -.2 * s, g); }
+  const a = box(.16 * s, .2 * s, 1.9 * s, c, .35 * s, 1.9 * s, 1.2 * s, g); a.rotation.x = -.75; const b = box(.14 * s, .18 * s, 1.5 * s, c, .35 * s, 1.75 * s, 2.3 * s, g); b.rotation.x = .95; box(.5 * s, .4 * s, .45 * s, blk, .35 * s, .95 * s, 2.75 * s, g); box(1.5 * s, .35 * s, .08 * s, blk, 0, .25 * s, 1.15 * s, g);
+  return g; }
+const RED = 0xd3202a;
+const U = [
+  ['tye-254', 'TYE 254', 'T', { s: .95, col: RED }, -1, 5], ['tye-404', 'TYE 404', 'T', { s: 1.0, col: RED }, 1, 5],
+  ['tye-504', 'TYE 504', 'T', { s: 1.05, col: 0x1b1c1f }, -1, 11], ['tye-604', 'TYE 604', 'T', { s: 1.08, col: RED }, 1, 11],
+  ['te-704', 'TE 704', 'T', { s: 1.12, col: RED, cab: 1, loader: 1 }, -1, 17], ['te-1004', 'TE 1004', 'T', { s: 1.15, col: 0x1b1c1f, loader: 1 }, 1, 17],
+  ['te-1004-cabina', 'TE 1004 CABINA', 'T', { s: 1.18, col: RED, cab: 1 }, -1, 23], ['tb-1004', 'TB 1004', 'T', { s: 1.25, col: RED }, 1, 23],
+  ['tb-1404', 'TB 1404', 'T', { s: 1.35, col: RED, cab: 1 }, -1, 28.5], ['tdf-1604', 'TDF 1604', 'T', { s: 1.45, col: 0x1f3fa8, cab: 1 }, 1, 28.5],
+  ['kn-15', 'KN-15', 'E', { s: .85, col: RED }, -1, 36.5], ['kn-20', 'KN-20', 'E', { s: 1.0, col: RED, cab: 1 }, 1, 36.5],
+  ['kn-25', 'KN-25', 'E', { s: 1.2, col: RED, cab: 1 }, 0, 41.5]];
+window.POS = {};
+U.forEach(([id, name, k, o, side, z]) => { const g = k === 'T' ? tractor(o) : excav(o); const x = side ? side * 4.7 : 4.4; g.position.set(x, side ? 0 : .3, z); g.rotation.y = side ? Math.PI + side * -.95 : Math.PI - .8; sc.add(g);
+  if (!side) { const p = new THREE.Mesh(new THREE.CylinderGeometry(3.4, 3.5, .3, 48), M(0xf3f3f1)); p.position.set(4.4, .15, z); p.receiveShadow = true; sc.add(p); }
+  const st = new THREE.Group(), t = label(name, 1.5, .34, '#ffffff', '#1d6b2a'); t.position.set(0, 1.05, .04); st.add(t); box(1.56, .4, .06, M(0x1d6b2a), 0, 1.05, 0, st); box(.08, .9, .06, blk, 0, .45, 0, st);
+  st.position.set(side ? side * 2.1 : 1.6, 0, side ? z - 2.2 : z - 3.0); st.rotation.y = Math.PI; sc.add(st);
+  // punctul „motor”: capota, în coordonatele halei
+  const e = new THREE.Vector3(0, (k === 'T' ? 1.35 : 1.0) * o.s, (k === 'T' ? 1.0 : -.6) * o.s); g.updateMatrixWorld(); e.applyMatrix4(g.matrixWorld); const cb = new THREE.Vector3(0, (k === 'T' ? 2.3 : 2.0) * o.s, (k === 'T' ? -.6 : -.2) * o.s).applyMatrix4(g.matrixWorld);
+  window.POS[id] = { x, z, motor: e.toArray().map(v => +v.toFixed(2)), cab: cb.toArray().map(v => +v.toFixed(2)), top: +(3.2 * o.s + (side ? 0 : .3)).toFixed(2) }; });
+sc.add(new THREE.HemisphereLight(0xffffff, 0x8a8f96, 1.5));
+for (let z = 6; z < L; z += 10) { const l = new THREE.PointLight(0xffffff, 60, 26); l.position.set(0, Hh - .6, z); l.castShadow = z % 20 === 6; l.shadow.mapSize.set(1024, 1024); sc.add(l); }
+const cam = new THREE.PerspectiveCamera(90, 1, .05, 200);
+const D = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]], UP = [[0, 1, 0], [0, 1, 0], [0, 0, -1], [0, 0, 1], [0, 1, 0], [0, 1, 0]];
+window.shot = (x, y, z, f) => { cam.position.set(x, y, z); cam.up.set(...UP[f]); cam.lookAt(x + D[f][0], y + D[f][1], z + D[f][2]); r.render(sc, cam); };
+window.persp = (x, y, z, tx, ty, tz) => { cam.fov = 70; cam.updateProjectionMatrix(); cam.position.set(x, y, z); cam.up.set(0, 1, 0); cam.lookAt(tx, ty, tz); r.render(sc, cam); cam.fov = 90; cam.updateProjectionMatrix(); };
+</script>

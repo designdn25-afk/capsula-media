@@ -64,6 +64,7 @@ def cap(titlu, descriere, extra='', peste=False):
     <nav class="nav" aria-label="Meniu">
       <a href="index.html#tractoare">Tractoare</a>
       <a href="index.html#excavatoare">Mini excavatoare</a>
+      <a href="showroom.html">Showroom 360°</a>
       <a href="index.html#contact">Contact</a>
     </nav>
     <div class="antet-dr">
@@ -140,6 +141,7 @@ def pagina_prima():
     <p>De la 25 la 160 CP. Prețuri cu TVA inclus, garanție 1 an sau 1.000 de ore.</p>
     <div class="butoane">
       <a class="btn btn-suna" href="#tractoare">Vezi tractoarele</a>
+      <a class="btn btn-wa" href="showroom.html">Intră în showroom 360°</a>
       <a class="btn btn-wa" href="{wa('Bună ziua, vreau o ofertă pentru un utilaj AgroKart.')}" target="_blank" rel="noopener">Cere o ofertă</a>
     </div>
   </div></div>
