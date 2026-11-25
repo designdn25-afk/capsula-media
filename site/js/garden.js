@@ -6,8 +6,8 @@
 import { THREE, clamp, lerp, ease, webglOK, fit } from './kit.js';
 import { createGScene } from './gscene.js';
 import { buildGarden } from './genv.js';
-import { createPano } from './pano.js';
-import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js?v=20261124d';   // ?v= se schimbă când se schimbă datele sau imaginile (altfel navigatorul ține fișierul vechi)
+import { createPano } from './pano.js?v=20261125a';
+import { CASE, GRADINA, VEDERI, ROTIRI, PLANURI } from './gradina-data.js?v=20261125a';   // ?v= se schimbă când se schimbă datele sau imaginile (altfel navigatorul ține fișierul vechi)
 import { openClip, warmClip, canClip } from './clip.js';
 
 window.__gdMod = 1;   // semn pentru pagina că modulul s-a încărcat (altfel pagina arată imaginea de rezervă)
@@ -178,7 +178,7 @@ async function boot() {
 
   /* Trecerea „reală” dintre două vederi din afară: imaginea de pe ecran rămâne pe loc, camera sare direct la vederea nouă, iar
      imaginea ei apare peste cea veche (fără drumul prin macheta 3D). xf = imaginea veche, așa cum era desenată. */
-  let xf = null, lastFov = 40, roofSnap = false, glide = 0, fixCls = false, veilCls = false, veilT = 0, spun = false, lastPY = 0, lastPP = 0, live = false, bootT = 0, roomPre = null;
+  let xf = null, lastFov = 40, roofSnap = false, glide = 0, fixCls = false, veilCls = false, veilT = 0, spun = false, lastPY = 0, lastPP = 0, live = false, bootT = 0, roomPre = null, roomBusy = false;
   const GLIDE = .3;   // cât mai alunecă rotirea după ce dai drumul (constanta de timp, în secunde)
   /* Rotirea reală a unei case (ROTIRI din gradina-data.js): cadrele unei filmări care ocolește casa pe cercul vederii ei.
      Ca mișcarea să fie lină pe orice calculator și la orice viteză a netului:
@@ -436,6 +436,8 @@ async function boot() {
   }
 
   chipsEl.addEventListener('click', e => { const b = e.target.closest('.gd-chip'); if (b) select(+b.dataset.i); });
+  // când mausul ajunge pe numele unei case, imaginea ei e despachetată pe loc (de obicei e deja adusă din timp): la apăsare apare imediat
+  chipsEl.addEventListener('pointerover', e => { const b = e.target.closest('.gd-chip'); if (!b || !fine.matches || mode === 'in' || slowNet() || pano.free() < 9e7) return; const i = +b.dataset.i, x = extOf(i, pvIn(i < 0 ? 'all' : 'house', i)); if (x) pano.load(panoUrl('ai:' + x[0]), true); });
   pinBox.addEventListener('click', e => { const b = e.target.closest('.gd-pin'); if (b) select(+b.dataset.i); });
   $('.gd-prev').onclick = () => select(sel < 0 ? H.length - 1 : (sel - 1 + H.length) % H.length);
   $('.gd-next').onclick = () => select((sel + 1) % H.length);
@@ -574,6 +576,11 @@ async function boot() {
       if (ready || now - spin.pendT > (fine.matches ? 2000 : 5000)) { const c = spin.pend; spin.pend = null; if (c.v && fine.matches) spin.vc = openClip(clipOf(c), wake); else if (spin.start) spin.start(); } }
     if (asked || spin.pend || (spin.vc && spin.vc.state === 'wait' && sc)) hungryT = now;   // (cât se încarcă imaginea de pe ecran, cele aduse „din timp” așteaptă)
     if (roomPre && !asked && !wk && pOp >= 1 && now - hungryT > 300) { pano.load(roomPre); roomPre = null; }   // fotografia primei camere: după imaginea vederii
+    // Celelalte camere ale casei se aduc din timp, una câte una (cele mai apropiate întâi), după ce imaginea camerei de acum e pe
+    // ecran: trecerea dintr-o cameră în alta nu mai așteaptă după rețea (25 nov 2026). Doar cât încape în memoria pentru imagini.
+    if (wk && pt && pOp >= 1 && !asked && !roomBusy && !slowNet() && pano.free() > 9e7) { const w = H[sel].walk, n = w.pts.length;
+      for (let d = 1; d < n; d++) { let u = null; for (const j of [w.i + d, w.i - d]) { const q = w.pts[j]; if (!q || !q.k || (q.ai && timeGoal > 15)) continue; const v = panoUrl(timeGoal > 15 && q.kn ? q.kn : q.k); if (!pano.has(v)) { u = v; break; } }
+        if (u) { roomBusy = true; pano.load(u).then(() => { roomBusy = false; wake(); }); break; } } }
     if (pt && pt !== pA && pOp < .02) { pA = pt; pH = ph; pR = pr; pAI = pai; }
     const sg = sk >= 0 ? 1 : 0; if (spin.op !== sg) { spin.op += clamp(sg - spin.op, -dt * 5, dt * 7); busy = true; }
     const hold = sk >= 0 && spin.op < 1 && pA && pR && pOp > 0;   // imaginea vederii rămâne până când cadrul rotirii a apărut de tot (să nu se vadă macheta între ele)

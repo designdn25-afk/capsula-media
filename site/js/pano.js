@@ -15,9 +15,15 @@ void main(){vec3 d=look((vUv*2.-1.)-off*2.);vec2 uv=vec2(.5+atan(d.x,-d.z)/6.283
 }` });
   const quad = new THREE.Mesh(new THREE.PlaneGeometry(2, 2), mat); quad.frustumCulled = false;
   const scene = new THREE.Scene(); scene.add(quad); const cam = new THREE.Camera();
-  const cache = new Map(), loader = new THREE.TextureLoader(), order = [];   // order = cele folosite recent (se țin cel mult 3 în memorie)
+  const cache = new Map(), loader = new THREE.TextureLoader(), order = [];   // order = cele folosite recent
+  // Câtă memorie a plăcii video pot ține imaginile (25 nov 2026: clientul a cerut treceri fără întreruperi între case și camere).
+  // Înainte se țineau doar 3 imagini, deci fiecare întoarcere la o casă sau cameră văzută deja o despacheta din nou. Acum se țin câte
+  // încap în buget (o imagine 4K ocupă ~35–45 MB, o fotografie 360° din X7 ~75 MB), cele mai vechi ies primele; minimum 3.
+  const small = Math.min(innerWidth, innerHeight) < 800 || !matchMedia('(pointer:fine)').matches, bigMem = (navigator.deviceMemory || 8) >= 8;
+  const BUDGET = (small ? (bigMem ? 224 : 144) : (bigMem ? 512 : 384)) * 1048576; let used = 0;
   const touch = url => { const i = order.indexOf(url); if (i >= 0) order.splice(i, 1); order.push(url); };
-  const trim = () => { while (order.length > 3) { const u = order.shift(), e = cache.get(u); if (e && e.tex && e.tex !== U.tA.value) { e.tex.dispose(); cache.delete(u); } else if (e && e.tex) { order.push(u); break; } } };
+  const inUse = t => t === U.tA.value || t === U.tB.value || t === UF.tA.value;
+  const trim = () => { let n = order.length; while (used > BUDGET && order.length > 3 && n-- > 0) { const u = order.shift(), e = cache.get(u); if (e && e.tex && !inUse(e.tex)) { used -= e.bytes || 0; e.tex.dispose(); cache.delete(u); } else if (e && e.tex) order.push(u); } };
   // încarcă o panoramă (o singură dată); întoarce o promisiune cu textura sau null
   // flat = imagine obișnuită (nu 360°): se arată de obicei micșorată, deci primește și variantele mici (mipmap)
   // Imaginile obișnuite (mari, 4K) se despachetează în afara firului principal (ImageBitmap) și se urcă pe placa video imediat ce
@@ -29,12 +35,18 @@ void main(){vec3 d=look((vUv*2.-1.)-off*2.);vec2 uv=vec2(.5+atan(d.x,-d.z)/6.283
     const setup = t => { t.colorSpace = THREE.SRGBColorSpace; t.magFilter = THREE.LinearFilter;
       if (flat) { t.generateMipmaps = true; t.minFilter = THREE.LinearMipmapLinearFilter; t.anisotropy = Math.min(4, renderer.capabilities.getMaxAnisotropy()); }
       else { t.wrapS = THREE.RepeatWrapping; t.generateMipmaps = false; t.minFilter = THREE.LinearFilter; }
+      const im = t.image || {}; e.bytes = (im.width || 0) * (im.height || 0) * 4 * (flat ? 1.34 : 1); used += e.bytes;
       e.tex = t; touch(url); trim(); return t; };
     const classic = () => new Promise(res => loader.load(url, t => res(setup(t)), undefined, () => { cache.delete(url); res(null); }));
     e.p = flat && canBitmap
       ? fetch(url).then(r => (r.ok ? r.blob() : Promise.reject(new Error('img')))).then(b => createImageBitmap(b)).then(bm => {
           const t = new THREE.Texture(bm); t.flipY = false; t.userData.fy = -1; t.needsUpdate = true; setup(t);   // (rândul de sus al imaginii e primul: se întoarce la desen, vezi fy)
           try { renderer.initTexture(t); if (bm.close) bm.close(); } catch (_) {}   // e deja pe placa video: copia din memorie nu mai trebuie
+          return t; }).catch(classic)
+      : canBitmap   // fotografiile 360°: tot în afara firului principal și urcate pe placa video la sosire (nu în clipa în care apar pe ecran)
+      ? fetch(url).then(r => (r.ok ? r.blob() : Promise.reject(new Error('img')))).then(b => createImageBitmap(b, { imageOrientation: 'flipY' })).then(bm => {
+          const t = new THREE.Texture(bm); t.flipY = false; t.needsUpdate = true; setup(t);
+          try { renderer.initTexture(t); if (bm.close) bm.close(); } catch (_) {}
           return t; }).catch(classic)
       : classic();
     return e.p;
@@ -72,5 +84,7 @@ void main(){vec2 nd=(vUv*2.-1.)-off*2.;vec2 q=(vec2(nd.x*th*asp,nd.y*th)-c)/hf;v
   // imaginea acoperă tot ecranul? (atunci scena 3D de dedesubt nu mai trebuie desenată)
   const covers = (r, fov, asp, offX, offY) => { const th = Math.tan(fov * Math.PI / 360), cx = (r[0] + r[1]) / 2, cy = (r[2] + r[3]) / 2, hx = (r[1] - r[0]) / 2 * .94, hy = (r[3] - r[2]) / 2 * .94;
     return (-1 - 2 * offX) * th * asp >= cx - hx && (1 - 2 * offX) * th * asp <= cx + hx && (-1 + 2 * offY) * th >= cy - hy && (1 + 2 * offY) * th <= cy + hy; };
-  return { load, ready, render, renderFlat, renderBack, covers };
+  const has = url => cache.has(url);                 // cerută deja (sosită sau pe drum)
+  const free = () => BUDGET - used;                  // cât mai încape, în octeți
+  return { load, ready, has, free, render, renderFlat, renderBack, covers };
 }

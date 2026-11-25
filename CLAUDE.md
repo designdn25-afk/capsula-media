@@ -401,3 +401,14 @@ să le băgăm în grădina aia 3D, tot așa, să pară totul real”. A oprit o
   Acum, într-o cameră cu imagine reală, cât imaginea nu e pe ecran, pânza se ascunde („vălul”, `veil` în `garden.js` și în
   `parts/gradina.html`, cel mult 25 s): se vede fundalul deschis al scenei, nu macheta. Nu scoate vălul.
 - `surse/ai360/k5yk5/pune.py` a fost folosit la punere; acum rândurile au și `ai: [...]`, deci `--scoate` nu mai merge (se scot de mână).
+
+## Treceri fără întreruperi între case și camere (25 nov 2026)
+Clientul: „mișcarea e prea sacadată… să aloci mai multă memorie grafică… zaparea între case și zone ale caselor să fie mult mai
+fluidă, fără întreruperi”. O pagină nu poate cere mai multă memorie plăcii video, dar pagina ținea doar **3 imagini** în memorie
+(restul erau despachetate din nou la fiecare întoarcere). Ce s-a schimbat (copia dinainte: `versiuni/inainte-memorie-imagini/`):
+- `site/js/pano.js`: imaginile se țin după un **buget de memorie** (calculator 384–512 MB, telefon 144–224 MB; cele mai vechi ies
+  primele), fotografiile 360° sunt despachetate în afara firului principal și urcate pe placa video la sosire (`has`, `free` noi).
+- `site/js/garden.js`: după ce imaginea camerei e pe ecran, **celelalte camere ale casei se aduc din timp**, una câte una; când mausul
+  ajunge pe numele unei case, imaginea ei e despachetată pe loc. `garden.js` cere acum și `./pano.js?v=…` (se mărește la schimbare).
+- Probat aici: trecerea între camere nu mai face nicio cerere nouă. **Nu s-a putut proba pe calculatorul clientului**; dacă tot se
+  poticnește, cere-i un filmuleț și întreabă unde anume (la rotire, la intrarea în casă, între camere) și pe ce aparat.
