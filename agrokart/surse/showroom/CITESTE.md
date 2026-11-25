@@ -23,3 +23,11 @@ motor = specificațiile)… în capăt sigla AgroKart”, apoi „tractoarele se
 - **Prin ușa camerei excavatoarelor** generatorul lăsase tractoarele „pătrățoase” (clientul a trimis captură). Reparat fără credite
   cu `tools/fixusa.py`: în golul ușii din s4 e pusă vederea reală a halei, luată din s3 privind înapoi. Se rulează o singură dată,
   pe imaginea proaspăt generată (după `fixsemne.py`); rezultatul se publică sub nume nou (`IMG` în `showroom.py`, acum `s4_v2`).
+- **Oprirea a doua fără excavatoare** (clientul: „uite aici se vede și excavatorul”): `tools/fixhala2.py` pune în partea din depărtare a
+  lui s2 ce se vede din s3 privind înainte (tractoarele mari, peretele cu ușă, camera galbenă). Folosit cu
+  `POLI='[(1545,790),(2530,790),(2530,945),(2470,965),(2470,1170),(2105,1170),(2105,1118),(1985,1118),(1985,1170),(1800,1170),(1800,1118),(1716,1118),(1716,992),(1565,945),(1545,935)]'`
+  și `PASTREAZA='[[(1776,1028),(1920,1082)],[(2181,1030),(2325,1082)],[(1838,1082),(1853,1176)],[(2245,1082),(2260,1176)]]'`; rezultatul e `s2_v2.jpg`.
+- **Butonul X** (sus, dreapta) scoate vizitatorul din showroom la prima pagină (clientul l-a cerut după ce ChatGPT a pus showroomul pe
+  site: nu avea cum să se întoarcă la meniu).
+- Clientul i-a dat lui ChatGPT arhiva showroomului (folderul `showroom/` de sine stătător) și e pus la
+  https://agrokart-karl-utilaje.appwithchat.chatgpt.site/showroom/ . La fiecare schimbare primește o arhivă mică de actualizare + textul.

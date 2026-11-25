@@ -23,7 +23,7 @@ GRUPE = {'T': [('motor', 'Motor', (0, 1.5, 1.0), r'^(motor|cilindree|putere|cai 
                ('brat', 'Braț', (.35, 1.9, 1.5), r'^(braț)'),
                ('senile', 'Deplasare', (.62, .3, 0), r'^(deplasare)')]}
 
-IMG = {'s4': 's4_v2'}   # o imagine înlocuită primește nume nou (altfel navigatorul o ține pe cea veche)
+IMG = {'s4': 's4_v2', 's2': 's2_v2'}   # o imagine înlocuită primește nume nou (altfel navigatorul o ține pe cea veche)
 DE_MANA = {'s4': [('kn-25', 'nume', 1265, 722), ('kn-25', 'cabina', 1265, 947), ('kn-25', 'motor', 1367, 1120), ('kn-25', 'brat', 959, 865), ('kn-25', 'senile', 1306, 1212),
                   ('kn-15', 'nume', 2836, 824), ('kn-15', 'cabina', 2836, 988), ('kn-15', 'motor', 2897, 1141),
                   ('kn-20', 'nume', 3468, 855), ('kn-20', 'cabina', 3468, 1008), ('kn-20', 'motor', 3448, 1151), ('kn-20', 'brat', 3672, 1090)]}
@@ -99,6 +99,7 @@ html,body{margin:0;height:100%;overflow:hidden;background:#11150f;color:var(--te
 .bt-v{background:var(--verde);color:#fff}.bt-v:hover{background:var(--verde-inchis)}
 .bt-a{background:#fff;color:var(--verde-inchis)}
 .bt-g{background:#ffffffe6;color:var(--text)}
+.inchide{padding:0 14px;box-shadow:0 2px 10px #0005}.inchide:hover{background:#fff}
 select.bt{appearance:none;-webkit-appearance:none;padding-right:34px;background:#ffffffe6 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' fill='none' stroke='%231c1f18' stroke-width='2'/%3E%3C/svg%3E") no-repeat right 12px center/12px;max-width:44vw}
 .jos{position:fixed;left:0;right:0;bottom:0;z-index:5;padding:26px 12px max(12px,env(safe-area-inset-bottom));background:linear-gradient(#0000,#000b);display:flex;flex-direction:column;align-items:center;gap:8px;pointer-events:none}
 .opriri{display:flex;gap:8px;max-width:100%;overflow-x:auto;pointer-events:auto;padding:2px}
@@ -152,7 +153,7 @@ select.bt{appearance:none;-webkit-appearance:none;padding-right:34px;background:
 .fisa .but{display:flex;gap:8px}.fisa .but .bt{flex:1;justify-content:center;font-size:16px;padding:0 10px}.fisa .but .bt-a{border:2px solid var(--verde)}
 @media (max-width:700px){
   .sus .logo span,.sus .lung{display:none}.sus .logo img{height:38px}
-  .sus{gap:8px}.sus .bt{white-space:nowrap;padding:0 12px;font-size:15px}select.bt{max-width:42vw;padding-right:28px}
+  .sus{gap:6px;padding-left:8px;padding-right:8px}.sus .bt{white-space:nowrap;padding:0 10px;font-size:14px}select.bt{max-width:30vw;padding-right:26px}.sus .inchide{padding:0;width:44px;justify-content:center}
   .fisa{left:0;right:0;top:auto;bottom:0;width:auto;max-height:68vh;border-radius:18px 18px 0 0;transform:translateY(calc(100% + 20px))}
   .fisa .poza{height:110px}
   .hs-nume>button{font-size:13px;padding:5px 9px}
@@ -167,6 +168,7 @@ select.bt{appearance:none;-webkit-appearance:none;padding-right:34px;background:
   <span class="sp"></span>
   <select class="bt" id="mergi" aria-label="Mergi la un utilaj"><option value="">Mergi la un utilaj…</option></select>
   <a class="bt bt-v" href="tel:__TEL__"><span class="lung">Sună:&nbsp;</span>__TEL_A__</a>
+  <a class="bt bt-g inchide" href="index.html" aria-label="Închide showroomul și mergi la prima pagină" title="Închide showroomul"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg><span class="lung">Închide</span></a>
 </div>
 <div class="ajutor" id="ajutor"><b>Bun venit în showroomul AgroKart</b>Trage cu degetul sau cu mausul ca să te uiți în jur. Apasă pe cercurile de pe jos ca să mergi mai departe și pe punctele verzi ca să vezi specificațiile.<br><button class="bt bt-a" type="button">Am înțeles</button></div>
 <aside class="fisa" id="fisa" aria-live="polite" hidden></aside>
