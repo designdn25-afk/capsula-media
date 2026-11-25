@@ -16,6 +16,8 @@ touch .nojekyll
 if git -C "$ROOT" fetch -q origin claude/agrokart-demo 2>/dev/null; then
   git -C "$ROOT" archive FETCH_HEAD agrokart/demo | tar -x && mv agrokart/demo _ak && rm -rf agrokart && mv _ak agrokart
 fi
+# Copia configuratorului Modularis (folderul modularis/ din rădăcina proiectului) stă tot pe aceeași adresă, în modularis/.
+[ -d "$ROOT/modularis" ] && cp -r "$ROOT/modularis" modularis && rm -f modularis/CITESTE.md
 git init -q -b gh-pages
 git add -A
 git -c user.name="$(git -C "$ROOT" log -1 --format=%an)" -c user.email="$(git -C "$ROOT" log -1 --format=%ae)" \

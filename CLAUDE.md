@@ -426,3 +426,14 @@ fluidă, fără întreruperi”. O pagină nu poate cere mai multă memorie plă
   cabină și de dedesubt: fiecare e o imagine nouă (~4.000 de credite), iar creditele s-au terminat (~1.300). I s-a explicat și că la
   Matterport imaginile sunt fotografii reale: cabina și dedesubtul făcute cu AI ar fi inventate (de marcat ca atare); varianta bună e
   cu poze 360° făcute în utilajele lui (o cameră 360° sau telefonul), din care turul se face fără credite. Așteaptă răspunsul lui.
+
+## Configuratorul Modularis (25 nov 2026) — copie cu casa modulară „reală”, publicată
+- Clientul are un configurator făcut în ChatGPT (https://modularis-configurator-case.appwithchat.chatgpt.site/) și a cerut: „mult mai
+  interactiv… adică să fie mult mai real… restul să rămână la fel, ca omul să poată singur să-și facă configurațiile” (cu filmuleț:
+  la casa modulară se schimbă fațada pe fiecare parte, materialul, culoarea, acoperișul, ușile).
+- De aici nu se poate schimba site-ul din ChatGPT. S-a făcut o **copie** în `modularis/` (rădăcina proiectului), publicată la
+  https://designdn25-afk.github.io/capsula-media/modularis/ . Singura schimbare: casa modulară e acum o scenă 3D adevărată
+  (`modularis/viewer-real.js`, three.js local), cu aceleași opțiuni. Capsula X7 a rămas cum era. Detalii: `modularis/CITESTE.md`.
+- Fără credite (totul e făcut în cod). Gazda `modularis-configurator-case.appwithchat.chatgpt.site` a fost adăugată la mediul de lucru.
+- De știut: în copie nu merge trimiterea cererii de ofertă (serverul e la ChatGPT). Dacă clientul vrea schimbarea în site-ul lui din
+  ChatGPT, primește fișierele + un text de dat lui ChatGPT.

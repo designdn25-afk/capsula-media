@@ -1,0 +1,40 @@
+.ms-skip, .sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.ms-skip:focus { z-index: 30; top: 6px; left: 8px; width: auto; height: auto; padding: 8px; clip-path: none; color: #fff; background: #383e48; }
+#project-notice { padding: .8rem 1rem; margin-top: .9rem; background: #fff6dc; border: 1px solid #d5c69e; border-radius: 10px; }
+.ms-footer { max-width: 1180px; margin-inline: auto; padding: 28px 25px; display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #deded8; }
+.ms-footer > span { font: 600 1.04rem var(--ms-sans); letter-spacing: -.04em; }
+.ms-footer > div { display: flex; flex-wrap: wrap; gap: 22px; }
+.ms-footer a { font-size: .875rem; color: var(--ms-muted); text-underline-offset: 4px; }
+.info-dialog { position: fixed; margin: auto; width: min(630px, calc(100% - 24px)); max-height: calc(100dvh - 32px); overflow: auto; padding: 0; border: 1px solid var(--ms-line); border-radius: 18px; color: var(--ms-ink); background: white; box-shadow: 0 16px 65px #22242c30; }
+.info-dialog::backdrop { background: #262a3270; }
+.dialog-body { position: relative; padding: clamp(20px,4.8vw,36px); }
+.dialog-body h2 { font: 550 clamp(1.6rem,4vw,2.1rem)/1.22 var(--ms-serif); margin: 0 38px 20px 0; }
+.dialog-close { position: absolute; top: 18px; right: 17px; width: 36px; height: 36px; display: grid; place-items: center; border: 1px solid var(--ms-line); border-radius: 50%; background: #fff; color: var(--ms-ink); }
+.dialog-close i, .ms-wordmark i, .ms-menu-button i { display: inline-flex; font-style: normal; }
+.model-index { display: grid; gap: 10px; }
+.model-pick { display: grid; grid-template-columns: 122px 1fr; align-items: center; gap: 16px; border: 1px solid var(--ms-line); border-radius: 10px; overflow: hidden; text-align: left; color: var(--ms-ink); background: white; padding: 0 9px 0 0; min-height: 85px; }
+.model-pick:hover { border-color: #989a9d; background: #faf9f6; }
+.model-pick > img { width: 122px; height: 85px; padding: 6px; object-fit: contain; background: #f3f2ed; }
+.model-pick:first-child > img { padding: 0; object-fit: cover; }
+.model-pick > span { display: grid; gap: 1px; }
+.model-pick small,.model-pick > span > span { font: .84rem/1.4 var(--ms-sans); }
+.model-pick strong { font: 550 1.2rem/1.25 var(--ms-serif); }
+.text-command { margin-top: 17px; border: 0; padding: 6px 0; color: var(--ms-ink); background: transparent; text-decoration: underline; text-underline-offset: 4px; }
+.share-label { display: grid; gap: 8px; }
+.share-label input { width: 100%; padding: .6rem; }
+#toast { position: fixed; z-index: 32; bottom: 16px; left: 50%; transform: translateX(-50%); max-width: 90vw; padding: 10px 16px; text-align: center; color: #fff; background: var(--ms-ink); border-radius: 20px; }
+.mq-dialog { --mq-ink: #383e48; background: white; }
+.mq-dialog .mq-heading { font-family: var(--ms-serif); font-weight: 550; letter-spacing: -.03em; }
+.mq-project,.mq-breakdown,.mq-reference { background: #faf9f6; }
+.model-comparison { --mc-ink: #383e48; --mc-paper: #f6f5f1; --mc-line: #deded8; }
+@media (max-width:480px) { .ms-footer { flex-wrap: wrap; gap: 14px; } .model-pick { grid-template-columns: 85px 1fr; gap:10px; } .model-pick > img { width: 85px; } }
+.bundle-list { display: grid; gap: 10px; margin: 16px 0; }
+.bundle-card { padding: 16px; border: 1px solid var(--ms-line); border-radius: 10px; }
+.bundle-card > div { display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 8px; }
+.bundle-card h3 { margin: 0; font: 600 1.14rem var(--ms-serif); }
+.bundle-card p { margin: 8px 0; font-size: .94rem; }
+.bundle-card small,.bundle-note { color: var(--ms-muted); }
+.bundle-card button,.confirm-actions button { color: var(--ms-ink); border: 1px solid var(--ms-line); border-radius: 18px; background: var(--ms-page); padding: 7px 14px; }
+.confirm-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.ms-nav-panel { max-height: calc(100dvh - var(--ms-header-height) - 10px); overflow-y: auto; }
+.preview-stage[data-model="compact"] .preview-image,.preview-stage[data-model="family"] .preview-image { object-fit: contain; background: #f1f0e9; padding: 6%; }

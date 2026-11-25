@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="ro">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="robots" content="noindex, nofollow">
+  <meta name="theme-color" content="#f3e8d7">
+  <title>Configurează-ți casa | Modularis</title>
+  <meta name="description" content="Configurează Capsula X7, Modul 32 sau Modul 48. Alege dotările, urmărește estimarea în euro și solicită oferta pentru casa ta.">
+  <link rel="icon" href="./mark.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@500;600;700&display=swap" rel="stylesheet">
+  <link rel="preload" href="./fonts/dm-sans.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="./quote.css">
+  <link rel="stylesheet" href="./model-comparison.css">
+  <link rel="stylesheet" href="./studio-configurator.css">
+  <link rel="stylesheet" href="./studio-dialogs.css">
+  <link rel="stylesheet" href="./compact-options.css">
+  <link rel="stylesheet" href="./configurator-views.css">
+  <link rel="stylesheet" href="./warm-palette.css">
+  <link rel="stylesheet" href="./cutaway.css">
+</head>
+<body class="ms-page">
+  <a class="ms-skip" href="#configurator-form">Sari la configurator</a>
+  <header class="ms-header">
+    <div class="ms-header-inner">
+      <button type="button" class="ms-menu-button" data-command="menu" aria-label="Deschide meniul" aria-expanded="false" aria-controls="navigation"><i data-icon="menu"></i></button>
+      <a class="ms-wordmark" href="#modele" data-command="models" aria-label="Modularis, vezi modelele"><i data-icon="brand"></i><span>Modularis</span></a>
+      <div class="ms-header-actions">
+        <span class="ms-language" aria-label="Română" title="Română"><i class="ms-flag" aria-hidden="true"></i> RO</span>
+        <a class="ms-header-link" href="tel:+40731166070">Contact</a>
+        <button type="button" class="ms-header-cta" data-command="quote">Cere ofertă</button>
+      </div>
+    </div>
+    <nav class="ms-nav-panel" id="navigation" aria-label="Meniu principal" hidden>
+      <button type="button" data-command="models">Modelele noastre</button>
+      <button type="button" data-command="compare">Compară două modele</button>
+      <button type="button" data-command="bundles">Pachete X7</button>
+      <button type="button" data-command="summary">Sumarul configurației</button>
+      <button type="button" data-command="share">Copiază linkul configurației</button>
+      <button type="button" data-command="image">Descarcă imaginea</button>
+      <button type="button" data-command="reset">Reia configurația</button>
+      <a href="https://casecapsula.ro/tur-3d" target="_blank" rel="noopener">Tur virtual X7</a>
+      <a href="https://casecapsula.ro/docs/prezentare-tehnica-x7.pdf" target="_blank" rel="noopener">Fișă tehnică X7 · PDF</a>
+      <a href="tel:+40731166070">Contact · 0731 166 070</a>
+    </nav>
+  </header>
+  <main class="ms-main" id="configurator">
+    <button type="button" class="ms-back" data-command="models"><span aria-hidden="true">←</span> Înapoi la modele</button>
+    <div id="project-notice" role="status" hidden></div>
+    <div class="ms-workbench-heading">
+      <h1 class="ms-title" id="page-title">Configurează-ți casa</h1>
+      <div class="ms-views" role="group" aria-label="Așezarea configuratorului">
+        <button type="button" data-layout="panorama" aria-pressed="true"><i data-icon="layoutSide"></i>Panoramă</button>
+        <button type="button" data-layout="sus" aria-pressed="false"><i data-icon="layoutTop"></i>Casă fixă sus</button>
+      </div>
+    </div>
+    <div class="ms-layout">
+      <section class="ms-editor" aria-label="Opțiunile casei">
+        <div id="configurator-form" tabindex="-1"></div>
+      </section>
+      <aside class="ms-preview" id="preview-root" aria-label="Previzualizarea casei"></aside>
+    </div>
+    <noscript><p>Activează JavaScript pentru a personaliza modelul. Poți consulta și <a href="https://casecapsula.ro/configurator">oferta X7</a> sau ne poți suna la <a href="tel:+40731166070">0731 166 070</a>.</p></noscript>
+  </main>
+  <footer class="ms-footer"><span>Modularis</span><div><a href="https://casecapsula.ro/configurator" target="_blank" rel="noopener">Prețuri X7</a><a href="tel:+40731166070">0731 166 070</a></div></footer>
+  <dialog id="information" class="info-dialog" aria-labelledby="info-heading">
+    <div class="dialog-body"><button type="button" class="dialog-close" data-command="close" aria-label="Închide"><i data-icon="close"></i></button><div id="dialog-content"></div></div>
+  </dialog>
+  <div id="toast" role="status" hidden></div>
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

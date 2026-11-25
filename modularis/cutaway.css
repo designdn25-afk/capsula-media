@@ -1,0 +1,183 @@
+/* Canvas, material strip and price each have their own grid row. */
+.ms-preview > .preview-stage[data-mode="cutaway"] {
+  grid-template-rows: var(--ms-media-height) auto minmax(var(--ms-caption-height),auto);
+}
+.preview-stage[data-mode="cutaway"] > .cutaway-layers {
+  grid-area: 2 / 1 / 3 / -1;
+  min-width: 0;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  padding: 8px clamp(9px,1.25vw,20px);
+  background: var(--linen);
+  border-top: 1px solid var(--ms-line);
+}
+.ms-preview > .preview-stage[data-mode="cutaway"] .preview-bottom { grid-area: 3 / 1; }
+.ms-preview > .preview-stage[data-mode="cutaway"] .preview-summary { grid-area: 3 / 2; }
+.preview-stage:not([data-mode="cutaway"]) .cutaway-layers { display: none; }
+
+.preview-stage .cutaway-layers [data-layer] {
+  gap: 7px;
+  min-height: 35px;
+  padding-inline: 12px;
+  background: var(--ms-surface);
+  border-color: #c8b799;
+  color: var(--ms-ink);
+  font-weight: 550;
+}
+.cutaway-layers [data-layer="underfloorHeating"] { --layer-material: #df742e; }
+.cutaway-layers [data-layer="tripleGlazing"] { --layer-material: #409dbc; }
+.cutaway-layers [data-layer="underbodyInsulation"] { --layer-material: #a59c58; }
+.cutaway-layers [data-layer]::before {
+  content: "";
+  flex: 0 0 auto;
+  width: 11px;
+  height: 11px;
+  border: 1px solid #0004;
+  border-radius: 4px;
+  background: var(--layer-material);
+}
+.preview-stage .cutaway-layers [data-layer]:hover { background: var(--ms-sand); border-color: #a48c67; }
+.preview-stage .cutaway-layers [data-layer][aria-pressed="true"] {
+  background: var(--olive);
+  border-color: var(--olive-dark);
+  color: var(--on-accent);
+}
+.cutaway-layers [data-layer][aria-pressed="true"]::before { border-color: #fff8; }
+.preview-stage .cutaway-config {
+  margin-inline-start: auto;
+  min-height: 35px;
+  padding-inline: 14px;
+  border-color: var(--clay-dark);
+  background: var(--clay);
+  color: var(--on-accent);
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+.preview-stage .cutaway-config:hover { background: var(--clay-dark); }
+.preview-stage .cutaway-config[aria-pressed="true"] {
+  color: var(--clay-dark);
+  background: var(--clay-wash);
+  border-color: #b88462;
+}
+.preview-stage .cutaway-config[aria-pressed="true"]:hover { background: #efd3bc; }
+
+/* When enlarged the same stage is reparented into a dialog. */
+.preview-gallery-dialog .preview-stage[data-mode="cutaway"] {
+  grid-template-columns: minmax(0,1fr) auto;
+  grid-template-rows: min(65dvh, 650px) auto auto;
+  isolation: isolate;
+}
+.preview-gallery-dialog .preview-stage[data-mode="cutaway"] > .preview-canvas {
+  grid-area: 1 / 1 / 2 / -1;
+  width: 100%;
+  height: 100%;
+  min-height: 0;
+  aspect-ratio: auto;
+}
+.preview-gallery-dialog .preview-stage[data-mode="cutaway"] > :is(.preview-top,.preview-tools) {
+  grid-area: 1 / 1 / 2 / -1;
+  z-index: 1;
+  pointer-events: none;
+}
+.preview-gallery-dialog .preview-stage[data-mode="cutaway"] > .preview-top {
+  align-self: start;
+  align-items: start;
+  flex-direction: row;
+  padding: 10px;
+}
+.preview-gallery-dialog .preview-stage[data-mode="cutaway"] > .preview-tools {
+  align-self: end;
+  justify-self: end;
+  padding: 2px;
+  margin: 0 10px 10px;
+  border: 1px solid var(--ms-line);
+  border-radius: 20px;
+  background: var(--linen);
+}
+.preview-gallery-dialog .preview-stage[data-mode="cutaway"] :is(.preview-tools button,.preview-switch,.preview-expand) {
+  pointer-events: auto;
+}
+.preview-gallery-dialog .preview-stage[data-mode="cutaway"] .preview-bottom {
+  grid-area: 3 / 1;
+  align-items: center;
+  min-width: 0;
+  padding: 10px 14px;
+  border-top: 1px solid var(--ms-line);
+}
+.preview-gallery-dialog .preview-stage[data-mode="cutaway"] .preview-summary {
+  grid-area: 3 / 2;
+  border-inline-start: 1px solid var(--sage-line);
+}
+
+:root[data-layout="sus"]:has(.ms-preview > [data-mode="cutaway"]) {
+  scroll-padding-top: calc(var(--ms-header-height) + var(--ms-media-height) + var(--ms-caption-height) + 76px);
+}
+@media (max-width: 560px) {
+  .preview-stage .cutaway-layers [data-layer], .preview-stage .cutaway-config { min-height: 35px; }
+  .preview-gallery-dialog .preview-stage[data-mode="cutaway"] {
+    grid-template-rows: min(53dvh,480px) auto auto;
+  }
+}
+@media (max-width: 480px) {
+  /* Keep all mode names visible next to the expand control on narrow phones. */
+  .preview-stage[data-model="x7"] .preview-switch button {
+    padding-inline: 7px;
+    min-height: 32px;
+    white-space: nowrap;
+  }
+  .preview-stage[data-model="x7"] .preview-switch button svg { display: none; }
+  .preview-stage[data-mode="cutaway"] > .cutaway-layers {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 4px;
+    padding: 6px 8px;
+  }
+  .preview-stage .cutaway-layers [data-layer] {
+    gap: 4px;
+    padding-inline: 4px;
+    min-width: 0;
+    white-space: nowrap;
+  }
+  .cutaway-layers [data-layer]::before { width: 9px; height: 9px; }
+  .preview-stage .cutaway-config {
+    grid-column: 1 / -1;
+    width: 100%;
+    margin: 0;
+  }
+  .preview-gallery-dialog .preview-stage[data-mode="cutaway"] {
+    grid-template-columns: minmax(0,1fr) minmax(105px,42%);
+  }
+  .preview-gallery-dialog .preview-stage[data-mode="cutaway"] .preview-detail { display: none; }
+  .preview-gallery-dialog .preview-stage[data-mode="cutaway"] .preview-title { font-size: .94rem; }
+  .preview-gallery-dialog .preview-stage[data-mode="cutaway"] .preview-bottom {
+    padding: 7px;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+  .preview-gallery-dialog .preview-stage[data-mode="cutaway"] .preview-summary {
+    flex-wrap: wrap;
+    justify-content: end;
+    padding: 7px;
+  }
+  .preview-gallery-dialog .preview-stage[data-mode="cutaway"] .preview-model { flex-basis: 100%; text-align: end; }
+  :root[data-layout="sus"]:has(.ms-preview > [data-mode="cutaway"]) {
+    scroll-padding-top: calc(var(--ms-header-height) + var(--ms-media-height) + var(--ms-caption-height) + 110px);
+  }
+}
+@media (max-height: 440px) {
+  .preview-gallery-dialog .preview-stage[data-mode="cutaway"] { grid-template-rows: 48dvh auto auto; }
+}
+.preview-caption .cutaway-schematic {
+  color: #665237;
+  font: 600 11px/1.2 var(--ms-sans);
+  letter-spacing: .025em;
+}
+.preview-stage:not([data-mode="cutaway"]) .cutaway-schematic { display: none; }
+@media (max-width: 480px) {
+  .preview-stage[data-mode="cutaway"] .preview-caption {
+    gap: 2px;
+    overflow-wrap: anywhere;
+  }
+}
