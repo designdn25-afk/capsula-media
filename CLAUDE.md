@@ -412,3 +412,11 @@ fluidă, fără întreruperi”. O pagină nu poate cere mai multă memorie plă
   ajunge pe numele unei case, imaginea ei e despachetată pe loc. `garden.js` cere acum și `./pano.js?v=…` (se mărește la schimbare).
 - Probat aici: trecerea între camere nu mai face nicio cerere nouă. **Nu s-a putut proba pe calculatorul clientului**; dacă tot se
   poticnește, cere-i un filmuleț și întreabă unde anume (la rotire, la intrarea în casă, între camere) și pe ce aparat.
+
+## Showroomul virtual AgroKart (25 nov 2026) — publicat
+- Clientul a cerut un showroom „ca la Matterport” pentru AgroKart: plimbare 360° printr-o hală, puncte pe fiecare utilaj (motor =
+  specificații), sigla și „AgroKart” pe peretele din capăt; apoi „tractoarele separat și excavatoarele separat… în altă cameră”.
+- Stă la https://designdn25-afk.github.io/capsula-media/agrokart/showroom.html (ramura `claude/agrokart-demo`: `agrokart/tools/showroom.py`,
+  `agrokart/tools/fixsemne.py`, `agrokart/demo/showroom.html`, `demo/img/showroom/s1…s4.jpg`, `demo/vendor/pannellum.*`). Cum s-a făcut,
+  ce a rămas mai slab și cum se reface: `agrokart/surse/showroom/CITESTE.md` (pe acea ramură).
+- Credite: 6 imagini 360° ≈ 25.450; **au rămas ≈ 1.300** (nu mai ajung nici pentru o imagine: orice refacere cere credite noi).
