@@ -420,3 +420,9 @@ fluidă, fără întreruperi”. O pagină nu poate cere mai multă memorie plă
   `agrokart/tools/fixsemne.py`, `agrokart/demo/showroom.html`, `demo/img/showroom/s1…s4.jpg`, `demo/vendor/pannellum.*`). Cum s-a făcut,
   ce a rămas mai slab și cum se reface: `agrokart/surse/showroom/CITESTE.md` (pe acea ramură).
 - Credite: 6 imagini 360° ≈ 25.450; **au rămas ≈ 1.300** (nu mai ajung nici pentru o imagine: orice refacere cere credite noi).
+- **25 nov, a doua cerere (filmuleț cu un tur Matterport al unei hale Volvo):** „cu multe puncte, poți să vezi și pe dedesubt, mult mai
+  real, și din cabină, vreau să-mi faci și mie așa”. Făcut fără credite: banda de jos cu pozele tuturor utilajelor (apeși = mergi la
+  utilaj) și vederea reală a halei prin ușa camerei excavatoarelor (`fixusa.py`). **Nefăcut:** opriri noi lângă fiecare utilaj, din
+  cabină și de dedesubt: fiecare e o imagine nouă (~4.000 de credite), iar creditele s-au terminat (~1.300). I s-a explicat și că la
+  Matterport imaginile sunt fotografii reale: cabina și dedesubtul făcute cu AI ar fi inventate (de marcat ca atare); varianta bună e
+  cu poze 360° făcute în utilajele lui (o cameră 360° sau telefonul), din care turul se face fără credite. Așteaptă răspunsul lui.
