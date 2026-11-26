@@ -46,10 +46,10 @@ nav{position:fixed;inset:0 0 auto;z-index:50;transition:background .3s}
 nav.solid{background:rgba(11,12,14,.8);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:16px}
 .logo{display:inline-flex;align-items:center;gap:10px;font-family:var(--body);font-weight:600;letter-spacing:.005em;font-size:19px;line-height:1;white-space:nowrap}
-.logo .lg-m{height:30px;width:auto;flex:none;display:block}.logo b{color:#d1a653;font-weight:inherit}
+.logo .lg-m{height:30px;width:48px;flex:none;display:block}.logo b{color:#d1a653;font-weight:inherit}
 nav.solid:not(.dark) .logo,nav.ink .logo,footer .logo{color:#4e5c50}
 .logo .lg-m rect,.logo .lg-m path{stroke-width:4.4}
-@media (max-width:420px){.logo{font-size:17px;gap:8px}.logo .lg-m{height:26px}}
+@media (max-width:420px){.logo{font-size:17px;gap:8px}.logo .lg-m{height:26px;width:42px}}
 
 .links{display:flex;gap:24px;font-size:14px;color:var(--mute)}
 .links a:hover{color:var(--ink)}
@@ -908,7 +908,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 
 <nav id="nav">
   <div class="wrap">
-    <a href="#top" class="logo" aria-label="Case Capsulă — începutul paginii"><svg class="lg-m" viewBox="0 0 120 74.6" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="117" height="71.6" rx="35.8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M51 73.1V52.2h17.6v20.9" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M29.7 49.1 59.4 22.8 89.9 49.1" fill="none" stroke="#d1a653" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lg-t">case capsul<b>ă</b></span></a>
+    <a href="#top" class="logo" aria-label="Case Capsulă — începutul paginii"><svg class="lg-m" viewBox="0 0 120 74.6" width="48" height="30" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="117" height="71.6" rx="35.8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M51 73.1V52.2h17.6v20.9" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M29.7 49.1 59.4 22.8 89.9 49.1" fill="none" stroke="#d1a653" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lg-t">case capsul<b>ă</b></span></a>
     <div class="links" id="links">
       <a href="#interior" class="navhl">Interior</a>
       <a href="#exterior">Exterior</a>
@@ -1171,7 +1171,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <div class="wrap">
     <div class="fgrid">
       <div>
-        <div class="logo" style="margin-bottom:14px"><svg class="lg-m" viewBox="0 0 120 74.6" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="117" height="71.6" rx="35.8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M51 73.1V52.2h17.6v20.9" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M29.7 49.1 59.4 22.8 89.9 49.1" fill="none" stroke="#d1a653" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lg-t">case capsul<b>ă</b></span></div>
+        <div class="logo" style="margin-bottom:14px"><svg class="lg-m" viewBox="0 0 120 74.6" width="48" height="30" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="117" height="71.6" rx="35.8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M51 73.1V52.2h17.6v20.9" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M29.7 49.1 59.4 22.8 89.9 49.1" fill="none" stroke="#d1a653" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lg-t">case capsul<b>ă</b></span></div>
         <p style="color:var(--mute);max-width:300px;font-size:15px">O casă pentru tine, pentru vacanțe sau pentru oaspeții tăi.</p>
       </div>
       <div><h5>Descoperă</h5><ul><li><a href="#interior">Interiorul capsulei</a></li><li><a href="#exterior">Ocolește capsula</a></li><li><a href="#la-comanda">Capsule la comandă</a></li><li><a href="#model">Modelul X7</a></li><li><a href="#galerie">Galerie foto</a></li><li><a href="#tur">Tur virtual 360°</a></li><li><a href="complet.html#configurator">Preț și configurator</a></li></ul></div>
