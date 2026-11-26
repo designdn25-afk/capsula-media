@@ -1,0 +1,225 @@
+:root {
+  --ms-page: #f3e8d7;
+  --ms-surface: #fff7e9;
+  --ms-sand: #eedbc1;
+  --ms-ink: #32281f;
+  --ms-muted: #655447;
+  --ms-line: #cdb89d;
+  --clay: #92432d;
+  --clay-dark: #75331f;
+  --clay-wash: #f6dfce;
+  --olive: #465337;
+  --olive-dark: #35432b;
+  --sage: #e8ebda;
+  --sage-line: #afba99;
+  --linen: #faefde;
+  --on-accent: #fff8ea;
+  --warm-shadow: #50331c16;
+  --focus-ring: #783a25;
+  color-scheme: light;
+}
+.ms-page {
+  background-color: var(--ms-page);
+  background-image: linear-gradient(124deg, #f4e6ce 0%, #f4eadb 48%, #e8e7d6 100%);
+  color: var(--ms-ink);
+  accent-color: var(--olive);
+}
+.ms-header {
+  background: #f9edda;
+  border-color: #cbbb9e;
+  box-shadow: 0 2px 14px #7051360b;
+}
+.ms-menu-button, .ms-wordmark { color: var(--ms-ink); }
+.ms-wordmark i, .ms-back, .mka-text-button, .text-command { color: var(--clay); }
+.ms-language { color: var(--olive); }
+.ms-menu-button:is(:hover,[aria-expanded="true"]), .ms-header-link:hover { background: var(--ms-sand); }
+.ms-header-actions .ms-header-link, .ms-nav-panel {
+  background: var(--ms-surface);
+  color: var(--ms-ink);
+  border-color: #c7ad8e;
+}
+.ms-nav-panel { box-shadow: 0 12px 36px #62401e29; }
+.ms-nav-panel :is(a,button):hover { background: #ecdbc3; color: var(--clay-dark); }
+.ms-header-actions .ms-header-cta, .mka-actions .mka-quote,
+.mq-dialog :is(.mq-submit,.mq-done) {
+  background: var(--clay);
+  border-color: var(--clay-dark);
+  color: var(--on-accent);
+}
+.ms-header-actions .ms-header-cta:hover, .mka-actions .mka-quote:hover,
+.mq-dialog :is(.mq-submit,.mq-done):hover { background: var(--clay-dark); }
+.ms-title { color: #3d3326; }
+.ms-back:hover, .mka-text-button:hover, .text-command:hover { color: var(--clay-dark); }
+
+.mka-accordion {
+  --section-accent: var(--clay);
+  --section-wash: var(--clay-wash);
+  --section-edge: #d4b39a;
+  background: linear-gradient(125deg, var(--section-wash), var(--ms-surface) 72%);
+  border-color: var(--section-edge);
+  box-shadow: 0 2px 8px var(--warm-shadow);
+}
+.mka-accordion:is([data-section="size"],[data-section="insulation"],[data-section="roof"],[data-section="accents"],[data-section="specifications"]) {
+  --section-accent: var(--olive);
+  --section-wash: var(--sage);
+  --section-edge: #b8c1a5;
+}
+.mka-accordion:is([data-section="equipment"],[data-section="walls"],[data-section="summary"]) {
+  --section-wash: #f4e3c5;
+  --section-edge: #d2b68d;
+}
+.mka-accordion:is([data-section="colors"],[data-section="interior"]) {
+  --section-wash: #f7e9d5;
+  --section-edge: #cfb39b;
+}
+.mka-section-title, .mka-chevron { color: var(--section-accent); }
+.mka-option, .mka-extra, .mka-swatch {
+  background: #fff7e9;
+  border-color: #bfa98c;
+  color: var(--ms-ink);
+}
+.mka-option:hover, .mka-extra:hover, .mka-swatch:hover {
+  border-color: var(--section-accent);
+  background: #f2e4cf;
+}
+.mka-option[aria-pressed="true"], .mka-extra[aria-pressed="true"], .mka-swatch[aria-pressed="true"] {
+  background: var(--section-accent);
+  border-color: var(--section-accent);
+  color: var(--on-accent);
+}
+[aria-pressed="true"] :is(.mka-choice-main small,.mka-choice-price) { color: var(--on-accent); }
+.mka-check { border-color: #897760; }
+[aria-pressed="true"] .mka-check { border-color: #e2d6bf; }
+.mka-content select, .share-label input, .mq-form input, .mc-select-wrap select {
+  background: #fffaef;
+  color: var(--ms-ink);
+  border-color: #ae997d;
+}
+.mka-note, .mka-location, .mka-price-note, #project-notice {
+  background: #f2e4bf;
+  color: #5e4928;
+  border-color: #d8c291;
+}
+.mka-standard li::marker { color: var(--olive); }
+.mka-summary dd { color: var(--ms-ink); }
+.mka-total { color: var(--clay-dark); }
+.mka-actions .mka-whatsapp { background: var(--sage); border-color: var(--sage-line); color: var(--olive-dark); }
+.mka-actions .mka-whatsapp:hover { background: #d7dfc6; border-color: var(--olive); }
+
+.preview-stage, .preview-gallery-dialog {
+  color: var(--ms-ink);
+  border-color: var(--ms-line);
+  background: var(--ms-surface);
+  box-shadow: 0 4px 18px var(--warm-shadow);
+}
+.preview-switch { background: #eee3cd; border-color: var(--ms-line); }
+.preview-stage button { background: #fff5e4; color: var(--olive-dark); border-color: #bbab8e; }
+.preview-stage button:hover { background: #e9e7d3; border-color: #879370; }
+.preview-switch button { background: transparent; }
+.preview-stage button[aria-pressed="true"] { background: var(--olive); color: var(--on-accent); border-color: var(--olive); }
+.preview-title { color: var(--ms-ink); }
+.preview-stage .preview-summary {
+  background: var(--sage);
+  color: var(--olive-dark);
+  border-color: var(--sage-line);
+}
+.preview-stage .preview-summary:hover { background: #dce3cb; }
+.preview-summary .preview-tax { color: #4c5540; }
+
+.info-dialog, .mq-dialog, .info-dialog:has(.model-comparison) {
+  --mq-ink: var(--ms-ink);
+  border-color: var(--ms-line);
+  background: var(--ms-surface);
+  color: var(--ms-ink);
+  box-shadow: 0 16px 65px #44362242;
+}
+.info-dialog::backdrop, .mq-dialog::backdrop, .preview-gallery-dialog::backdrop { background: #392c20ba; }
+.dialog-close, .mq-dialog .mq-close { color: var(--olive-dark); background: var(--linen); border-color: var(--ms-line); }
+.dialog-close:hover, .mq-dialog .mq-close:hover { background: #e7d8bb; }
+.model-pick, .bundle-card { background: var(--linen); border-color: var(--ms-line); }
+.model-pick:hover, .bundle-card button:hover, .confirm-actions button:hover { background: var(--clay-wash); border-color: var(--clay); }
+.model-pick small, .bundle-card strong { color: var(--clay); }
+.bundle-card button, .confirm-actions button { background: #fff5e6; }
+.mq-intro, .mq-delivery, .mq-saved-price, .mq-form small { color: var(--ms-muted); }
+.mq-project { background: var(--olive-dark); color: var(--on-accent); }
+.mq-house { background: #ffffff13; color: #f5dcaf; }
+.mq-size, .mq-details, .mq-total, .mq-price small { color: var(--on-accent); }
+.mq-reference, .mq-tick { color: var(--olive-dark); background: var(--sage); border-color: var(--sage-line); }
+.mq-reference strong, .mq-breakdown summary { color: var(--olive-dark); }
+.mq-breakdown { background: transparent; }
+.mq-lines { border-color: var(--ms-line); }
+.mq-form label { color: var(--ms-ink); }
+.mq-form input:read-only { color: #625744; background: #ede4d2; }
+.mq-dialog .mq-error { background: #f5dbcd; color: #782d1f; }
+
+.model-comparison {
+  --mc-ink: var(--olive);
+  --mc-line: var(--ms-line);
+  --mc-paper: var(--sage);
+  color: var(--ms-ink);
+}
+.model-comparison h2, .mc-table { color: var(--ms-ink); }
+.model-comparison .mc-intro, .mc-kind, .mc-field th, .model-comparison .mc-note { color: var(--ms-muted); }
+.mc-pick { background: var(--olive); color: var(--on-accent); border-color: var(--olive); }
+.mc-pick:hover { background: var(--olive-dark); }
+.mc-field-price td, .model-comparison .mc-difference { color: var(--clay-dark); }
+.model-comparison .mc-difference { border-color: var(--clay); }
+.ms-footer { color: var(--olive-dark); border-color: #c1ab8d; }
+.ms-footer a { color: var(--clay-dark); }
+#toast, .ms-skip:focus { color: var(--on-accent); background: var(--olive-dark); }
+
+.ms-page :where(a,button,input,select,summary,canvas):focus-visible,
+.mq-dialog :is(button,input,summary):focus-visible {
+  outline-color: var(--focus-ring);
+}
+
+/* The two workbench arrangements share one set of navigation and preview controls. */
+.ms-views {
+  background: #ecdfc8;
+  border-color: #c6af8d;
+}
+.ms-views button { background: transparent; color: #624f3d; }
+.ms-views button:hover { background: #f8edda; color: var(--clay-dark); }
+.ms-views button[aria-pressed="true"] {
+  background: var(--clay);
+  border-color: var(--clay-dark);
+  color: var(--on-accent);
+  box-shadow: 0 1px 3px #5739231c;
+}
+.mka-form {
+  background: var(--ms-surface);
+  border-color: #cab496;
+}
+.mka-form .mka-accordion {
+  background: linear-gradient(115deg, color-mix(in srgb, var(--section-wash) 62%, var(--linen)), var(--linen) 85%);
+  box-shadow: none;
+}
+.mka-form .mka-accordion.is-open {
+  background: linear-gradient(115deg, var(--section-wash), var(--ms-surface) 80%);
+}
+.mka-form .mka-accordion + .mka-accordion { border-color: var(--section-edge); }
+.mka-form .mka-toggle:hover .mka-section-title { text-decoration-color: currentColor; color: var(--ms-ink); }
+.ms-preview > .preview-stage .preview-switch, .ms-preview > .preview-stage > .preview-tools {
+  background: #fbefdb;
+  border-color: #c7b99c;
+  box-shadow: 0 2px 8px #2d271c25;
+}
+.ms-preview > .preview-stage .preview-tools button { background: transparent; color: var(--olive-dark); }
+.ms-preview > .preview-stage :is(.preview-tools,.preview-switch) button:hover {
+  background: #e4e6d0;
+  color: var(--olive-dark);
+}
+.ms-preview > .preview-stage :is(.preview-tools,.preview-switch) button[aria-pressed="true"] {
+  background: var(--olive);
+  color: var(--on-accent);
+}
+.ms-preview > .preview-stage .preview-expand button { background: var(--ms-surface); border-color: var(--ms-line); }
+.ms-preview > .preview-stage .preview-bottom { background: var(--ms-surface); }
+.ms-preview > .preview-stage .preview-summary { border-color: var(--sage-line); }
+[data-layout="sus"] .ms-preview > .preview-stage { box-shadow: 0 4px 12px var(--warm-shadow); }
+[data-layout="sus"] .ms-preview > .preview-stage > .preview-image { background: #403c30; }
+
+/* A low-contrast studio backdrop keeps the cabinet, glazing and finish samples legible. */
+.preview-stage .preview-canvas {
+  background: radial-gradient(ellipse at 52% 43%, #f8edda 0%, #efe2cb 64%, #dfd5b9 100%);
+}

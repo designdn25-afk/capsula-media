@@ -1,0 +1,71 @@
+.mka-form {
+  container-type: inline-size;
+  gap: 0;
+  align-content: start;
+  border: 1px solid var(--ms-line);
+  border-radius: var(--ms-radius);
+  background: var(--ms-surface);
+}
+
+.mka-accordion {
+  padding: 0 1rem;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.mka-accordion + .mka-accordion { border-block-start: 1px solid var(--ms-line); }
+.mka-accordion:first-child { border-radius: var(--ms-radius) var(--ms-radius) 0 0; }
+.mka-accordion:last-child { border-radius: 0 0 var(--ms-radius) var(--ms-radius); }
+.mka-accordion.is-open { background: #fbfaf7; }
+
+.mka-toggle {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  gap: .55rem;
+  min-height: 2.8rem;
+  padding: .52rem 0;
+}
+
+.mka-section-title { font-size: .98rem; line-height: 1.25; }
+.mka-current { font-size: .76rem; line-height: 1.3; }
+.mka-accordion[data-section="summary"] .mka-current { color: var(--ms-ink); font-weight: 650; }
+.mka-toggle[aria-expanded="true"] .mka-current { display: none; }
+.mka-toggle .mka-chevron { grid-column: 3; }
+.mka-content { padding-bottom: .8rem; }
+.mka-field + .mka-field, .mka-content > * + .mka-field { margin-top: .75rem; }
+.mka-field legend { padding-bottom: .35rem; }
+.mka-options, .mka-swatches, .mka-extras { gap: .4rem; }
+.mka-option, .mka-extra, .mka-swatch {
+  min-height: 2.125rem;
+  max-width: 100%;
+  padding: .35rem .6rem;
+  gap: .4rem;
+  border-radius: .5rem;
+  font-size: .8125rem;
+}
+
+.mka-choice-main { gap: .125rem; }
+.mka-choice-main strong { font-size: inherit; }
+.mka-choice-main small, .mka-choice-price { font-size: .75rem; }
+.mka-swatch { padding-inline-start: .35rem; }
+.mka-swatch-dot { width: 1.35rem; height: 1.35rem; }
+.mka-models { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); }
+.mka-models .mka-option { justify-content: center; text-align: center; }
+.mka-note { margin-top: .6rem; padding: .5rem .6rem; }
+.mka-standard { margin: 0; }
+
+@container (max-width: 18rem) {
+  .mka-accordion { padding-inline: .7rem; }
+  .mka-toggle {
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: .12rem .4rem;
+  }
+  .mka-current { grid-column: 1; margin: 0; text-align: start; }
+  .mka-toggle .mka-chevron { grid-area: 1 / 2 / span 2; }
+}
+
+@media (pointer: coarse) {
+  .mka-option, .mka-extra, .mka-swatch { min-height: 2.75rem; }
+}
