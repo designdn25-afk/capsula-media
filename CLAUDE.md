@@ -60,8 +60,14 @@ povestea de la deschidere și grădina cu case model. Detaliile tehnice și isto
     clientul a întrebat dacă se poate scoate („putem scoate vizualizare”); i s-a explicat că imaginile nu sunt fotografii și că
     trebuie marcate (reclamă înșelătoare / regulile europene despre AI), deci a rămas, dar discretă. **Nu o scoate de tot** și nu
     scoate nota de sub grădină; dacă insistă, trimite-l la avocatul / contabilul lui.
-- **Titlurile mari sunt cu serife** (Cormorant Garamond, cuvântul auriu în italic), ca în filmulețul de referință. Logo-ul și
-  etichetele mici rămân în Unbounded / Manrope.
+- **Titlurile mari sunt cu serife** (Cormorant Garamond, cuvântul auriu în italic), ca în filmulețul de referință. Etichetele mici
+  rămân în Unbounded / Manrope.
+- **Logo-ul (din 26 nov 2026) = „case capsulă”**: clientul a trimis o captură cu logo-ul lui (o capsulă-contur verde închis cu un
+  acoperiș auriu și o ușă, sub ea „case capsulă” cu „ă” auriu) și a cerut „vreau să-mi bagi și logoul ăsta”. A fost redesenat ca
+  desen vectorial (nu avem fișierul original) și pus în bara de sus și în subsol (prima pagină și `complet.html`) și ca iconiță de filă,
+  în locul textului „CAPSULA·ROMÂNIA”. Culori: verde `#4e5c50`, auriu `#d1a653`; peste fundal închis e alb cu acoperișul auriu.
+  Fișiere: `site/img/logo-case-capsula.svg` și `logo-case-capsula-alb.svg`. Copia dinainte: `versiuni/inainte-logo-nou/`. Dacă
+  clientul trimite fișierul original al logo-ului, se pune acela.
 - **Grădina cu case model (secțiunea 04, din 14 nov 2026)**: o grădină 3D în care apeși pe o casă, intri în ea (acoperișul se
   ridică) și vezi camerele, m², dimensiunile și prețul. Cerința clientului: „o grădină frumoasă… clientul să meargă frumos prin
   fiecare casă, apasă pe casă și să poată intra în casă, să vadă configurația, metri pătrați, tot, ca un fel de tur 3D”.

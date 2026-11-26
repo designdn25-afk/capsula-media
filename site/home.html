@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Case capsulă de vânzare în România — X7, preț 39.500 € | Capsula România</title>
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23070b16'/%3E%3Cpath d='M16 22h26l8 6v12l-8 6H16a6 6 0 0 1-6-6V28a6 6 0 0 1 6-6z' fill='none' stroke='%23d4a24c' stroke-width='3.5' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%23eff2ec'/%3E%3Cg transform='translate%287 15%29 scale%28.4167%29'%3E%3Crect x='1.5' y='1.5' width='117' height='71.6' rx='35.8' fill='none' stroke='%234e5c50' stroke-width='3'/%3E%3Cpath d='M51 73.1V52.2h17.6v20.9' fill='none' stroke='%234e5c50' stroke-width='3' stroke-linejoin='round'/%3E%3Cpath d='M29.7 49.1 59.4 22.8 89.9 49.1' fill='none' stroke='%23d1a653' stroke-width='3.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/g%3E%3C/svg%3E">
 <meta property="og:type" content="website">
 <meta property="og:locale" content="ro_RO">
 <meta property="og:site_name" content="Capsula România">
@@ -45,8 +45,12 @@ img{max-width:100%;display:block}
 nav{position:fixed;inset:0 0 auto;z-index:50;transition:background .3s}
 nav.solid{background:rgba(11,12,14,.8);backdrop-filter:blur(14px);border-bottom:1px solid var(--line)}
 nav .wrap{display:flex;align-items:center;justify-content:space-between;height:72px;gap:16px}
-.logo{font-family:var(--display);font-weight:700;letter-spacing:.08em;font-size:15px;white-space:nowrap}
-.logo span{color:var(--accent)}
+.logo{display:inline-flex;align-items:center;gap:10px;font-family:var(--body);font-weight:600;letter-spacing:.005em;font-size:19px;line-height:1;white-space:nowrap}
+.logo .lg-m{height:30px;width:auto;flex:none;display:block}.logo b{color:#d1a653;font-weight:inherit}
+nav.solid:not(.dark) .logo,nav.ink .logo,footer .logo{color:#4e5c50}
+.logo .lg-m rect,.logo .lg-m path{stroke-width:4.4}
+@media (max-width:420px){.logo{font-size:17px;gap:8px}.logo .lg-m{height:26px}}
+
 .links{display:flex;gap:24px;font-size:14px;color:var(--mute)}
 .links a:hover{color:var(--ink)}
 .navcta{display:flex;gap:14px;align-items:center}
@@ -1394,7 +1398,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
 
 <nav id="nav">
   <div class="wrap">
-    <a href="#top" class="logo">CAPSULA<span>·</span>ROMÂNIA</a>
+    <a href="#top" class="logo" aria-label="Case Capsulă — începutul paginii"><svg class="lg-m" viewBox="0 0 120 74.6" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="117" height="71.6" rx="35.8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M51 73.1V52.2h17.6v20.9" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M29.7 49.1 59.4 22.8 89.9 49.1" fill="none" stroke="#d1a653" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lg-t">case capsul<b>ă</b></span></a>
     <div class="links" id="links">
       <a href="#interior" class="navhl">Interior</a>
       <a href="#exterior">Exterior</a>
@@ -1811,7 +1815,7 @@ select,input[type=text],input[type=number],input[type=tel],input[type=email],tex
   <div class="wrap">
     <div class="fgrid">
       <div>
-        <div class="logo" style="margin-bottom:14px">CAPSULA<span>·</span>ROMÂNIA</div>
+        <div class="logo" style="margin-bottom:14px"><svg class="lg-m" viewBox="0 0 120 74.6" aria-hidden="true" focusable="false"><rect x="1.5" y="1.5" width="117" height="71.6" rx="35.8" fill="none" stroke="currentColor" stroke-width="3"/><path d="M51 73.1V52.2h17.6v20.9" fill="none" stroke="currentColor" stroke-width="3" stroke-linejoin="round"/><path d="M29.7 49.1 59.4 22.8 89.9 49.1" fill="none" stroke="#d1a653" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="lg-t">case capsul<b>ă</b></span></div>
         <p style="color:var(--mute);max-width:300px;font-size:15px">O casă pentru tine, pentru vacanțe sau pentru oaspeții tăi.</p>
       </div>
       <div><h5>Descoperă</h5><ul><li><a href="#interior">Interiorul capsulei</a></li><li><a href="#exterior">Ocolește capsula</a></li><li><a href="#la-comanda">Capsule la comandă</a></li><li><a href="#model">Modelul X7</a></li><li><a href="#galerie">Galerie foto</a></li><li><a href="#tur">Tur virtual 360°</a></li><li><a href="complet.html#configurator">Preț și configurator</a></li></ul></div>
