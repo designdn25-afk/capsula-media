@@ -21,9 +21,7 @@
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"Product","name":"Casă capsulă X7","brand":{"@type":"Brand","name":"Capsula România"},"description":"Casă capsulă 36,5 m² utili, 39 m² construiți, dormitor separat, baie completă, smart home.","image":"https://casecapsula.ro/images/real/exterior-evening.webp","offers":{"@type":"Offer","price":"39500","priceCurrency":"EUR","url":"https://casecapsula.ro/model-x7"}}</script>
 <script type="application/ld+json">{"@context":"https://schema.org","@type":"LocalBusiness","name":"Capsula România","url":"https://casecapsula.ro/","telephone":"+40731166070","address":{"@type":"PostalAddress","streetAddress":"Calea București nr. 41","postalCode":"077055","addressLocality":"Ciorogârla","addressRegion":"Ilfov","addressCountry":"RO"}}</script>
 <link rel="modulepreload" href="vendor/three.module.min.js">
-<link rel="preload" as="fetch" crossorigin href="img/st/film/f_0000.webp" media="(min-width:900px) and (min-aspect-ratio:3/2)">
-<link rel="preload" as="fetch" crossorigin href="img/st/film/t/f_0000.webp?v=1" media="(hover:none) and (pointer:coarse) and (max-width:800px) and (max-aspect-ratio:69/100)">
-<link rel="preload" as="fetch" crossorigin href="img/st/film/t/p_00.bin?v=1" media="(hover:none) and (pointer:coarse) and (max-width:800px) and (max-aspect-ratio:69/100)">
+<link rel="preload" as="image" href="img/st/formare-poster.jpg">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Unbounded:wght@300;500;700;900&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -1194,7 +1192,7 @@ const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];
 const nav=$('#nav'),heroEl=document.getElementById('top'),intEl=document.getElementById('interior');
 // bara rămâne închisă la culoare peste capsula de noapte și peste intrarea întunecată din interior
 let heroH=heroEl?heroEl.offsetHeight:0,navRaf=0;const numEl=document.getElementById('cifre');
-// peste povestea 3D de la deschidere bara e transparentă: text închis ziua, deschis seara (window.__skyDark, pus de js/story.js)
+// peste filmul de la deschidere bara e transparentă, cu text deschis (window.__skyDark, pus de partea „story”)
 const navU=()=>{const y=scrollY,inStory=!!heroEl&&y<heroH-72;let dark=inStory&&!!window.__skyDark;
  if(!dark&&intEl&&intEl.classList.contains('is-dark')){const r=intEl.getBoundingClientRect();dark=r.top<=72&&r.bottom>72}
  if(!dark&&numEl){const r=numEl.getBoundingClientRect();dark=r.top<=72&&r.bottom>72}

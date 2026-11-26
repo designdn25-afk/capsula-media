@@ -22,7 +22,19 @@ povestea de la deschidere și grădina cu case model. Detaliile tehnice și isto
   cu ea e în `versiuni/inainte-fara-zi-seara/`.
 - **Capsula X7 reală, văzută din față:** vitrajul mare (dormitorul) e în **stânga** ușii, livingul în dreapta. Modelul 3D
   (`site/js/x7.js`) respectă asta; verifică orice desen nou al capsulei după pozele reale.
-- **Deschiderea site-ului (din 14 nov 2026) = povestea 3D legată de derulare**: capsula X7 ca model 3D adevărat, de dimineața
+- **Deschiderea site-ului (din 26 nov 2026) = un film care rulează singur, fără derulare.** Clientul a trimis ca model
+  https://www.ghmaisonbois.com/ (sus rulează singur un film în care casa „se formează”, cu titlul peste el) și a cerut: „vreau să-mi faci
+  și mie așa la casele capsulă, cum se formează casa capsulă X7, să pară real, să nu mai fie cu scroll cum am băgat noi, dar să pară
+  sută la sută real”. Acum `#top` e un singur ecran: filmul `site/img/st/formare-1080.mp4` (telefon: `formare-720.mp4`, imagine de
+  așteptare `formare-poster.jpg`), 18 secunde, în buclă, fără sunet: capsula apare ca schiță albastră de plan, se „umple” în casă
+  reală, acoperișul coboară pe ea, camera se rotește în jurul ei dimineața, apoi vine seara. Peste el: titlul, cele trei butoane și un
+  rând care se schimbă odată cu filmul; buton mic de oprire; mențiunea AI rămâne. Pe ecran îngust filmul e o bandă sus, cu textul
+  dedesubt. La mișcare redusă / economie de date filmul nu pornește singur. Filmul e făcut **fără credite** din cadrele filmării reale
+  de la deschiderea veche (`surse/film-deschidere/face.py`: cadrele mari se scot din `site/img/st/film/v/`, apoi ffmpeg). Partea de
+  pagină: `surse/final/parts/story.html` (nu mai folosește `js/story.js`). **Nu readuce derularea** fără să ceară el. Varianta veche,
+  legată de derulare (cu capitolele și desenul pe straturi „Fiecare strat, gândit”): `surse/final/parts/story-derulare.html` +
+  `versiuni/inainte-film-automat/`; cadrele ei (`site/img/st/film/`) au rămas pe loc, nefolosite de pagină.
+- **(Istoric) Deschiderea dintre 14 și 26 nov 2026 = povestea 3D legată de derulare**: capsula X7 ca model 3D adevărat, de dimineața
   până seara („Seara, capsula devine felinar”), apoi desfăcută pe straturi; după ea, banda cu cifre mari. Clientul a trimis un
   filmuleț de pe Instagram (un site cu o casă 3D care se schimbă la derulare) și a cerut: „vreau și site-ul meu să fie fix așa…
   că nu-mi place cum arată, să fie mult mai interactiv, să fie frumos ochiului”. Varianta dinainte (doar capsula seara,
