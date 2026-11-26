@@ -466,3 +466,10 @@ fluidă, fără întreruperi”. O pagină nu poate cere mai multă memorie plă
 - **25 nov, seara:** clientul i-a dat lui ChatGPT arhiva showroomului și e pus pe site-ul lui: https://agrokart-karl-utilaje.appwithchat.chatgpt.site/showroom/ .
   Apoi a cerut: fără excavator la oprirea a doua (făcut fără credite, `fixhala2.py` → `s2_v2.jpg`) și un buton X de ieșire (făcut).
   La fiecare schimbare a showroomului îi trebuie o arhivă mică de actualizare (fișierele schimbate din `showroom/`) + textul pentru ChatGPT.
+
+## Grădina 3D ca pagină separată, pentru alt site (26 nov 2026)
+- Clientul: „dă-mi grădina 3D fix așa cum ai făcut-o, să o dau la chat să o bage în site”. Grădina are ~440 MB și ~2.900 de fișiere,
+  deci nu se dă ca arhivă: există pagina `site/gradina.html` (doar secțiunea 04, făcută de `tools/fa_gradina.py`, rulat și de
+  `tools/publica_pages.sh`; nu o edita de mână), la https://designdn25-afk.github.io/capsula-media/gradina.html , iar ChatGPT o pune
+  în site ca fereastră încadrată (iframe). Pagina trimite gazdei înălțimea ei (`postMessage`, câmpul `casecapsulaGradina`).
+- Orice schimbare a grădinii apare singură și în site-ul lui (e aceeași pagină). Mențiunile AI și `noindex` rămân și aici.

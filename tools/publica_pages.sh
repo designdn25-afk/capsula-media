@@ -5,6 +5,7 @@
 set -eu
 ROOT=$(pwd)
 python3 tools/asambleaza.py
+python3 tools/fa_gradina.py   # pagina doar cu grădina (site/gradina.html), pentru a fi încadrată în alt site
 TMP=$(mktemp -d)
 cp -r site/. "$TMP/"
 cd "$TMP"
