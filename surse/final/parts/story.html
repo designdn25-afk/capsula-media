@@ -8,7 +8,7 @@
 :root{--serif:'Cormorant Garamond',Georgia,'Times New Roman',serif}
 #top.st{position:relative;padding:0;background:#0b1730;--st-ink:#fff;--st-mute:rgba(255,255,255,.82);--st-gold:#e3b866}
 .hf-pin{position:relative;height:100vh;height:100svh;min-height:540px;max-height:1200px;overflow:hidden;isolation:isolate;background:#0b2545 center/cover no-repeat}
-.hf-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%;display:block}
+.hf-v{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:60% 50%;display:block;transform:translateZ(0);will-change:transform}
 .hf-veil{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,rgba(6,10,22,.78) 0%,rgba(6,10,22,.52) 32%,rgba(6,10,22,0) 62%),linear-gradient(180deg,rgba(6,10,22,.5) 0,rgba(6,10,22,0) 150px),linear-gradient(0deg,rgba(6,10,22,.55),rgba(6,10,22,0) 26%)}
 .st-ai{position:absolute;z-index:3;right:max(16px,calc((100% - 1240px)/2));bottom:22px;margin:0;color:#fff;font:500 10px/1 var(--body);letter-spacing:.02em;white-space:nowrap;pointer-events:none;opacity:.72;text-shadow:0 1px 3px rgba(0,0,0,.6)}
 .st-copy{position:absolute;top:0;bottom:0;left:50%;width:min(1240px,100% - 32px);transform:translateX(-50%);z-index:3;display:flex;flex-direction:column;justify-content:center;pointer-events:none}
@@ -31,7 +31,7 @@
 .hf-cap span.out{opacity:0}
 .hf-cap b{font-weight:700}
 /* oprește / pornește filmul */
-.hf-pp{position:absolute;z-index:4;right:max(16px,calc((100% - 1240px)/2));bottom:44px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(8,12,24,.38);color:#fff;display:grid;place-items:center;cursor:pointer;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.hf-pp{position:absolute;z-index:4;right:max(16px,calc((100% - 1240px)/2));bottom:44px;width:44px;height:44px;border-radius:50%;border:1px solid rgba(255,255,255,.5);background:rgba(8,12,24,.5);color:#fff;display:grid;place-items:center;cursor:pointer}
 .hf-pp:hover{background:rgba(8,12,24,.6)}
 .hf-pp svg{width:16px;height:16px;fill:currentColor}
 .hf-pp .pl{display:none}.hf-pp.oprit .pl{display:block}.hf-pp.oprit .pa{display:none}
@@ -81,7 +81,7 @@
 (function(){const v=document.getElementById('hfV'),pp=document.getElementById('hfPP'),cap=document.getElementById('hfCap'),bar=document.getElementById('hfBar');if(!v)return;
 window.__skyDark=true;   // bara de sus rămâne cu text deschis peste film
 const red=matchMedia('(prefers-reduced-motion:reduce)').matches,con=navigator.connection,save=!!(con&&con.saveData);
-const mic=Math.min(innerWidth,innerHeight)<700||innerWidth<900;
+const mic=Math.min(innerWidth,innerHeight)<700||innerWidth<900||!!(con&&con.downlink&&con.downlink<8);   // ecran mic sau internet mai încet: filmul mic (pornește mai repede)
 /* ce se vede în film, pe secunde (filmul are 30 de cadre pe secundă: surse/film-deschidere/face.py) */
 const CAP=[[0,'<b>Din plan, în casă adevărată.</b> Capsula X7 vine gata făcută din fabrică.'],[2.9,'<b>36,5 m² utili.</b> Living, bucătărie, baie completă și dormitor separat.'],[6.2,'<b>Geam triplu LOW-E</b>, din podea până în tavan, cu forme rotunjite.'],[10.2,'<b>Capsula X7</b> · 36,5 m² utili · <b>39.500 €</b> cu TVA · rate prin TBI Bank'],[13.6,'<b>Seara, capsula devine felinar.</b> Lumina se aprinde la un cuvânt.']];
 let ci=-1,oprit=false,vazut=true;
@@ -91,10 +91,17 @@ v.addEventListener('play',()=>requestAnimationFrame(tick));
 const arata=()=>{pp.classList.toggle('oprit',v.paused);pp.setAttribute('aria-label',v.paused?'Pornește filmul':'Oprește filmul');pp.setAttribute('aria-pressed',String(v.paused))};
 v.addEventListener('pause',arata);v.addEventListener('play',arata);
 const porneste=()=>{if(oprit||!vazut)return;const p=v.play();if(p&&p.catch)p.catch(()=>{arata()})};
-pp.addEventListener('click',()=>{if(v.paused){oprit=false;if(!v.src)incarca();porneste()}else{oprit=true;v.pause()}});
-function incarca(){v.src=mic?'img/st/formare-720.mp4':'img/st/formare-1080.mp4';v.load()}
+pp.addEventListener('click',()=>{if(v.paused){oprit=false;if(!v.src){incarca();v.addEventListener('canplaythrough',porneste,{once:true})}else porneste()}else{oprit=true;v.pause()}});
+/* filmul se aduce ÎNTREG în memorie înainte să pornească (clientul, 26 nov: „alocă mai multă memorie să meargă mai fluid și să nu se
+   blocheze”): așa nu se mai poate opri la mijloc să aștepte după internet. Cât se aduce, se vede imaginea de așteptare și linia de jos. */
+let cerut=false;
+function incarca(){if(cerut)return;cerut=true;const u=mic?'img/st/formare2-720.mp4':'img/st/formare2-1080.mp4',direct=()=>{v.src=u;v.load()};
+ if(!window.fetch||!window.URL||!URL.createObjectURL)return direct();
+ fetch(u).then(r=>{if(!r.ok)throw 0;if(!r.body||!r.body.getReader)return r.blob();const n=+r.headers.get('content-length')||0,rd=r.body.getReader(),ch=[];let got=0;
+   const pump=()=>rd.read().then(x=>{if(x.done)return new Blob(ch,{type:'video/mp4'});ch.push(x.value);got+=x.value.length;if(n)bar.style.width=(got/n*100).toFixed(1)+'%';return pump()});return pump()})
+  .then(b=>{bar.style.width='0';v.src=URL.createObjectURL(b);v.load()}).catch(direct)}
 if(red||save){oprit=true;arata();cap.innerHTML=CAP[3][1];return}   // mișcare redusă / economie de date: rămâne imaginea, filmul pornește doar la apăsare
-incarca();v.addEventListener('canplay',porneste,{once:true});
+incarca();v.addEventListener('canplaythrough',porneste,{once:true});
 if('IntersectionObserver' in window)new IntersectionObserver(e=>{vazut=e[0].isIntersecting;if(vazut)porneste();else if(!v.paused)v.pause()},{threshold:.12}).observe(v);
 document.addEventListener('visibilitychange',()=>{if(document.hidden){if(!v.paused)v.pause()}else porneste()});
 })();</script><!--/JS-->
